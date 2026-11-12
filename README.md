@@ -9,13 +9,16 @@
 ## 功能特性
 
 - 双游戏合并看板：体力进度条 + 回满倒计时、等级/活跃天数/成就统计、资源、角色图鉴
+- 体力历史曲线：最近 30 条快照自动画成趋势图，一眼看出体力波动
 - 三种数据来源，任选其一或混用：
   1. 截图上传 + PaddleOCR 识别（先识别、人工核对、再入库，从流程上消化识别误差）
   2. 手动录入
   3. 星穹铁道米游社 Cookie 自动同步（可选，非官方接口）
+- 页面内"米游社一键同步"按钮：配好 Cookie 后点一下即可刷新星铁数据
 - 鸣潮本地导出桥接：本地辅助工具产出 JSON，`tools/wuwa_export.py` 一键上传
 - 公开分享页：`https://你的域名/?share=xxx` 只读展示，无需登录
 - SQLite 零配置存储，每次更新留存历史快照
+- Docker 一键部署（OCR 作为可选构建参数）
 
 ## 架构
 
@@ -47,6 +50,18 @@ python run.py
 浏览器打开 <http://127.0.0.1:8000>，点右上角"更新数据"即可手动录入；
 截图上传需要先安装 OCR（见下节）。
 
+### Docker 部署
+
+```powershell
+Copy-Item .env.example .env   # 填好 API_KEY 与 HKRPG_COOKIE
+docker compose up -d --build
+```
+
+- 数据持久化在 `starwaves-data` 卷中，重启不丢
+- 需要截图 OCR 时：`docker compose build --build-arg WITH_OCR=true`
+  （镜像体积会明显变大，请自行评估）
+- `.env` 中的变量会自动注入容器
+
 ## OCR 安装（可选）
 
 ```powershell
@@ -70,6 +85,9 @@ pip install -r requirements-ocr.txt
 2. F12 打开开发者工具，抓任意 `api-takumi-record.mihoyo.com` 请求
 3. 复制请求头里的完整 Cookie 串，写入 `.env` 的 `HKRPG_COOKIE`
 4. 重启服务后 `POST /api/sync/hsr`（页面后续可加一键按钮）
+
+> 看板页面的星铁卡片右上角已内置"🔄 米游社同步"按钮，配好 Cookie 后
+> 直接点按钮即可，无需手动调接口。
 
 注意事项：
 
@@ -157,10 +175,8 @@ tests/               # pytest 测试
 
 ## Roadmap
 
-- 体力 / 资源历史曲线与趋势图
 - 鸣潮 PC 端本地缓存读取适配器（需要逆向本地数据格式，另开仓库更合适）
-- 页面内"米游社一键同步"按钮与定时刷新
-- Docker 部署与公网托管
+- 定时自动刷新（星铁侧，可配合系统计划任务调用 /api/sync/hsr）
 - 多玩家注册登录、分享页自定义主题
 
 ## 免责声明

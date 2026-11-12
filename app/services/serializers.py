@@ -52,6 +52,16 @@ def _stamina_payload(profile: Profile) -> dict:
 
 def game_payload(profile: Profile) -> dict:
     snapshot = profile.snapshots[0] if profile.snapshots else None
+    history = [
+        {
+            "at": _iso(s.captured_at),
+            "current": s.stamina_current,
+            "max": s.stamina_max or GAME_RULES[profile.game]["cap"],
+            "source": s.source,
+        }
+        for s in profile.snapshots[:30]
+    ]
+    history.reverse()  # 最近 30 条，按时间升序便于前端画曲线
     return {
         "label": GAME_RULES[profile.game]["label"],
         "profile": {
@@ -76,6 +86,7 @@ def game_payload(profile: Profile) -> dict:
         "last_update": (
             {"at": _iso(snapshot.captured_at), "source": snapshot.source} if snapshot else None
         ),
+        "history": history,
         "snapshot_count": len(profile.snapshots),
     }
 

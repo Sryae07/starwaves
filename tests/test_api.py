@@ -35,6 +35,9 @@ def test_manual_update_and_share(client):
     assert hsr["stamina"]["minutes_to_full"] == 840
     assert hsr["stamina"]["full"] is False
     assert hsr["snapshot_count"] == 1
+    assert len(hsr["history"]) == 1
+    assert hsr["history"][0]["current"] == 100
+    assert hsr["history"][0]["source"] == "manual"
     assert "wuwa" not in body["games"]
 
 
@@ -47,6 +50,17 @@ def test_full_stamina(client):
     wuwa = me["games"]["wuwa"]
     assert wuwa["stamina"]["full"] is True
     assert wuwa["stamina"]["full_at"] is None
+
+
+def test_history_accumulates(client):
+    client.post("/api/profiles/wuwa", json={"stamina_current": 100, "stamina_max": 240})
+    client.post("/api/profiles/wuwa", json={"stamina_current": 140, "stamina_max": 240})
+    me = client.get("/api/me").json()
+    history = me["games"]["wuwa"]["history"]
+    assert len(history) == 2
+    assert history[0]["current"] == 100
+    assert history[1]["current"] == 140
+    assert history[0]["at"] <= history[1]["at"]
 
 
 def test_share_404(client):

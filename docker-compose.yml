@@ -1,0 +1,18 @@
+services:
+  starwaves:
+    build:
+      context: .
+      # 需要截图 OCR 时构建：docker compose build --build-arg WITH_OCR=true
+    ports:
+      - "8000:8000"
+    volumes:
+      - starwaves-data:/app/data
+    environment:
+      API_KEY: ${API_KEY:-}
+      HKRPG_COOKIE: ${HKRPG_COOKIE:-}
+      HKRPG_SERVER: ${HKRPG_SERVER:-cn}
+      HKRPG_UID: ${HKRPG_UID:-}
+    restart: unless-stopped
+
+volumes:
+  starwaves-data:

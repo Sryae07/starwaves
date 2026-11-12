@@ -14,11 +14,13 @@ const GAME_THEME = {
     label: '星穹铁道', emoji: '🚂', ring: 'border-amber-300/25', glow: 'shadow-amber-500/10',
     bar: 'from-amber-300 to-violet-500',
     chip: 'border-amber-300/25 bg-amber-400/10 text-amber-200',
+    c1: '#fcd34d', c2: '#8b5cf6',
   },
   wuwa: {
     label: '鸣潮', emoji: '🌊', ring: 'border-cyan-300/25', glow: 'shadow-cyan-500/10',
     bar: 'from-cyan-300 to-blue-500',
     chip: 'border-cyan-300/25 bg-cyan-400/10 text-cyan-200',
+    c1: '#67e8f9', c2: '#3b82f6',
   },
 };
 
@@ -116,16 +118,52 @@ function elementBadge(name) {
   return `<span class="text-[11px] px-1.5 py-0.5 rounded border" style="color:${color};border-color:${color}55;background:${color}15">${esc(name)}</span>`;
 }
 
+function renderChart(key, history, theme) {
+  if (!history || history.length < 2) return '';
+  const W = 300;
+  const H = 60;
+  const P = 4;
+  const maxV = Math.max(...history.map((h) => h.max), 1);
+  const pts = history.map((h, i) => {
+    const x = P + (i / (history.length - 1)) * (W - 2 * P);
+    const y = H - P - (h.current / maxV) * (H - 2 * P);
+    return [x, y];
+  });
+  const line = pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const area = `${P},${H - P} ${line} ${W - P},${H - P}`;
+  const last = history[history.length - 1];
+  return `
+    <div class="mt-3">
+      <div class="flex items-center justify-between mb-1">
+        <p class="text-xs text-slate-500">体力历史 <span class="text-slate-600">(最近 ${history.length} 条)</span></p>
+        <p class="text-[11px] text-slate-600">${fmtTime(last.at)}</p>
+      </div>
+      <svg viewBox="0 0 ${W} ${H}" class="w-full h-16" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="grad-${key}" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="${theme.c1}"></stop>
+            <stop offset="1" stop-color="${theme.c2}"></stop>
+          </linearGradient>
+        </defs>
+        <polygon points="${area}" fill="url(#grad-${key})" opacity="0.14"></polygon>
+        <polyline points="${line}" fill="none" stroke="url(#grad-${key})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      </svg>
+    </div>`;
+}
+
 function renderGame(key, game) {
   const root = $(`#game-${key}`);
   const theme = GAME_THEME[key];
   if (!game) {
+    const syncButton = key === 'hsr' && !isShare
+      ? `<button class="sync-btn mt-2 rounded-lg border border-amber-300/30 bg-amber-400/10 px-4 py-1.5 text-sm text-amber-200 hover:bg-amber-400/20 transition" data-game="${key}">🔄 米游社一键同步</button>`
+      : '';
     root.innerHTML = `
       <div class="rounded-2xl border ${theme.ring} bg-white/[0.04] backdrop-blur p-6 shadow-xl ${theme.glow} flex flex-col items-center justify-center text-center min-h-[280px]">
         <p class="text-3xl">${theme.emoji}</p>
         <p class="mt-3 font-bold">${theme.label}</p>
         <p class="text-xs text-slate-500 mt-1">还没有数据</p>
-        ${isShare ? '' : `<button class="update-btn mt-4 rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>`}
+        ${isShare ? '' : `<button class="update-btn mt-4 rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}`}
       </div>`;
     return;
   }
@@ -147,6 +185,10 @@ function renderGame(key, game) {
   const resourceHtml = resources.length
     ? resources.map(([k, v]) => `<span class="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-xs">${esc(RESOURCE_LABELS[k] || k)} <b class="text-slate-100">${Number(v).toLocaleString()}</b></span>`).join('')
     : '<span class="text-xs text-slate-500">暂无资源数据</span>';
+  const syncButton = key === 'hsr' && !isShare
+    ? `<button class="sync-btn rounded-lg border border-amber-300/30 bg-amber-400/10 px-2.5 py-1 text-[11px] text-amber-200 hover:bg-amber-400/20 transition" data-game="${key}">🔄 米游社同步</button>`
+    : '';
+  const chartHtml = renderChart(key, game.history, theme);
 
   root.innerHTML = `
     <div class="rounded-2xl border ${theme.ring} bg-white/[0.04] backdrop-blur p-5 shadow-xl ${theme.glow}">
@@ -158,7 +200,10 @@ function renderGame(key, game) {
             <p class="text-xs text-slate-500">UID ${esc(p.uid) || '未绑定'}</p>
           </div>
         </div>
-        ${game.last_update ? `<span class="rounded-full border ${theme.chip} px-2 py-0.5 text-[11px]">${sourceLabel}</span>` : ''}
+        <div class="flex items-center gap-1.5">
+          ${syncButton}
+          ${game.last_update ? `<span class="rounded-full border ${theme.chip} px-2 py-0.5 text-[11px]">${sourceLabel}</span>` : ''}
+        </div>
       </div>
 
       <div class="mt-4 rounded-xl border border-white/10 bg-black/25 p-4">
@@ -184,6 +229,8 @@ function renderGame(key, game) {
         <p class="text-xs text-slate-500 mb-2">角色图鉴 <span class="text-slate-600">(${(game.characters || []).length} 名)</span></p>
         <div class="flex gap-2 overflow-x-auto pb-1">${charHtml}</div>
       </div>
+
+      ${chartHtml}
 
       ${game.last_update ? `<p class="mt-3 text-[11px] text-slate-600">最近更新：${fmtTime(game.last_update.at)} · 共 ${game.snapshot_count} 条记录</p>` : ''}
     </div>`;
@@ -406,7 +453,23 @@ $('#editor').addEventListener('submit', async (e) => {
 document.body.addEventListener('click', (e) => {
   const btn = e.target.closest('.update-btn');
   if (btn) openModal(btn.dataset.game);
+  const syncBtn = e.target.closest('.sync-btn');
+  if (syncBtn) syncHsr(syncBtn);
 });
+
+async function syncHsr(btn) {
+  btn.disabled = true;
+  btn.textContent = '同步中…';
+  try {
+    await api('/api/sync/hsr', { method: 'POST' });
+    toast('星穹铁道数据已同步');
+    await load();
+  } catch (err) {
+    toast(err.message, false);
+    btn.disabled = false;
+    btn.textContent = '🔄 米游社同步';
+  }
+}
 
 /* ---------- 启动 ---------- */
 async function load() {
