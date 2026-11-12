@@ -17,12 +17,13 @@ from sqlalchemy.orm import Session
 from ..config import UPLOAD_DIR
 from ..database import get_db
 from ..games import merged_games
+from ..models import User
 from ..schemas import ProfileUpdate
 from ..services.ocr import OcrUnavailable, ocr_image
 from ..services.parser import parse_ocr_text
 from ..services.profiles import apply_profile_update
 from ..services.serializers import share_payload
-from .deps import require_api_key
+from .deps import get_current_user, require_api_key
 
 router = APIRouter(prefix="/api", tags=["upload"])
 ALLOWED_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
@@ -46,6 +47,7 @@ async def upload_screenshot(
     game: str,
     file: UploadFile = File(...),
     apply: bool = Form(False),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> dict:
     registry = merged_games(db)
@@ -75,6 +77,8 @@ async def upload_screenshot(
                 status_code=422,
                 detail="OCR 未识别出关键数值（等级/体力），请换截图重试或改用手动录入",
             )
-        player = apply_profile_update(db, game, _to_profile_update(game, parsed, "ocr", registry))
+        player = apply_profile_update(
+            db, game, _to_profile_update(game, parsed, "ocr", registry), user
+        )
         saved = share_payload(db, player)
     return {"saved": apply, "ocr_text": ocr_text, "parsed": parsed, "profile": saved}

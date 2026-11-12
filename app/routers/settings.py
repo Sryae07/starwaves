@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 from ..config import DATA_DIR
-from .deps import require_api_key
+from .deps import get_current_user, require_api_key
 
 router = APIRouter(prefix="/api", tags=["settings"])
 
@@ -34,7 +34,7 @@ def get_background() -> FileResponse:
     return FileResponse(path, media_type=media)
 
 
-@router.post("/background", dependencies=[Depends(require_api_key)])
+@router.post("/background", dependencies=[Depends(require_api_key), Depends(get_current_user)])
 async def upload_background(file: UploadFile = File(...)) -> dict:
     ext = Path(file.filename or "bg.jpg").suffix.lower()
     if ext not in ALLOWED_EXTS:
@@ -49,7 +49,7 @@ async def upload_background(file: UploadFile = File(...)) -> dict:
     return {"background": True, "url": "/api/background"}
 
 
-@router.delete("/background", dependencies=[Depends(require_api_key)])
+@router.delete("/background", dependencies=[Depends(require_api_key), Depends(get_current_user)])
 def reset_background() -> dict:
     for old in DATA_DIR.glob(f"{BG_STEM}.*"):
         old.unlink(missing_ok=True)

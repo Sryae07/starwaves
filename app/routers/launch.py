@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..games import GameSpec, merged_games
-from .deps import require_api_key
+from .deps import get_current_user, require_api_key
 
 router = APIRouter(prefix="/api", tags=["launch"])
 
@@ -45,7 +45,7 @@ def _resolve_path(game: str, spec: GameSpec | None = None) -> Path | None:
     return None
 
 
-@router.post("/launch/{game}", dependencies=[Depends(require_api_key)])
+@router.post("/launch/{game}", dependencies=[Depends(require_api_key), Depends(get_current_user)])
 def launch_game(game: str, db: Session = Depends(get_db)) -> dict:
     registry = merged_games(db)
     spec = registry.get(game)

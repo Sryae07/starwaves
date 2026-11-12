@@ -16,8 +16,8 @@ GAME_PAYLOAD = {
 }
 
 
-def test_create_custom_game(client):
-    resp = client.post("/api/games", json=GAME_PAYLOAD)
+def test_create_custom_game(client, auth_headers):
+    resp = client.post("/api/games", json=GAME_PAYLOAD, headers=auth_headers)
     assert resp.status_code == 200
     games = {g["key"]: g for g in client.get("/api/games").json()["games"]}
     assert "pgr" in games
@@ -32,22 +32,23 @@ def test_create_custom_game(client):
     assert spec["colors"] == {"a": "#f472b6", "b": "#7c3aed"}
 
 
-def test_custom_game_duplicate_and_builtin_conflict(client):
-    client.post("/api/games", json=GAME_PAYLOAD)
-    assert client.post("/api/games", json=GAME_PAYLOAD).status_code == 409
-    assert client.post("/api/games", json={**GAME_PAYLOAD, "key": "hsr"}).status_code == 400
-    assert client.post("/api/games", json={**GAME_PAYLOAD, "key": "Bad-Key!"}).status_code == 422
-    assert client.post("/api/games", json={**GAME_PAYLOAD, "color_a": "red"}).status_code == 422
+def test_custom_game_duplicate_and_builtin_conflict(client, auth_headers):
+    client.post("/api/games", json=GAME_PAYLOAD, headers=auth_headers)
+    assert client.post("/api/games", json=GAME_PAYLOAD, headers=auth_headers).status_code == 409
+    assert client.post("/api/games", json={**GAME_PAYLOAD, "key": "hsr"}, headers=auth_headers).status_code == 400
+    assert client.post("/api/games", json={**GAME_PAYLOAD, "key": "Bad-Key!"}, headers=auth_headers).status_code == 422
+    assert client.post("/api/games", json={**GAME_PAYLOAD, "color_a": "red"}, headers=auth_headers).status_code == 422
 
 
-def test_custom_game_profile_flow(client):
-    client.post("/api/games", json=GAME_PAYLOAD)
+def test_custom_game_profile_flow(client, auth_headers):
+    client.post("/api/games", json=GAME_PAYLOAD, headers=auth_headers)
     resp = client.post(
         "/api/profiles/pgr",
         json={"level": 88, "active_days": 1200, "stamina_current": 40, "stamina_max": 160},
+        headers=auth_headers,
     )
     assert resp.status_code == 200
-    body = client.get("/api/me").json()
+    body = client.get("/api/me", headers=auth_headers).json()
     pgr = body["games"]["pgr"]
     assert pgr["label"] == "战双帕弥什"
     assert pgr["stamina"]["name"] == "血清"
@@ -55,8 +56,8 @@ def test_custom_game_profile_flow(client):
     assert pgr["stamina"]["minutes_to_full"] == (160 - 40) * 6
 
 
-def test_custom_game_ocr_parse(client):
-    client.post("/api/games", json=GAME_PAYLOAD)
+def test_custom_game_ocr_parse(client, auth_headers):
+    client.post("/api/games", json=GAME_PAYLOAD, headers=auth_headers)
     from app.games import merged_games
     from app.database import SessionLocal
 
@@ -72,24 +73,28 @@ def test_custom_game_ocr_parse(client):
     assert parsed["characters"] == 60
 
 
-def test_delete_custom_game(client):
-    client.post("/api/games", json=GAME_PAYLOAD)
-    assert client.delete("/api/games/pgr").status_code == 200
+def test_delete_custom_game(client, auth_headers):
+    client.post("/api/games", json=GAME_PAYLOAD, headers=auth_headers)
+    assert client.delete("/api/games/pgr", headers=auth_headers).status_code == 200
     assert "pgr" not in {g["key"] for g in client.get("/api/games").json()["games"]}
     # 内置游戏不可删
-    assert client.delete("/api/games/hsr").status_code == 400
+    assert client.delete("/api/games/hsr", headers=auth_headers).status_code == 400
 
 
-def test_delete_blocked_when_has_data(client):
-    client.post("/api/games", json=GAME_PAYLOAD)
-    client.post("/api/profiles/pgr", json={"level": 10, "stamina_current": 50, "stamina_max": 160})
-    resp = client.delete("/api/games/pgr")
+def test_delete_blocked_when_has_data(client, auth_headers):
+    client.post("/api/games", json=GAME_PAYLOAD, headers=auth_headers)
+    client.post(
+        "/api/profiles/pgr",
+        json={"level": 10, "stamina_current": 50, "stamina_max": 160},
+        headers=auth_headers,
+    )
+    resp = client.delete("/api/games/pgr", headers=auth_headers)
     assert resp.status_code == 409
     assert "已有游戏数据" in resp.json()["detail"]
 
 
-def test_news_skips_games_without_source(client):
-    client.post("/api/games", json=GAME_PAYLOAD)
+def test_news_skips_games_without_source(client, auth_headers):
+    client.post("/api/games", json=GAME_PAYLOAD, headers=auth_headers)
     resp = client.get("/api/news")
     assert resp.status_code == 200
     keys = set(resp.json()["sources"].keys())

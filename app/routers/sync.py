@@ -4,17 +4,18 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
+from ..models import User
 from ..schemas import CharacterIn, ProfileUpdate
 from ..services.hoyolab import SyncError, fetch_hsr_record
 from ..services.profiles import apply_profile_update
 from ..services.serializers import share_payload
-from .deps import require_api_key
+from .deps import get_current_user, require_api_key
 
 router = APIRouter(prefix="/api", tags=["sync"])
 
 
 @router.post("/sync/hsr", dependencies=[Depends(require_api_key)])
-def sync_hsr(db: Session = Depends(get_db)) -> dict:
+def sync_hsr(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> dict:
     try:
         record = fetch_hsr_record()
     except SyncError as exc:
@@ -33,5 +34,6 @@ def sync_hsr(db: Session = Depends(get_db)) -> dict:
             characters=[CharacterIn(**c) for c in record["characters"]],
             source="sync",
         ),
+        user,
     )
     return share_payload(db, player)

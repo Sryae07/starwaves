@@ -2,11 +2,38 @@
 
 from __future__ import annotations
 
+import re
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
 
 COLOR_RE = r"^#[0-9a-fA-F]{6}$"
+PHONE_RE = r"^1[3-9]\d{9}$"
+USERNAME_RE = r"^[\u4e00-\u9fa5A-Za-z0-9_-]+$"
+
+
+class SendCodeIn(BaseModel):
+    phone: str = Field(pattern=PHONE_RE)
+
+
+class RegisterIn(BaseModel):
+    phone: str = Field(pattern=PHONE_RE)
+    code: str = Field(min_length=6, max_length=6)
+    username: str = Field(default="", max_length=24)
+    password: str = Field(min_length=6, max_length=72)
+
+    @field_validator("username")
+    @classmethod
+    def _check_username(cls, value: str) -> str:
+        value = value.strip()
+        if value and (len(value) < 2 or not re.fullmatch(USERNAME_RE, value)):
+            raise ValueError("用户名需 2-24 位，仅支持中文/字母/数字/下划线/短横线（留空自动生成）")
+        return value
+
+
+class LoginIn(BaseModel):
+    account: str = Field(min_length=1, max_length=64)
+    password: str = Field(min_length=1, max_length=72)
 
 
 class CharacterIn(BaseModel):
@@ -47,8 +74,6 @@ class GameCreate(BaseModel):
     @field_validator("color_a", "color_b")
     @classmethod
     def _check_color(cls, value: str) -> str:
-        import re
-
         if not re.fullmatch(COLOR_RE, value):
             raise ValueError("颜色必须是 #RRGGBB 格式")
         return value

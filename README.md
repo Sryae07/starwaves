@@ -13,6 +13,8 @@
 ## 功能特性
 
 - 多游戏合并看板：体力进度条 + 回满倒计时、等级/活跃天数/成就统计、资源、角色图鉴
+- 👤 账号系统：手机验证码注册、用户名（或手机号）+ 密码登录；用户名即档案名，
+  不填自动生成「用户＋随机不重复编号」，多账号数据互相隔离、各自一条分享链接
 - 📡 资讯中心（`/news`）：聚合各游戏官方公告 / 新闻 / 活动（星铁·绝区零走米游社论坛、鸣潮走库洛官网 JSON），
   后端 5 分钟 TTL 缓存 + 页面自动轮询，数据源故障自动降级，支持关键词搜索过滤
 - 注册表驱动的游戏接入：新增游戏只需在 `app/games.py` 登记一条 `GameSpec`
@@ -72,6 +74,11 @@ python run.py
 浏览器打开 <http://127.0.0.1:8000>（官网首页），看板在
 <http://127.0.0.1:8000/dashboard>。Windows 下也可以直接双击 `start.bat`，
 自动准备环境、启动服务并打开浏览器。
+
+首次打开看板点「👤 登录 / 注册」：手机注册流程在开发模式下会把 6 位验证码
+直接显示在弹窗里（未接入真实短信服务），填上即可注册登录。
+若你的旧数据（无账号时代录的档案）存在，服务启动时会自动创建一个初始账号
+接管它，随机初始密码写入 `data/initial_password.txt` 并打印到控制台。
 
 ### Docker 部署
 
@@ -160,8 +167,10 @@ pip install -r requirements-ocr.txt
 
 ```powershell
 python tools/wuwa_export.py --file wuwa_data.json
+# 登录令牌（/api/auth/login 返回的 token）：
+python tools/wuwa_export.py --file wuwa_data.json --token 你的token
 # 服务端开了 API Key 时：
-python tools/wuwa_export.py --file wuwa_data.json --api-key 你的Key
+python tools/wuwa_export.py --file wuwa_data.json --token 你的token --api-key 你的Key
 # 查看格式示例：
 python tools/wuwa_export.py --example
 ```
@@ -170,23 +179,36 @@ python tools/wuwa_export.py --example
 
 | 方法 | 路径 | 说明 | 鉴权 |
 | --- | --- | --- | --- |
-| POST | `/api/profiles/{game}` | 手动 / OCR 校对后写入（game: hsr/wuwa） | X-API-Key |
-| POST | `/api/upload/{game}` | 截图上传 OCR，`apply=true` 直接入库 | X-API-Key |
-| POST | `/api/sync/hsr` | 米游社同步星铁数据 | X-API-Key |
-| POST | `/api/launch/{game}` | 启动本机游戏进程（仅 Windows） | X-API-Key |
-| POST | `/api/background` | 上传自定义背景图 | X-API-Key |
-| DELETE | `/api/background` | 恢复默认背景 | X-API-Key |
+| POST | `/api/auth/send-code` | 发送手机验证码（开发模式响应含 `dev_code`） | 无 |
+| POST | `/api/auth/register` | 手机验证码注册（用户名留空自动生成） | 无 |
+| POST | `/api/auth/login` | 用户名 / 手机号 + 密码登录，返回 Bearer token | 无 |
+| POST | `/api/auth/logout` | 退出登录，令牌作废 | Bearer |
+| POST | `/api/profiles/{game}` | 手动 / OCR 校对后写入（game: hsr/wuwa） | Bearer + X-API-Key |
+| POST | `/api/upload/{game}` | 截图上传 OCR，`apply=true` 直接入库 | Bearer + X-API-Key |
+| POST | `/api/sync/hsr` | 米游社同步星铁数据 | Bearer + X-API-Key |
+| POST | `/api/launch/{game}` | 启动本机游戏进程（仅 Windows） | Bearer + X-API-Key |
+| POST | `/api/background` | 上传自定义背景图 | Bearer + X-API-Key |
+| DELETE | `/api/background` | 恢复默认背景 | Bearer + X-API-Key |
 | GET | `/api/background` | 获取当前背景图 | 无 |
-| GET | `/api/me` | 我的档案（含分享 id） | X-API-Key |
+| GET | `/api/me` | 我的档案（含用户名与分享 id） | Bearer + X-API-Key |
 | GET | `/api/share/{share_id}` | 公开只读档案 | 无 |
 | GET | `/api/games` | 游戏注册表元数据（前端动态渲染用） | 无 |
 | GET | `/api/news?game=hsr&limit=12` | 官方资讯聚合（默认全部游戏） | 无 |
-| POST | `/api/games` | 接入自定义游戏（表单见看板「➕ 接入游戏」） | X-API-Key |
-| DELETE | `/api/games/{key}` | 移除自定义游戏（已有数据时拒绝） | X-API-Key |
+| POST | `/api/games` | 接入自定义游戏（表单见看板「➕ 接入游戏」） | Bearer + X-API-Key |
+| DELETE | `/api/games/{key}` | 移除自定义游戏（已有数据时拒绝） | Bearer + X-API-Key |
 | GET | `/api/health` | 健康检查 | 无 |
 
-写接口鉴权规则：`.env` 未配置 `API_KEY` 时放行（仅限本机调试），
-配置后所有写接口要求 `X-API-Key` 请求头。
+写接口鉴权规则：先要求登录（`Authorization: Bearer <token>`，注册/登录接口签发）；
+`.env` 未配置 `API_KEY` 时不再要求密钥（仅限本机调试），
+配置后写接口额外要求 `X-API-Key` 请求头（公网部署双保险）。
+
+### 手机短信说明
+
+默认是「开发模式」：没有接入短信服务商，`POST /api/auth/send-code` 会在响应里
+直接返回 `dev_code`（同时打印到服务端日志），前端弹窗也会显示验证码。
+接入真实短信时改 `app/routers/auth.py`：把 `dev_code` 从响应里移除，改为调用
+阿里云 / 腾讯云短信 SDK 发送即可，其余流程（60s 冷却、5 分钟过期、
+5 次错误锁定）无需改动。
 
 ## 配置项（.env）
 
@@ -234,9 +256,10 @@ app/
   main.py            # FastAPI 入口（含页面路由）
   config.py          # 环境变量配置
   games.py           # 游戏注册表（新增游戏在这里登记）
-  models.py          # SQLAlchemy 模型（Player/Profile/Snapshot/Character）
+  models.py          # SQLAlchemy 模型（User/AuthToken/PhoneCode/Player/Profile/Snapshot/Character）
   schemas.py         # 请求体模型
-  routers/           # public / profiles / uploads / sync / launch / settings / news
+  security.py        # 密码散列 / 令牌 / 验证码 / 默认用户名
+  routers/           # auth / public / profiles / uploads / sync / launch / settings / news / games
   services/          # parser(OCR解析) / ocr / profiles / serializers / hoyolab / news(资讯聚合)
   static/            # home.html(官网) / index.html + app.js(看板) / news.html(资讯中心)
 tools/wuwa_export.py # 鸣潮 JSON 上传桥接
@@ -261,7 +284,7 @@ start.bat            # Windows 一键启动脚本
 - 鸣潮 PC 端本地缓存读取适配器（需要逆向本地数据格式，另开仓库更合适）
 - 定时自动刷新（星铁侧，可配合系统计划任务调用 /api/sync/hsr）
 - 鸣潮 B 站官方动态源（B 站 API 对本机 IP 有风控，暂以库洛官网资讯替代）
-- 多玩家注册登录、分享页自定义主题
+- 分享页自定义主题
 
 ## 免责声明
 

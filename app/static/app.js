@@ -3,7 +3,10 @@
    新增游戏无需改动本文件。 */
 
 const KEY_NAME = 'starwaves_api_key';
+const TOKEN_KEY = 'starwaves_token';
+const USER_KEY = 'starwaves_user';
 let apiKey = localStorage.getItem(KEY_NAME) || '';
+let authToken = localStorage.getItem(TOKEN_KEY) || '';
 
 const params = new URLSearchParams(location.search);
 const pathShare = location.pathname.match(/^\/share\/([A-Za-z0-9_-]+)/);
@@ -60,13 +63,21 @@ const RESOURCE_LABELS = {
 async function api(path, options = {}) {
   const headers = Object.assign({}, options.headers || {});
   if (apiKey) headers['X-API-Key'] = apiKey;
+  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
   const resp = await fetch(path, Object.assign({}, options, { headers }));
   if (resp.status === 401 && !options.retried) {
+    let detail = '';
+    try { detail = (await resp.json()).detail || ''; } catch (e) { /* ignore */ }
+    if (detail && detail.includes('API Key')) {
     const key = prompt('该服务开启了 API Key 保护，请输入 API Key：');
     if (key) {
       apiKey = key.trim();
       localStorage.setItem(KEY_NAME, apiKey);
       return api(path, Object.assign({}, options, { retried: true }));
+    }
+    } else if (!isShare && !options.silent) {
+      setLoggedOut('登录已失效，请重新登录', true);
+      throw new Error('请先登录');
     }
   }
   if (!resp.ok) {
@@ -110,6 +121,174 @@ function toast(message, ok = true) {
   toast._t = setTimeout(() => el.classList.add('hidden'), 2600);
 }
 
+/* ---------- 账号：登录 / 手机验证码注册 / 退出 ---------- */
+function showAuthModal(tab = 'login') {
+  $('#auth-modal').classList.remove('hidden');
+  setAuthTab(tab);
+}
+
+function setAuthTab(tab) {
+  const isLogin = tab === 'login';
+  $('#auth-tab-login').className = `auth-tab rounded-lg py-2 text-sm font-semibold transition ${isLogin ? 'bg-gradient-to-r from-violet-500/40 to-cyan-500/40 text-white' : 'text-slate-400 hover:text-white'}`;
+  $('#auth-tab-register').className = `auth-tab rounded-lg py-2 text-sm font-semibold transition ${!isLogin ? 'bg-gradient-to-r from-violet-500/40 to-cyan-500/40 text-white' : 'text-slate-400 hover:text-white'}`;
+  $('#login-form').classList.toggle('hidden', !isLogin);
+  $('#register-form').classList.toggle('hidden', isLogin);
+  $('#login-error').classList.add('hidden');
+  $('#register-error').classList.add('hidden');
+}
+
+function updateAuthUI(user) {
+  if (!user || !authToken) {
+    $('#btn-login').classList.remove('hidden');
+    $('#auth-userbox').classList.add('hidden');
+    $('#auth-userbox').classList.remove('flex');
+    return;
+  }
+  $('#btn-login').classList.add('hidden');
+  $('#auth-userbox').classList.remove('hidden');
+  $('#auth-userbox').classList.add('flex');
+  $('#auth-user').textContent = `👤 ${user.username}`;
+}
+
+function setLoggedOut(message, openModal = false) {
+  authToken = '';
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  updateAuthUI(null);
+  if (!isShare) showLocked();
+  if (message) toast(message, false);
+  if (openModal) showAuthModal('login');
+}
+
+function showLocked() {
+  $('#admin-actions').classList.add('hidden');
+  $('#admin-actions').classList.remove('flex');
+  $('#share-hint').classList.add('hidden');
+  $('#player-name').textContent = '未登录';
+  $('#updated-at').textContent = '登录后可查看和管理你的游戏档案';
+  $('#games-grid').innerHTML = '';
+  $('#locked-view').classList.remove('hidden');
+}
+
+function enterSession(data) {
+  authToken = data.token;
+  localStorage.setItem(TOKEN_KEY, authToken);
+  localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+  updateAuthUI(data.user);
+  $('#auth-modal').classList.add('hidden');
+  $('#locked-view').classList.add('hidden');
+  toast(`✓ 欢迎，${data.user.username}`);
+  loadRegistry();
+  load();
+}
+
+let sendCooldown = 0;
+
+async function handleSendCode() {
+  const phone = $('#re-phone').value.trim();
+  if (!/^1[3-9]\d{9}$/.test(phone)) {
+    $('#register-error').textContent = '请输入正确的 11 位手机号';
+    $('#register-error').classList.remove('hidden');
+    return;
+  }
+  const btn = $('#btn-send-code');
+  btn.disabled = true;
+  try {
+    const res = await api('/api/auth/send-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone }),
+      silent: true,
+    });
+    $('#code-hint').textContent = `开发模式验证码：${res.dev_code}（未接入短信服务，生产环境请接入真实短信）`;
+    $('#code-hint').classList.remove('hidden');
+    $('#register-error').classList.add('hidden');
+    toast('验证码已发送（开发模式）');
+    sendCooldown = 60;
+    btn.textContent = `${sendCooldown}s`;
+    const timer = setInterval(() => {
+      sendCooldown -= 1;
+      if (sendCooldown <= 0) {
+        clearInterval(timer);
+        btn.disabled = false;
+        btn.textContent = '发送验证码';
+      } else {
+        btn.textContent = `${sendCooldown}s`;
+      }
+    }, 1000);
+  } catch (err) {
+    btn.disabled = false;
+    $('#register-error').textContent = err.message;
+    $('#register-error').classList.remove('hidden');
+  }
+}
+
+$('#btn-login')?.addEventListener('click', () => showAuthModal('login'));
+$('#btn-login-locked')?.addEventListener('click', () => showAuthModal('login'));
+$('#auth-tab-login')?.addEventListener('click', () => setAuthTab('login'));
+$('#auth-tab-register')?.addEventListener('click', () => setAuthTab('register'));
+$('#btn-send-code')?.addEventListener('click', handleSendCode);
+document.querySelectorAll('[data-auth-close]').forEach((el) =>
+  el.addEventListener('click', () => $('#auth-modal').classList.add('hidden'))
+);
+
+$('#login-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    const data = await api('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ account: $('#li-account').value.trim(), password: $('#li-password').value }),
+      silent: true,
+    });
+    enterSession(data);
+  } catch (err) {
+    $('#login-error').textContent = err.message;
+    $('#login-error').classList.remove('hidden');
+  }
+});
+
+$('#register-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const phone = $('#re-phone').value.trim();
+  const code = $('#re-code').value.trim();
+  const password = $('#re-password').value;
+  if (!/^1[3-9]\d{9}$/.test(phone)) {
+    $('#register-error').textContent = '请输入正确的 11 位手机号';
+    $('#register-error').classList.remove('hidden');
+    return;
+  }
+  if (!/^\d{6}$/.test(code)) {
+    $('#register-error').textContent = '请输入 6 位验证码';
+    $('#register-error').classList.remove('hidden');
+    return;
+  }
+  if (password.length < 6) {
+    $('#register-error').textContent = '密码至少 6 位';
+    $('#register-error').classList.remove('hidden');
+    return;
+  }
+  try {
+    const data = await api('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, code, username: $('#re-username').value.trim(), password }),
+      silent: true,
+    });
+    enterSession(data);
+  } catch (err) {
+    $('#register-error').textContent = err.message;
+    $('#register-error').classList.remove('hidden');
+  }
+});
+
+$('#btn-logout')?.addEventListener('click', async () => {
+  try {
+    await api('/api/auth/logout', { method: 'POST', silent: true });
+  } catch (e) { /* token 可能已失效，忽略 */ }
+  setLoggedOut('已退出登录');
+});
+
 function applyBackground() {
   const img = new Image();
   img.onload = () => {
@@ -145,10 +324,12 @@ let timers = [];
 
 function render(data) {
   $('#player-name').textContent = data.player.nickname;
+  $('#locked-view').classList.add('hidden');
   if (isShare) {
     $('#share-banner').classList.remove('hidden');
     $('#share-owner').textContent = data.player.nickname;
   } else {
+    if (data.user) updateAuthUI(data.user);
     $('#admin-actions').classList.remove('hidden');
     $('#admin-actions').classList.add('flex');
     $('#share-hint').classList.remove('hidden');
@@ -499,6 +680,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeModal();
     $('#add-game-modal')?.classList.add('hidden');
+    $('#auth-modal')?.classList.add('hidden');
   }
 });
 
@@ -697,6 +879,10 @@ $('#btn-bg-reset')?.addEventListener('click', async () => {
 
 /* ---------- 启动 ---------- */
 async function load() {
+  if (!isShare && !authToken) {
+    showLocked();
+    return;
+  }
   try {
     if (!REGISTRY.length) await loadRegistry();
     const data = isShare
@@ -704,8 +890,11 @@ async function load() {
       : await api('/api/me');
     render(data);
   } catch (err) {
-    $('#player-name').textContent = '加载失败';
-    $('#updated-at').textContent = err.message;
+    if (err.message === '请先登录') return;
+    if (isShare) {
+      $('#player-name').textContent = '加载失败';
+      $('#updated-at').textContent = err.message;
+    }
     toast(err.message, false);
   }
 }

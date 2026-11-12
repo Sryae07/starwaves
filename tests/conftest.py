@@ -24,3 +24,17 @@ def clean_db():
 def client():
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture()
+def auth_headers(client):
+    """注册一个测试账号并返回 Bearer 头（每个测试独立空库，手机号可复用）。"""
+    resp = client.post("/api/auth/send-code", json={"phone": "13800138000"})
+    assert resp.status_code == 200
+    code = resp.json()["dev_code"]
+    resp = client.post(
+        "/api/auth/register",
+        json={"phone": "13800138000", "code": code, "username": "测试玩家", "password": "pass123456"},
+    )
+    assert resp.status_code == 200, resp.text
+    return {"Authorization": f"Bearer {resp.json()['token']}"}

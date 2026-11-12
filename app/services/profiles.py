@@ -5,19 +5,24 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from ..games import merged_games
-from ..models import Character, Player, Profile, Snapshot
+from ..models import Character, Player, Profile, Snapshot, User
 from ..schemas import ProfileUpdate
 
 
-def apply_profile_update(db: Session, game: str, payload: ProfileUpdate) -> Player:
+def get_or_create_player(db: Session, user: User) -> Player:
+    player = user.player
+    if player is None:
+        player = Player(user_id=user.id, nickname=user.username)
+        db.add(player)
+        db.flush()
+    return player
+
+
+def apply_profile_update(db: Session, game: str, payload: ProfileUpdate, user: User) -> Player:
     spec = merged_games(db).get(game)
     if spec is None:
         raise ValueError(f"未知游戏: {game}")
-    player = db.query(Player).order_by(Player.id.asc()).first()
-    if player is None:
-        player = Player(nickname="旅行者")
-        db.add(player)
-        db.flush()
+    player = get_or_create_player(db, user)
 
     profile = (
         db.query(Profile)

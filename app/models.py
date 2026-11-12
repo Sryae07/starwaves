@@ -5,7 +5,7 @@ from __future__ import annotations
 import secrets
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
@@ -15,10 +15,56 @@ def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+class User(Base):
+    """站点账号：用户名登录 + 手机验证码注册。"""
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(32), unique=True, index=True)
+    phone: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True)
+    password_hash: Mapped[str] = mapped_column(String(128))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    player: Mapped[Player | None] = relationship(back_populates="user", uselist=False)
+    tokens: Mapped[list[AuthToken]] = relationship(back_populates="user", cascade="all, delete-orphan")
+
+
+class AuthToken(Base):
+    """登录会话令牌（数据库里只存 SHA-256 摘要）。"""
+
+    __tablename__ = "auth_tokens"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    user: Mapped[User] = relationship(back_populates="tokens")
+
+
+class PhoneCode(Base):
+    """手机验证码（开发模式短信由接口直接返回 dev_code）。"""
+
+    __tablename__ = "phone_codes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    phone: Mapped[str] = mapped_column(String(20), index=True)
+    code_hash: Mapped[str] = mapped_column(String(64))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    used: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class Player(Base):
     __tablename__ = "players"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
     nickname: Mapped[str] = mapped_column(String(64), default="旅行者")
     share_id: Mapped[str] = mapped_column(
         String(32), unique=True, index=True, default=lambda: secrets.token_urlsafe(12)
@@ -28,6 +74,7 @@ class Player(Base):
     profiles: Mapped[list[Profile]] = relationship(
         back_populates="player", cascade="all, delete-orphan"
     )
+    user: Mapped[User | None] = relationship(back_populates="player")
 
 
 class Profile(Base):

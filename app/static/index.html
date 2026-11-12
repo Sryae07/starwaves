@@ -53,6 +53,13 @@
         <a href="/" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">首页</a>
         <a href="/news" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">📡 资讯</a>
       </nav>
+      <div id="auth-area" class="flex items-center gap-2">
+        <button id="btn-login" class="rounded-lg border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-sm text-violet-200 hover:bg-violet-400/20 transition">👤 登录 / 注册</button>
+        <div id="auth-userbox" class="hidden items-center gap-2">
+          <span class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-slate-200"><span id="auth-user">…</span></span>
+          <button id="btn-logout" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/10 hover:text-white transition">退出</button>
+        </div>
+      </div>
       <div id="admin-actions" class="hidden items-center gap-2">
         <button id="btn-add-game" class="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-sm text-emerald-200 hover:bg-emerald-400/20 transition">➕ 接入游戏</button>
         <button id="btn-bg" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">🖼 背景</button>
@@ -69,7 +76,7 @@
 
     <section class="mt-8 flex items-end justify-between flex-wrap gap-2">
       <div>
-        <p class="text-xs text-slate-500 tracking-widest">PLAYER PROFILE</p>
+        <p class="text-xs text-slate-500 tracking-widest">用户名 / USERNAME</p>
         <h2 id="player-name" class="text-3xl font-black tracking-wide mt-1">加载中…</h2>
       </div>
       <div class="text-right">
@@ -79,6 +86,15 @@
     </section>
 
     <section id="games-grid" class="mt-6 grid gap-6 md:grid-cols-2"></section>
+
+    <section id="locked-view" class="hidden mt-6">
+      <div class="max-w-md mx-auto rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur p-10 text-center">
+        <p class="text-4xl">🔒</p>
+        <h3 class="mt-4 text-xl font-bold">登录后管理你的游戏档案</h3>
+        <p class="mt-2 text-sm text-slate-400 leading-relaxed">用手机验证码注册一个账号，或直接登录。用户名即档案名，不填会自动生成「用户＋随机编号」。</p>
+        <button id="btn-login-locked" class="mt-6 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 px-7 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">👤 登录 / 注册</button>
+      </div>
+    </section>
 
     <footer class="mt-16 text-center text-xs text-slate-600 leading-relaxed">
       StarWaves · 数据来源：米游社同步 / 截图 OCR / 手动录入 · 非官方工具，仅供个人学习使用<br/>
@@ -200,6 +216,46 @@
           <button type="submit" class="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:opacity-90 transition">接入游戏</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="auth-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-auth-close></div>
+    <div class="relative max-w-md mx-auto mt-[10vh] rounded-2xl border border-white/10 bg-[#0b0f1d] p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-bold">👤 账号</h3>
+        <button data-auth-close class="h-8 w-8 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition">✕</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 mb-5 rounded-xl border border-white/10 bg-white/5 p-1">
+        <button id="auth-tab-login" class="auth-tab rounded-lg py-2 text-sm font-semibold transition">登录</button>
+        <button id="auth-tab-register" class="auth-tab rounded-lg py-2 text-sm font-semibold transition">手机注册</button>
+      </div>
+
+      <form id="login-form" class="space-y-3">
+        <label class="text-xs text-slate-400">用户名 / 手机号<input id="li-account" class="field mt-1" placeholder="用户名或注册手机号" required /></label>
+        <label class="text-xs text-slate-400">密码<input id="li-password" type="password" class="field mt-1" placeholder="登录密码" required /></label>
+        <p id="login-error" class="hidden rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs text-red-200"></p>
+        <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">登 录</button>
+      </form>
+
+      <form id="register-form" class="hidden space-y-3">
+        <label class="text-xs text-slate-400">手机号<input id="re-phone" class="field mt-1" inputmode="numeric" placeholder="11 位手机号" maxlength="11" required /></label>
+        <div>
+          <label class="text-xs text-slate-400">短信验证码</label>
+          <div class="mt-1 flex gap-2">
+            <input id="re-code" class="field" inputmode="numeric" placeholder="6 位验证码" maxlength="6" required />
+            <button type="button" id="btn-send-code" class="shrink-0 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 text-sm text-cyan-200 hover:bg-cyan-400/20 transition disabled:opacity-50">发送验证码</button>
+          </div>
+        </div>
+        <p id="code-hint" class="hidden rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-200"></p>
+        <label class="text-xs text-slate-400">用户名<input id="re-username" class="field mt-1" placeholder="选填，默认自动生成「用户＋随机编号」" maxlength="24" /></label>
+        <label class="text-xs text-slate-400">密码<input id="re-password" type="password" class="field mt-1" placeholder="至少 6 位" minlength="6" required /></label>
+        <p id="register-error" class="hidden rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs text-red-200"></p>
+        <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:opacity-90 transition">注册并登录</button>
+      </form>
+
+      <p class="mt-4 text-[11px] text-slate-600 leading-relaxed">· 注册即生成你的专属分享链接，用户名即档案名<br/>· 开发模式短信：验证码会直接显示在下方提示里（部署公网请接入真实短信服务）</p>
     </div>
   </div>
 
