@@ -11,6 +11,7 @@ if not exist ".venv\Scripts\python.exe" (
 
 echo [StarWaves] 启动服务: http://127.0.0.1:8000
 start "" "http://127.0.0.1:8000"
-.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+echo [StarWaves] 局域网/手机访问请用本机 IP:8000（公网访问请运行 start-tunnel.bat）
+.venv\Scripts\python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 pause
