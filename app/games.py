@@ -63,7 +63,9 @@ GAMES: dict[str, GameSpec] = {
         launch_candidates=(
             r"C:\Program Files\Star Rail\Games\StarRail.exe",
             r"C:\Program Files (x86)\Star Rail\Games\StarRail.exe",
+            r"C:\Program Files\miHoYo Launcher\games\*\StarRail.exe",
             r"C:\Program Files\HoYoPlay\games\*\Games\StarRail.exe",
+            r"C:\Program Files\HoYoPlay\games\*\StarRail.exe",
             r"C:\Program Files\miHoYo Launcher\*\HYP.exe",
         ),
         ocr_keywords={

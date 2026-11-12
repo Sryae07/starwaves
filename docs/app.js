@@ -1275,7 +1275,7 @@ async function launchGame(btn) {
   btn.textContent = '启动中…';
   try {
     await api(`/api/launch/${game}`, { method: 'POST' });
-    toast(`🚀 ${label}已启动`);
+    toast(`🚀 ${label}已在电脑上启动`);
     setTimeout(() => { btn.disabled = false; btn.textContent = '🚀 启动游戏'; }, 2500);
   } catch (err) {
     toast(err.message, false);
