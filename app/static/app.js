@@ -4,7 +4,8 @@ const KEY_NAME = 'starwaves_api_key';
 let apiKey = localStorage.getItem(KEY_NAME) || '';
 
 const params = new URLSearchParams(location.search);
-const shareId = params.get('share');
+const pathShare = location.pathname.match(/^\/share\/([A-Za-z0-9_-]+)/);
+const shareId = params.get('share') || (pathShare ? decodeURIComponent(pathShare[1]) : null);
 const isShare = Boolean(shareId);
 
 const $ = (sel) => document.querySelector(sel);
@@ -69,6 +70,18 @@ function toast(message, ok = true) {
   toast._t = setTimeout(() => el.classList.add('hidden'), 2600);
 }
 
+function applyBackground() {
+  const img = new Image();
+  img.onload = () => {
+    document.body.style.backgroundImage =
+      `linear-gradient(rgba(5,7,15,.78), rgba(5,7,15,.78)), url('/api/background?t=${Date.now()}')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundAttachment = 'fixed';
+  };
+  img.src = '/api/background';
+}
+
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
 ));
@@ -99,7 +112,7 @@ function render(data) {
     $('#admin-actions').classList.remove('hidden');
     $('#admin-actions').classList.add('flex');
     $('#share-hint').classList.remove('hidden');
-    $('#share-hint').textContent = `分享链接：${location.origin}${location.pathname}?share=${data.player.share_id}`;
+    $('#share-hint').textContent = `分享链接：${location.origin}/share/${data.player.share_id}`;
   }
   $('#updated-at').textContent = data.updated_at ? `最后更新：${fmtTime(data.updated_at)}` : '';
   renderGame('hsr', data.games.hsr);
@@ -163,7 +176,7 @@ function renderGame(key, game) {
         <p class="text-3xl">${theme.emoji}</p>
         <p class="mt-3 font-bold">${theme.label}</p>
         <p class="text-xs text-slate-500 mt-1">还没有数据</p>
-        ${isShare ? '' : `<button class="update-btn mt-4 rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}`}
+        ${isShare ? '' : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button></div>`}
       </div>`;
     return;
   }
@@ -188,6 +201,9 @@ function renderGame(key, game) {
   const syncButton = key === 'hsr' && !isShare
     ? `<button class="sync-btn rounded-lg border border-amber-300/30 bg-amber-400/10 px-2.5 py-1 text-[11px] text-amber-200 hover:bg-amber-400/20 transition" data-game="${key}">🔄 米游社同步</button>`
     : '';
+  const launchButton = !isShare
+    ? `<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button>`
+    : '';
   const chartHtml = renderChart(key, game.history, theme);
 
   root.innerHTML = `
@@ -201,6 +217,7 @@ function renderGame(key, game) {
           </div>
         </div>
         <div class="flex items-center gap-1.5">
+          ${launchButton}
           ${syncButton}
           ${game.last_update ? `<span class="rounded-full border ${theme.chip} px-2 py-0.5 text-[11px]">${sourceLabel}</span>` : ''}
         </div>
@@ -396,7 +413,7 @@ $('#btn-update')?.addEventListener('click', () => openModal('hsr'));
 $('#btn-share')?.addEventListener('click', async () => {
   try {
     const data = await api('/api/me');
-    const url = `${location.origin}${location.pathname}?share=${data.player.share_id}`;
+    const url = `${location.origin}/share/${data.player.share_id}`;
     await navigator.clipboard.writeText(url);
     toast('分享链接已复制到剪贴板');
   } catch (err) {
@@ -455,6 +472,8 @@ document.body.addEventListener('click', (e) => {
   if (btn) openModal(btn.dataset.game);
   const syncBtn = e.target.closest('.sync-btn');
   if (syncBtn) syncHsr(syncBtn);
+  const launchBtn = e.target.closest('.launch-btn');
+  if (launchBtn) launchGame(launchBtn);
 });
 
 async function syncHsr(btn) {
@@ -471,6 +490,68 @@ async function syncHsr(btn) {
   }
 }
 
+async function launchGame(btn) {
+  btn.disabled = true;
+  const game = btn.dataset.game;
+  const label = game === 'hsr' ? '星穹铁道' : '鸣潮';
+  btn.textContent = '启动中…';
+  try {
+    const res = await api(`/api/launch/${game}`, { method: 'POST' });
+    toast(`🚀 ${label}已启动`);
+    setTimeout(() => { btn.disabled = false; btn.textContent = '🚀 启动游戏'; }, 2500);
+  } catch (err) {
+    toast(err.message, false);
+    btn.disabled = false;
+    btn.textContent = '🚀 启动游戏';
+  }
+}
+
+/* ---------- 背景设置 ---------- */
+$('#btn-bg')?.addEventListener('click', () => {
+  $('#bg-modal').classList.remove('hidden');
+});
+document.querySelectorAll('[data-bg-close]').forEach((el) =>
+  el.addEventListener('click', () => $('#bg-modal').classList.add('hidden'))
+);
+const bgDz = $('#bg-dropzone');
+const bgInput = $('#bg-input');
+bgDz.addEventListener('click', () => bgInput.click());
+bgDz.addEventListener('dragover', (e) => { e.preventDefault(); bgDz.classList.add('border-violet-400/70'); });
+bgDz.addEventListener('dragleave', () => bgDz.classList.remove('border-violet-400/70'));
+bgDz.addEventListener('drop', (e) => { e.preventDefault(); bgDz.classList.remove('border-violet-400/70'); uploadBackground(e.dataTransfer.files[0]); });
+bgInput.addEventListener('change', () => { uploadBackground(bgInput.files[0]); bgInput.value = ''; });
+
+async function uploadBackground(file) {
+  if (!file) return;
+  const status = $('#bg-status');
+  status.textContent = '⏳ 正在上传…';
+  status.className = 'mt-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm';
+  status.classList.remove('hidden');
+  const fd = new FormData();
+  fd.append('file', file);
+  try {
+    await api('/api/background', { method: 'POST', body: fd });
+    applyBackground();
+    status.textContent = '✓ 背景已更新';
+    status.className = 'mt-3 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200';
+    toast('背景已更新');
+  } catch (err) {
+    status.textContent = `❌ ${err.message}`;
+    status.className = 'mt-3 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200';
+  }
+}
+
+$('#btn-bg-reset')?.addEventListener('click', async () => {
+  try {
+    await api('/api/background', { method: 'DELETE' });
+    document.body.style.backgroundImage = '';
+    $('#bg-status').classList.add('hidden');
+    toast('已恢复默认背景');
+  } catch (err) {
+    toast(err.message, false);
+  }
+});
+
 /* ---------- 启动 ---------- */
 async function load() {
   try {
@@ -485,4 +566,5 @@ async function load() {
   }
 }
 
+applyBackground();
 load();

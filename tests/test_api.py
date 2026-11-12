@@ -81,3 +81,34 @@ def test_api_key_guard(client, monkeypatch):
     assert client.get("/api/me").status_code == 401
     assert client.get("/api/me", headers={"X-API-Key": "wrong"}).status_code == 401
     assert client.get("/api/me", headers={"X-API-Key": "secret-123"}).status_code == 200
+
+
+def test_pages(client):
+    home = client.get("/")
+    assert home.status_code == 200
+    assert "关于本项目" in home.text
+    dashboard = client.get("/dashboard")
+    assert dashboard.status_code == 200
+    assert "StarWaves" in dashboard.text
+
+
+def test_share_page_route(client):
+    assert client.get("/share/whatever").status_code == 200
+
+
+def test_background_upload_and_reset(client):
+    files = {"file": ("bg.png", b"fake-image-bytes", "image/png")}
+    resp = client.post("/api/background", files=files)
+    assert resp.status_code == 200
+    assert client.get("/api/background").status_code == 200
+    assert client.delete("/api/background").status_code == 200
+    assert client.get("/api/background").status_code == 404
+
+
+def test_launch_without_path(client, monkeypatch):
+    from app.routers import launch
+
+    monkeypatch.setattr(launch, "_resolve_path", lambda game: None)
+    resp = client.post("/api/launch/hsr")
+    assert resp.status_code == 400
+    assert "未找到" in resp.json()["detail"]
