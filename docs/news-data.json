@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-12T19:08:18.832935+00:00",
+ "generated_at": "2026-11-12T21:57:43.354846+00:00",
  "games": [
   {
    "key": "hsr",
@@ -31,18 +31,6 @@
    "official": true
   },
   {
-   "id": "hsr-79519029",
-   "game": "hsr",
-   "title": "听歌领80星琼！歌曲「无中生有」音乐活动正式上线",
-   "summary": "亲爱的开拓者： 二相乐园全新音乐专辑「神说要有笑（下篇）」——全新音乐H5现已正式上线。专辑包含与「贪欢的神颅」的战斗背景音乐《无中生有 Ex Nihilo》，欢迎各位开拓者前往QQ音乐、",
-   "url": "https://www.miyoushe.com/hsr/article/79519029",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/12/288909600/cf43271587e4e14e78f9ae8e4e06f087_9041291641978263618.jpg",
-   "published_at": "2026-11-12T05:00:05+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
    "id": "zzz-79517921",
    "game": "zzz",
    "title": "「快、快还给我！伊埃斯是诺姆先抓到的！」",
@@ -50,30 +38,6 @@
    "url": "https://www.miyoushe.com/zzz/article/79517921",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/12/152039148/66c6aace94390dfd7048b8bcf8aa2181_238391636435421415.jpg",
    "published_at": "2026-11-12T04:00:16+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79517918",
-   "game": "hsr",
-   "title": "《崩坏：星穹铁道》EP：「无中生有」",
-   "summary": "当第一声「阿哈」响起，「欢愉」将再度诞生。 在虚与实的边缘起舞吧，今夜，奇迹将由众生缔造！ 《无中生有》 作词 Lyricist：温菁 Jing.W (HOYO-MiX) / Ruby Qu 作曲",
-   "url": "https://www.miyoushe.com/hsr/article/79517918",
-   "cover": "",
-   "published_at": "2026-11-12T04:00:14+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79517070",
-   "game": "hsr",
-   "title": "5.5版本 | 故事之外，有谁还在",
-   "summary": "翁法罗斯，续写「开拓」…… 然后，人们从昨日走向明天。",
-   "url": "https://www.miyoushe.com/hsr/article/79517070",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/11/288909600/75494a33adc79759e1fd719603f0c433_5050141903040822420.png",
-   "published_at": "2026-11-12T03:12:14+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -91,30 +55,6 @@
    "official": true
   },
   {
-   "id": "hsr-79489221",
-   "game": "hsr",
-   "title": "此刻，将群星付之一笑丨4.7版本攻略征集活动",
-   "summary": "亲爱的开拓者： 4.7版本「此刻，将群星付之一笑」上线啦！「货币战争•入画奇航」、「剧场版绒绒号：欢闹厨房」等活动玩法等待开拓者前往体验~ 4.7版本攻略征集活动也于今日正式开启！ [图",
-   "url": "https://www.miyoushe.com/hsr/article/79489221",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/11/288909601/b376037606e947136a6e7746e726142a_4997229060994008495.png",
-   "published_at": "2026-11-11T04:30:13+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79489219",
-   "game": "hsr",
-   "title": "「重返群星之旅」回归网页活动上线，最高可得480星琼等好礼！",
-   "summary": "亲爱的开拓者，列车的伙伴们都等着你哦，一同踏上旅途，重新出发银河大冒险吧！最高可获480星琼！ >>点击前往<< ▌活动时间 4.7版本期间 ▌活动介绍 1. 活动期间开拓者可通过邀",
-   "url": "https://www.miyoushe.com/hsr/article/79489219",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/10/288909600/c5f983fba2f527e2b9999122a7e8c64d_5820361864332327691.jpg",
-   "published_at": "2026-11-11T04:30:12+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
    "id": "zzz-79488690",
    "game": "zzz",
    "title": "生日快乐妮可丨家电回收去哪里",
@@ -122,54 +62,6 @@
    "url": "https://www.miyoushe.com/zzz/article/79488690",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/11/152039148/f8a1b00267c76e7d611f9499ab663021_6417137076189289471.jpg",
    "published_at": "2026-11-11T04:15:09+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "zzz-79488227",
-   "game": "zzz",
-   "title": "重返天空的旅程丨3.3版本内容一览（下期）",
-   "summary": "绳匠们好，3.3版本下期现已开启！S级代理人[赛维里安(风·强攻)]、[诺姆(火·击破)]与S级音擎[禁罪囚笼(强攻)]、[首席跟班(击破)]加入限时频段~ 更有签到活动「『嗯呢』从天降」、",
-   "url": "https://www.miyoushe.com/zzz/article/79488227",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/11/152039148/00992e372232911379b65f4937eea8b9_1639015812579822826.png",
-   "published_at": "2026-11-11T04:00:16+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79488214",
-   "game": "hsr",
-   "title": "动画短片：「月下的欢快葬礼」",
-   "summary": "遥遥致意，远道而来的客人， 「何不尝试，再次开始一场游戏，再次品味其中痛苦，再次为其无情而颤动，再次在内心的地狱徘徊，往返多次，然后你终将会将这游戏玩得更好，也终将学会笑。」 不欢迎你的，阿哈",
-   "url": "https://www.miyoushe.com/hsr/article/79488214",
-   "cover": "",
-   "published_at": "2026-11-11T04:00:12+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79471597",
-   "game": "hsr",
-   "title": "阿哈全明星 | 《世界净头的美容院》",
-   "summary": "绝灭大君「归寂」渴望从骰再来？ 节目或迎来改造史上的最大挑战！ ✧ 王牌美容师「星神★阿哈」领衔 ✧ 谒者班底十年磨一剑直面终局考验—— 「照了多年镜子，这次他终于不想毁灭世界了。」",
-   "url": "https://www.miyoushe.com/hsr/article/79471597",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/06/288909600/1f2b4abf25e1487310cd0c8b3a1ba200_2207207426417683414.png",
-   "published_at": "2026-11-10T10:00:14+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79468685",
-   "game": "hsr",
-   "title": "您有一份「模糊二维马」的遗产请查收（备注：不动产）",
-   "summary": "让《苍天航路绒绒号》烂尾？抱歉，最富责任心的伟大漫画家「模糊二维马」非但做不到，还要画出个美食剧场版！ 她给你留下了一笔亟待继承的遗产，想要得到它，就得先完成这篇旷世奇作，不过，「画」漫画",
-   "url": "https://www.miyoushe.com/hsr/article/79468685",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/09/288909600/d9cf3dac85ec0528ee10fff21d506228_1717106008047241111.png",
-   "published_at": "2026-11-10T06:00:10+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -206,30 +98,6 @@
    "url": "https://www.miyoushe.com/zzz/article/79449326",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/09/152039148/deecd6516bd8a08dcd9c80faa613623d_6143838151031813396.png",
    "published_at": "2026-11-09T04:30:09+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79434174",
-   "game": "hsr",
-   "title": "阿哈全明星 | 《落魄闺蜜竟是寰宇首富》",
-   "summary": "在她笑起来的瞬间，这场「游戏」才刚刚开始—— 初遇！是想把最好的都给你。 谎言！友谊必经的试炼来临。 《落魄闺蜜竟是寰宇首富》最新话连载中。 11月11日《崩坏：星穹铁道》更",
-   "url": "https://www.miyoushe.com/hsr/article/79434174",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/06/288909600/2445f26abeb4e379b1551885eb9a3079_1418264972306304626.png",
-   "published_at": "2026-11-08T10:00:11+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79427010",
-   "game": "hsr",
-   "title": "星神★阿哈角色PV：「让骰子飞」",
-   "summary": "「你这妙计叫什么名字？」 「打BOSS，直接用BOSS打——此计名为BOSS直拼。」 中文CV： 星神★阿哈——子音 男开拓者——秦且歌 来古士——赵君毅 银狼——Hanser 黄泉——菊花花",
-   "url": "https://www.miyoushe.com/hsr/article/79427010",
-   "cover": "",
-   "published_at": "2026-11-08T04:00:20+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -307,18 +175,6 @@
    "official": true
   },
   {
-   "id": "hsr-79378421",
-   "game": "hsr",
-   "title": "【有奖活动】给阿哈一个面子 | 内含彩蛋，赢阿哈好礼！",
-   "summary": "啊哈！猜猜我在员工电脑里还发现了什么？一个名字叫「呜呜是个呜呜伯」的运营账号啊……好不容易来到这个世界，我得为即将到来的银河演出做足准备才是。让我来加点欢愉特色~ 这样吧，阿哈认证——「星",
-   "url": "https://www.miyoushe.com/hsr/article/79378421",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/06/288909601/97e503c3b7b1f9dc0cd5d5516f8f6d45_5259939793334255102.png",
-   "published_at": "2026-11-06T04:00:16+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
    "id": "wuwa-5699",
    "game": "wuwa",
    "title": "《鸣潮》服饰PV | 月沉霜",
@@ -331,6 +187,30 @@
    "official": true
   },
   {
+   "id": "zzz-79357293",
+   "game": "zzz",
+   "title": "《绝区零》对iPhone Duo机型的适配说明",
+   "summary": "亲爱的绳匠： 《绝区零》现已支持对iPhone Duo机型的适配，有需要的绳匠请前往App Store搜索《绝区零》，手动选择更新至3.3.1版本后即可体验相关适配功能。 若您已开启App自",
+   "url": "https://www.miyoushe.com/zzz/article/79357293",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/05/152039148/4bc363823e0723d4c18369bbb9682af2_712518011372738142.png",
+   "published_at": "2026-11-05T06:00:15+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "zzz-79355055",
+   "game": "zzz",
+   "title": "代理人机制介绍丨赛维里安篇",
+   "summary": "更新即将完成… 资料库中已收录代理人【赛维里安】的战斗相关信息，重点内容解析完毕，请查收。 「我会成为，最后的屏障。」",
+   "url": "https://www.miyoushe.com/zzz/article/79355055",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/05/152039148/4ded88cfe78b078abe5a80bf78e280b6_5937956864016948068.png",
+   "published_at": "2026-11-05T04:00:17+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "zzz-79328665",
    "game": "zzz",
    "title": "【有奖活动】Random Play会员册丨赛维里安",
@@ -338,42 +218,6 @@
    "url": "https://www.miyoushe.com/zzz/article/79328665",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/04/152039149/3c7b22bea541323606cbf2b3a5b1c85d_2606764433624267575.png",
    "published_at": "2026-11-04T04:30:12+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "zzz-79328664",
-   "game": "zzz",
-   "title": "代理人未归档影像丨赛维里安篇",
-   "summary": "「必要的时候，一点破坏无伤大雅。」",
-   "url": "https://www.miyoushe.com/zzz/article/79328664",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/04/152039148/73dc179b44d869ad9f91795071b0e6c3_6795147553084081515.png",
-   "published_at": "2026-11-04T04:30:10+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "zzz-79327806",
-   "game": "zzz",
-   "title": "Random Play | 全息试炼－赛维里安",
-   "summary": "「无需担忧，事态在掌握之中。」",
-   "url": "https://www.miyoushe.com/zzz/article/79327806",
-   "cover": "",
-   "published_at": "2026-11-04T04:00:15+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79327798",
-   "game": "hsr",
-   "title": "即兴巡演PV：「当阿哈来敲门」",
-   "summary": "假如生活欺骗了你，不要悲伤，不要心急—— 在每一个沮丧的时刻，阿哈都在注视着你。 中文CV： 星神★阿哈——子音",
-   "url": "https://www.miyoushe.com/hsr/article/79327798",
-   "cover": "",
-   "published_at": "2026-11-04T04:00:13+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -403,90 +247,6 @@
    "official": true
   },
   {
-   "id": "hsr-79232958",
-   "game": "hsr",
-   "title": "「幻月主的群星集绘」主题绘画征集活动已开启！",
-   "summary": "开拓者好呀~ 「幻月主的群星集绘」主题绘画征集活动现已开启！ 呜呜为参与活动的开拓者准备了星琼和精美周边礼品呜~ 开拓者快来参加吧！ >>点击前往活动页面<< 投稿征集阶段：202",
-   "url": "https://www.miyoushe.com/hsr/article/79232958",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/30/288909601/2ca0ef1189b63d11d1f31b017c7a7a2d_3931982228027850553.jpg",
-   "published_at": "2026-10-31T04:30:11+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79217585",
-   "game": "hsr",
-   "title": "4.7版本商店上新",
-   "summary": "4.7版本更新后，6元、30元与98元超值礼包将会限时上架！消耗「星轨专票」或在「幻乐秀场」消耗星琼参与时装抽取活动，可获得「回响」领取「奇缘星魂」。此外，兑换商店「星尘之礼」中，将新增开",
-   "url": "https://www.miyoushe.com/hsr/article/79217585",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/29/288909600/8823ecefdfa1ae23aad087077e432369_7851414125754648967.png",
-   "published_at": "2026-10-30T12:55:09+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79217583",
-   "game": "hsr",
-   "title": "「奇缘星魂」即将上线！",
-   "summary": "开拓者好呀，「奇缘星魂」即将于4.7版本更新后上线！ 本期将为开拓者带来「奇缘星魂」的介绍，以及「黄泉」「丹恒•饮月」「景元」在激活「奇缘星魂」后的新能力速览，和帕姆一起看看帕~ ※更多详",
-   "url": "https://www.miyoushe.com/hsr/article/79217583",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/29/288909600/fadf03864c56adf60ef2f71ebf754a4e_2716468199021020928.png",
-   "published_at": "2026-10-30T12:55:08+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79217286",
-   "game": "hsr",
-   "title": "「寰宇美学•幻乐秀场」时装抽取活动说明",
-   "summary": "亲爱的开拓者： 星月流光为饰，点缀大乐透女神的定制套装。「星神★阿哈」全新时装「群星乐透」将在4.7版本推出！ ▌「幻乐秀场」时装抽取活动说明 活动期间，开拓者可使用「时装邀请函」在「幻",
-   "url": "https://www.miyoushe.com/hsr/article/79217286",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/29/288909600/6b44d09ce4daeaa836f1b521ebfc8ea1_7101111509043992813.png",
-   "published_at": "2026-10-30T12:45:22+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79217284",
-   "game": "hsr",
-   "title": "群星乐透 | 「星神★阿哈」全新时装",
-   "summary": "星月流光为饰，点缀大乐透女神的定制套装。4.7版本中，参与「幻乐秀场」时装抽取活动可获取「星神★阿哈」全新时装「群星乐透」，及开拓穿搭-背部「幻月星轨」、名片「狂欢时刻」、聊天气泡「银河乐",
-   "url": "https://www.miyoushe.com/hsr/article/79217284",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/29/288909600/ebef972fe7a9b333374303e2b913e4ff_5151610425926699680.png",
-   "published_at": "2026-10-30T12:45:21+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79216891",
-   "game": "hsr",
-   "title": "4.7版本「此刻，将群星付之一笑」专题展示页",
-   "summary": "亲爱的开拓者，4.7版本「此刻，将群星付之一笑」专题展示页现已上线，一起看看新版本都有哪些内容吧！ >>>点击前往<<< 疯狂的寂静中，有声音说：「笑吧，让祂听见你的存在。」于是，群星不",
-   "url": "https://www.miyoushe.com/hsr/article/79216891",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/29/288909600/f6fb9242b33ad846d0f39197421ea84c_8628791513768883730.jpg",
-   "published_at": "2026-10-30T12:35:09+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79215986",
-   "game": "hsr",
-   "title": "4.7版本PV：「此刻，将群星付之一笑」",
-   "summary": "疯狂的寂静中，有声音说：「笑吧，让祂听见你的存在。」于是，群星不再沉默，他们将所有的光明付于一声欢笑。 ※本视频包含部分开发中内容，实际内容请以正式上线为准 中文CV： 星神★阿哈——子音 火",
-   "url": "https://www.miyoushe.com/hsr/article/79215986",
-   "cover": "",
-   "published_at": "2026-10-30T12:15:10+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
    "id": "zzz-79099521",
    "game": "zzz",
    "title": "代理人档案丨卡芙卡",
@@ -494,6 +254,18 @@
    "url": "https://www.miyoushe.com/zzz/article/79099521",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/23/152039148/c7699a89007123908599dbfb66bfde3d_1277423421202278982.png",
    "published_at": "2026-10-24T04:30:10+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "zzz-79099235",
+   "game": "zzz",
+   "title": "代理人档案丨知更鸟",
+   "summary": "「别害怕舞台，试着感受它。先数数自己的呼吸，一、二、三…有没有好一点？」 知更鸟 「如果在片场有什么需要『前辈』帮忙的，请不要客气！随时都可以找我~」 「我相信…精彩的演出从来都不是一个",
+   "url": "https://www.miyoushe.com/zzz/article/79099235",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/23/152039148/ad6550454af26cff936273a8e9b70bc5_6897094760382944494.png",
+   "published_at": "2026-10-24T04:15:10+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -715,18 +487,6 @@
    "official": true
   },
   {
-   "id": "hsr-63634183",
-   "game": "hsr",
-   "title": "「万敌」主题绘画征集活动获奖名单",
-   "summary": "开拓者好呜~ 《崩坏：星穹铁道》「万敌」主题绘画征集活动的获奖名单正式出炉！快来和呜呜一起来看看吧~ ※本帖内图片可能会有部分压缩，开拓者可前往作品原帖查看原图呜~ ==弑神登神==",
-   "url": "https://www.miyoushe.com/hsr/article/63634183",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2025/04/17/288909601/fcc48b33d833c792838a46fe4391ff49_5318720100641621844.png",
-   "published_at": "2025-04-17T10:00:20+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
    "id": "zzz-53257600",
    "game": "zzz",
    "title": "【已开奖】《绝区零》7月4日开启全平台公测！",
@@ -742,7 +502,7 @@
  "sources": {
   "hsr": {
    "name": "米游社",
-   "error": null
+   "error": "获取失败: timed out"
   },
   "wuwa": {
    "name": "鸣潮官网",
