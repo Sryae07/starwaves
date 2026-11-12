@@ -40,7 +40,7 @@
   <div class="orb orb-hsr"></div>
   <div class="orb orb-wuwa"></div>
 
-  <header class="max-w-6xl mx-auto px-4 pt-6 pb-2 flex items-center justify-between gap-3 flex-wrap">
+  <header class="max-w-6xl mx-auto px-3 sm:px-4 pt-4 sm:pt-6 pb-2 flex items-center justify-between gap-3 flex-wrap">
     <div class="flex items-center gap-3">
       <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400 grid place-items-center text-lg font-black text-white shadow-lg shadow-violet-500/30">星</div>
       <div>
@@ -50,28 +50,28 @@
     </div>
     <div class="flex items-center gap-2 flex-wrap justify-end">
       <nav class="flex items-center gap-1.5">
-        <a href="/" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">首页</a>
-        <a href="/news" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">📡 资讯</a>
+        <a href="/" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition">首页</a>
+        <a href="/news" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition">📡 资讯</a>
       </nav>
       <div id="auth-area" class="flex items-center gap-2">
-        <button id="btn-login" class="rounded-lg border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-sm text-violet-200 hover:bg-violet-400/20 transition">👤 登录 / 注册</button>
+        <button id="btn-login" class="rounded-lg border border-violet-400/30 bg-violet-400/10 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm text-violet-200 hover:bg-violet-400/20 transition">👤 登录 / 注册</button>
         <div id="auth-userbox" class="hidden items-center gap-2">
-          <span class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-slate-200"><span id="auth-user">…</span></span>
-          <button id="btn-logout" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/10 hover:text-white transition">退出</button>
+          <span class="rounded-lg border border-white/10 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm text-slate-200"><span id="auth-user">…</span></span>
+          <button id="btn-logout" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm text-slate-400 hover:bg-white/10 hover:text-white transition">退出</button>
         </div>
       </div>
       <div id="admin-actions" class="hidden items-center gap-2">
-        <button id="btn-refresh" class="rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-sm text-cyan-200 hover:bg-cyan-400/20 transition" title="重新拉取最新数据">🔄 刷新</button>
-        <button id="btn-force-refresh" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition" title="绕过浏览器缓存强制重载页面">🧹 强制刷新</button>
-        <button id="btn-add-game" class="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-sm text-emerald-200 hover:bg-emerald-400/20 transition">➕ 接入游戏</button>
-        <button id="btn-bg" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">🖼 背景</button>
-        <button id="btn-share" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">🔗 分享主页</button>
-        <button id="btn-update" class="rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">⬆ 更新数据</button>
+        <button id="btn-refresh" class="rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm text-cyan-200 hover:bg-cyan-400/20 transition" title="重新拉取最新数据">🔄 刷新</button>
+        <button id="btn-force-refresh" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition" title="绕过浏览器缓存强制重载页面">🧹 强制刷新</button>
+        <button id="btn-add-game" class="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm text-emerald-200 hover:bg-emerald-400/20 transition">➕ 接入游戏</button>
+        <button id="btn-bg" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition">🖼 背景</button>
+        <button id="btn-share" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition">🔗 分享主页</button>
+        <button id="btn-update" class="rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">⬆ 更新数据</button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 pb-16">
+  <main class="max-w-6xl mx-auto px-3 sm:px-4 pb-12 sm:pb-16">
     <section id="share-banner" class="hidden mt-6 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100">
       这是 <b id="share-owner">…</b> 的公开游戏档案 · 由 <b>StarWaves</b> 驱动
     </section>
@@ -79,7 +79,7 @@
     <section class="mt-8 flex items-end justify-between flex-wrap gap-2">
       <div>
         <p class="text-xs text-slate-500 tracking-widest">用户名 / USERNAME</p>
-        <h2 id="player-name" class="text-3xl font-black tracking-wide mt-1">加载中…</h2>
+        <h2 id="player-name" class="text-2xl sm:text-3xl font-black tracking-wide mt-1">加载中…</h2>
       </div>
       <div class="text-right">
         <p id="share-hint" class="hidden text-xs text-slate-500 mb-1"></p>
@@ -90,7 +90,7 @@
     <section id="games-grid" class="mt-6 grid gap-6 md:grid-cols-2"></section>
 
     <section id="locked-view" class="hidden mt-6">
-      <div class="max-w-md mx-auto rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur p-10 text-center">
+      <div class="max-w-md mx-4 sm:mx-auto rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur p-6 sm:p-10 text-center">
         <p class="text-4xl">🔒</p>
         <h3 class="mt-4 text-xl font-bold">登录后管理你的游戏档案</h3>
         <p class="mt-2 text-sm text-slate-400 leading-relaxed">用手机验证码注册一个账号，或直接登录。用户名即档案名，不填会自动生成「用户＋随机编号」。</p>
@@ -106,7 +106,7 @@
 
   <div id="modal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close></div>
-    <div class="relative max-w-2xl mx-auto mt-[5vh] max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#0b0f1d] p-6 shadow-2xl">
+    <div class="relative max-w-2xl mx-3 sm:mx-auto mt-[2vh] sm:mt-[5vh] max-h-[92vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#0b0f1d] p-4 sm:p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-bold">更新游戏数据</h3>
         <button data-close class="h-8 w-8 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition">✕</button>
@@ -114,7 +114,7 @@
 
       <div id="game-tabs" class="grid grid-cols-2 gap-2 mb-5"></div>
 
-      <div id="dropzone" class="rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] p-8 text-center cursor-pointer hover:border-violet-400/60 hover:bg-white/[0.06] transition">
+      <div id="dropzone" class="rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] p-5 sm:p-8 text-center cursor-pointer hover:border-violet-400/60 hover:bg-white/[0.06] transition">
         <p class="text-2xl mb-1">🖼️</p>
         <p class="text-sm font-semibold">点击或拖拽截图到此处，自动 OCR 识别</p>
         <p class="text-xs text-slate-500 mt-1">支持 PNG / JPG / WebP，不超过 10MB</p>
@@ -128,7 +128,7 @@
       </details>
 
       <form id="editor" class="mt-5 space-y-4">
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label class="text-xs text-slate-400">UID<input id="f-uid" class="field mt-1" placeholder="游戏 UID" /></label>
           <label class="text-xs text-slate-400">昵称<input id="f-nickname" class="field mt-1" placeholder="游戏内昵称" /></label>
           <label class="text-xs text-slate-400"><span id="lbl-level">等级</span><input id="f-level" type="number" min="0" class="field mt-1" /></label>
@@ -167,7 +167,7 @@
 
   <div id="bg-modal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-bg-close></div>
-    <div class="relative max-w-md mx-auto mt-[20vh] rounded-2xl border border-white/10 bg-[#0b0f1d] p-6 shadow-2xl">
+    <div class="relative max-w-md mx-3 sm:mx-auto mt-[8vh] sm:mt-[20vh] rounded-2xl border border-white/10 bg-[#0b0f1d] p-4 sm:p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-bold">设置网页背景</h3>
         <button data-bg-close class="h-8 w-8 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition">✕</button>
@@ -188,14 +188,14 @@
 
   <div id="add-game-modal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-add-game-close></div>
-    <div class="relative max-w-lg mx-auto mt-[6vh] max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#0b0f1d] p-6 shadow-2xl">
+    <div class="relative max-w-lg mx-3 sm:mx-auto mt-[2vh] sm:mt-[6vh] max-h-[92vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#0b0f1d] p-4 sm:p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-bold">➕ 接入新游戏</h3>
         <button data-add-game-close class="h-8 w-8 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition">✕</button>
       </div>
       <p class="text-xs text-slate-400 leading-relaxed mb-5">接入后看板会立刻出现一张空卡片，支持手动录入与截图 OCR；体力回满倒计时、历史曲线、分享页全部自动生效。</p>
       <form id="add-game-form" class="space-y-4">
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label class="text-xs text-slate-400">游戏名称 *<input id="ag-label" class="field mt-1" placeholder="如：原神" required /></label>
           <label class="text-xs text-slate-400">英文标识 *<input id="ag-key" class="field mt-1 font-mono" placeholder="如：genshin" pattern="[a-zA-Z][a-zA-Z0-9_]{0,15}" required /></label>
           <label class="text-xs text-slate-400">图标 Emoji<input id="ag-emoji" class="field mt-1" placeholder="🎮" /></label>
@@ -223,7 +223,7 @@
 
   <div id="auth-modal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-auth-close></div>
-    <div class="relative max-w-md mx-auto mt-[10vh] rounded-2xl border border-white/10 bg-[#0b0f1d] p-6 shadow-2xl">
+    <div class="relative max-w-md mx-3 sm:mx-auto mt-[4vh] sm:mt-[10vh] max-h-[92vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#0b0f1d] p-4 sm:p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-5">
         <h3 class="text-lg font-bold">👤 账号</h3>
         <button data-auth-close class="h-8 w-8 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition">✕</button>
@@ -263,7 +263,7 @@
 
   <div id="bind-modal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-bind-close></div>
-    <div class="relative max-w-lg mx-auto mt-[6vh] max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#0b0f1d] p-6 shadow-2xl">
+    <div class="relative max-w-lg mx-3 sm:mx-auto mt-[2vh] sm:mt-[6vh] max-h-[92vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#0b0f1d] p-4 sm:p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-bold">🔗 官方接入</h3>
         <button data-bind-close class="h-8 w-8 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition">✕</button>
@@ -289,7 +289,7 @@
       <div id="bind-auto-box" class="hidden mt-4 rounded-xl border border-emerald-400/25 bg-emerald-400/10 p-4">
         <p class="text-xs font-semibold text-emerald-200">🔑 账号密码自动接入（免手动抓 Cookie）</p>
         <p class="text-[11px] text-emerald-100/70 leading-relaxed mt-1">填写上方 UID 与米游社账号密码后，点击下方按钮即可自动完成：自动填表 → 自动提交 → 自动抓取 Cookie → 自动同步战绩。若出现人机验证，请在弹出的窗口中手动完成一次（滑块/拼图）；若要求短信验证，只需输入手机收到的 6 位验证码。其余步骤全自动。密码仅用于本次登录，不会保存。</p>
-        <div class="mt-2 grid grid-cols-2 gap-2">
+        <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
           <input id="auto-account" class="field" placeholder="米游社账号（手机/邮箱）" />
           <input id="auto-password" type="password" class="field" placeholder="米游社密码（可选）" />
         </div>
@@ -315,14 +315,14 @@
     </div>
   </div>
 
-  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] rounded-xl border border-white/15 bg-[#101527] px-5 py-2.5 text-sm shadow-2xl"></div>
+  <div id="toast" class="hidden fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-[60] rounded-xl border border-white/15 bg-[#101527] px-4 sm:px-5 py-2.5 text-sm shadow-2xl max-w-[92vw] text-center"></div>
 
   <script>
     (function () {
       var seg = location.pathname.split('/').filter(Boolean);
       var base = (seg.length >= 2 && seg[seg.length - 2] === 'share') ? '../' : './';
       var s = document.createElement('script');
-      s.src = base + 'app.js?v=6';
+      s.src = base + 'app.js?v=7';
       document.body.appendChild(s);
     })();
   </script>

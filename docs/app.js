@@ -299,7 +299,7 @@ function applyBackground() {
       `linear-gradient(rgba(5,7,15,.78), rgba(5,7,15,.78)), url('${API_BASE}/api/background?t=${Date.now()}')`;
     document.body.style.backgroundSize = 'cover';
     document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundAttachment = 'fixed';
+    document.body.style.backgroundAttachment = window.innerWidth >= 640 ? 'fixed' : 'scroll';
   };
   img.src = API_BASE + '/api/background';
 }
@@ -468,7 +468,7 @@ function renderGame(spec, game) {
       ? `<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button>`
       : '';
     root.innerHTML = `
-      <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-6 flex flex-col items-center justify-center text-center min-h-[280px]" style="${cardStyle}">
+      <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-5 sm:p-6 flex flex-col items-center justify-center text-center min-h-[240px] sm:min-h-[280px]" style="${cardStyle}">
         <div class="self-end -mt-2 -mr-2">${removeButton}</div>
         <p class="text-3xl">${esc(spec.emoji)}</p>
         <p class="mt-3 font-bold">${esc(spec.label)}</p>
@@ -528,7 +528,7 @@ function renderGame(spec, game) {
             <p class="text-xs text-slate-500">UID ${esc(p.uid) || '未绑定'}</p>
           </div>
         </div>
-        <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 flex-wrap justify-end">
           ${isShare ? '' : `<button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🔗 重新绑定</button>`}
           ${launchButton}
           ${removeButton}
@@ -688,11 +688,11 @@ function addCharRow(ch = {}) {
   const row = document.createElement('div');
   row.className = 'grid grid-cols-12 gap-2 items-center';
   row.innerHTML = `
-    <input class="field col-span-4 char-name" placeholder="角色名" value="${esc(ch.name || '')}" />
-    <input class="field col-span-2 char-rarity" type="number" min="1" max="6" placeholder="稀有度" value="${ch.rarity || 4}" />
-    <input class="field col-span-2 char-level" type="number" min="1" max="120" placeholder="等级" value="${ch.level || 1}" />
-    <input class="field col-span-3 char-element" placeholder="属性（冰/风…）" value="${esc(ch.element || '')}" />
-    <button type="button" class="col-span-1 h-9 rounded-lg border border-white/10 text-slate-400 hover:text-red-300 hover:border-red-400/40 transition char-del">✕</button>`;
+    <input class="field col-span-12 sm:col-span-4 char-name" placeholder="角色名" value="${esc(ch.name || '')}" />
+    <input class="field col-span-3 sm:col-span-2 char-rarity" type="number" min="1" max="6" placeholder="稀有度" value="${ch.rarity || 4}" />
+    <input class="field col-span-3 sm:col-span-2 char-level" type="number" min="1" max="120" placeholder="等级" value="${ch.level || 1}" />
+    <input class="field col-span-4 sm:col-span-3 char-element" placeholder="属性（冰/风…）" value="${esc(ch.element || '')}" />
+    <button type="button" class="col-span-2 sm:col-span-1 h-9 rounded-lg border border-white/10 text-slate-400 hover:text-red-300 hover:border-red-400/40 transition char-del">✕</button>`;
   row.querySelector('.char-del').addEventListener('click', () => row.remove());
   $('#char-list').appendChild(row);
 }
