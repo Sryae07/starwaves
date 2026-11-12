@@ -75,22 +75,27 @@ def migrate_legacy_player() -> None:
 
 def ensure_owner() -> None:
     """机主账号：服务运行在机主电脑上，启动游戏 / 改背景 / 换 Cookie 等
-    本机控制类操作只允许机主执行。优先采用 .env 的 OWNER_USERNAME，
-    未指定时默认最早注册的账号为机主。"""
+    本机控制类操作只允许机主执行。.env 的 OWNER_USERNAME 一旦设置即为
+    唯一机主（每次启动都会校验并纠正）；未设置时默认最早注册的账号为机主。"""
     db = SessionLocal()
     try:
-        if db.query(User).filter(User.is_owner.is_(True)).first() is not None:
-            return
-        candidate = None
+        target = None
         if OWNER_USERNAME:
-            candidate = db.query(User).filter(User.username == OWNER_USERNAME).first()
-        if candidate is None:
-            candidate = db.query(User).order_by(User.id.asc()).first()
-        if candidate is None:
+            target = db.query(User).filter(User.username == OWNER_USERNAME).first()
+            if target is None:
+                logger.warning("OWNER_USERNAME=%s 未匹配到账号，回退为最早注册账号", OWNER_USERNAME)
+        if target is None:
+            owner = db.query(User).filter(User.is_owner.is_(True)).first()
+            if owner is not None:
+                return
+            target = db.query(User).order_by(User.id.asc()).first()
+        if target is None:
             return
-        candidate.is_owner = True
+        target.is_owner = True
+        for row in db.query(User).filter(User.is_owner.is_(True), User.id != target.id).all():
+            row.is_owner = False
         db.commit()
-        logger.info("机主账号已指定：%s（可在 .env 用 OWNER_USERNAME 覆盖）", candidate.username)
+        logger.info("机主账号：%s", target.username)
     finally:
         db.close()
 

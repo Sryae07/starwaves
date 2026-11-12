@@ -199,3 +199,23 @@ def test_steam_appid_must_be_numeric(client, auth_headers):
     )
     assert resp.status_code == 422
 
+def test_env_owner_override(client, monkeypatch):
+    """.env 的 OWNER_USERNAME 必须覆盖「最早注册自动成为机主」的默认规则。"""
+    _register(client, "13800138000")
+    _register(client, "13800138001")
+
+    from app import main
+    from app.database import SessionLocal
+    from app.models import User
+
+    monkeypatch.setattr(main, "OWNER_USERNAME", "玩家8001")
+    main.ensure_owner()
+
+    db = SessionLocal()
+    try:
+        flags = {u.username: bool(u.is_owner) for u in db.query(User).all()}
+    finally:
+        db.close()
+    assert flags["玩家8000"] is False
+    assert flags["玩家8001"] is True
+
