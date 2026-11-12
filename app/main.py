@@ -56,7 +56,7 @@ def migrate_legacy_player() -> None:
         db.commit()
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         (DATA_DIR / "initial_password.txt").write_text(
-            f"StarWaves 初始账号（由旧数据自动迁移）\n用户名: {user.username}\n密码: {password}\n"
+            f"Sryaestart 初始账号（由旧数据自动迁移）\n用户名: {user.username}\n密码: {password}\n"
             "首次登录后请尽快通过注册新账号或直接使用本账号管理数据。\n",
             encoding="utf-8",
         )
@@ -74,7 +74,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="StarWaves", description="多游戏个人档案 + 官方资讯聚合", version="0.3.0", lifespan=lifespan)
+app = FastAPI(title="Sryaestart", description="游戏启动器 + 多游戏档案 + 官方资讯聚合", version="0.4.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

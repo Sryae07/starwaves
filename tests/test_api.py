@@ -93,7 +93,7 @@ def test_pages(client):
     assert "关于本项目" in home.text
     dashboard = client.get("/dashboard")
     assert dashboard.status_code == 200
-    assert "StarWaves" in dashboard.text
+    assert "Sryaestart" in dashboard.text
 
 
 def test_share_page_route(client):

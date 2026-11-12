@@ -35,7 +35,7 @@ window.addEventListener('DOMContentLoaded', () => {
     + 'background:#0b1220;color:#67e8f9;text-align:center;padding:12px 16px;'
     + 'font-size:15px;font-weight:bold;border-bottom:2px solid #22d3ee;'
     + 'font-family:system-ui,sans-serif;';
-  bar.textContent = '🌟 StarWaves 自动接入进行中：正在自动登录米游社，请勿关闭本窗口（如出现人机验证请手动完成一次，其余步骤全自动）';
+  bar.textContent = '🌟 Sryaestart 自动接入进行中：正在自动登录米游社，请勿关闭本窗口（如出现人机验证请手动完成一次，其余步骤全自动）';
   document.body && document.body.appendChild(bar);
 });
 """

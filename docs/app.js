@@ -1,4 +1,4 @@
-/* StarWaves 前端逻辑：管理页与分享页共用一套渲染。
+/* Sryaestart 前端逻辑：管理页与分享页共用一套渲染。
    游戏卡片、更新弹窗页签、主题色全部由后端注册表（/api/games）动态渲染，
    新增游戏无需改动本文件。 */
 
@@ -492,7 +492,7 @@ function renderGame(spec, game) {
       ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2.5 py-1 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
       : '';
     const launchButton = spec.launchable !== false && !isShare
-      ? `<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button>`
+      ? `<button class="launch-btn rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition" data-game="${key}">🚀 启动游戏</button>`
       : '';
     root.innerHTML = `
       <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-5 sm:p-6 flex flex-col items-center justify-center text-center min-h-[240px] sm:min-h-[280px]" style="${cardStyle}">
@@ -537,7 +537,7 @@ function renderGame(spec, game) {
     ? `<button class="sync-btn rounded-lg border px-2.5 py-1 text-[11px] transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
     : '';
   const launchButton = spec.launchable !== false && !isShare
-    ? `<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button>`
+    ? `<button class="launch-btn rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-2.5 py-1 text-[11px] font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition" data-game="${key}">🚀 启动游戏</button>`
     : '';
   const removeButton = spec.custom && !isShare
     ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2 py-0.5 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`

@@ -3,7 +3,7 @@
 
 背景：鸣潮没有官方开放数据接口。本工具定义了一份"本地导出 JSON"契约，
 任何本地辅助工具（读日志 / 读缓存 / 手动整理）只要产出这份 JSON，
-就能用本工具一键上传到 StarWaves 服务端。
+就能用本工具一键上传到 Sryaestart 服务端。
 
 用法：
     python tools/wuwa_export.py --file wuwa_data.json
@@ -71,7 +71,7 @@ def upload(server: str, payload: dict, token: str | None, api_key: str | None) -
 def main() -> int:
     parser = argparse.ArgumentParser(description="鸣潮本地数据导出桥接工具")
     parser.add_argument("--file", help="本地 JSON 数据文件路径")
-    parser.add_argument("--server", default=DEFAULT_SERVER, help=f"StarWaves 服务地址（默认 {DEFAULT_SERVER}）")
+    parser.add_argument("--server", default=DEFAULT_SERVER, help=f"Sryaestart 服务地址（默认 {DEFAULT_SERVER}）")
     parser.add_argument("--token", default=None, help="登录令牌（/api/auth/login 返回的 token）")
     parser.add_argument("--api-key", default=None, help="服务端 API_KEY（未配置时可省略）")
     parser.add_argument("--example", action="store_true", help="打印 JSON 格式示例")

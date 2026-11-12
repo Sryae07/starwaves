@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StarWaves · 多游戏个人档案 + 官方资讯</title>
-  <meta name="description" content="把星穹铁道、鸣潮、绝区零的账号数据汇集到一个页面：等级、成就、体力倒计时、角色图鉴与官方资讯，一条链接即可分享。" />
+  <title>Sryaestart · 多游戏启动器 + 数据看板</title>
+  <meta name="description" content="Sryaestart 游戏启动器：手机点一下、电脑直接打开游戏，星穹铁道 / 鸣潮 / 绝区零的等级、成就、体力倒计时、角色图鉴与官方资讯同屏展示。" />
+  <link rel="icon" type="image/png" href="assets/icon-192.png" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -51,37 +52,38 @@
 
   <header class="max-w-6xl mx-auto px-3 sm:px-4 pt-4 sm:pt-6 flex items-center justify-between flex-wrap gap-3">
     <div class="flex items-center gap-3">
-      <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400 grid place-items-center text-lg font-black text-white shadow-lg shadow-violet-500/30">星</div>
+      <img src="assets/icon-192.png" alt="Sryaestart" class="h-10 w-10 rounded-xl shadow-lg shadow-violet-500/30" />
       <div>
-        <h1 class="font-bold tracking-wide">StarWaves <span class="text-slate-400 font-medium">· 游戏档案</span></h1>
-        <p class="text-xs text-slate-500">多游戏统一看板 · 官方资讯聚合</p>
+        <h1 class="font-bold tracking-wide">Sryaestart <span class="text-slate-400 font-medium">· 游戏启动器</span></h1>
+        <p class="text-xs text-slate-500">一键启动 · 数据看板 · 官方资讯</p>
       </div>
     </div>
     <nav class="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
       <a data-news href="/news" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3.5 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition">📡 资讯</a>
-      <a data-dashboard href="/dashboard" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3.5 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition">进入看板</a>
+      <a data-dashboard href="/dashboard" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3.5 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition">进入启动器</a>
       <a href="https://github.com/Sryae07/starwaves" target="_blank" rel="noopener" class="rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">GitHub</a>
     </nav>
   </header>
 
   <main class="max-w-6xl mx-auto px-4">
     <section class="pt-12 pb-16 sm:pt-20 sm:pb-24 text-center">
-      <p class="inline-block rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1 text-xs text-violet-200 tracking-wide">非官方 · 个人数据看板</p>
-      <h2 class="mt-6 text-4xl md:text-6xl font-black tracking-wide leading-tight">一个页面，<br class="md:hidden"/>装下<span class="hero-gradient">所有游戏</span>的档案</h2>
+      <p class="inline-block rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1 text-xs text-violet-200 tracking-wide">非官方 · 个人游戏启动器</p>
+      <h2 class="mt-6 text-4xl md:text-6xl font-black tracking-wide leading-tight">一个启动器，<br class="md:hidden"/>装下<span class="hero-gradient">所有游戏</span></h2>
       <p class="mt-6 max-w-2xl mx-auto text-slate-400 leading-relaxed">
-        把《崩坏：星穹铁道》《鸣潮》《绝区零》的账号数据汇集到一起——等级、活跃天数、成就、
-        体力回满倒计时、角色图鉴与资源统计，生成一条链接即可分享你的游戏名片。
-        游戏列表由注册表驱动，后续新游戏接入无需改前端。
+        Sryaestart 把《崩坏：星穹铁道》《鸣潮》《绝区零》装进同一个启动器——
+        手机点一下，电脑直接打开游戏；等级、活跃天数、成就、体力回满倒计时、
+        角色图鉴与资源统计同屏展示，一条链接即可分享你的游戏名片。
+        游戏列表由注册表驱动，接入新游戏无需改前端。
       </p>
       <div class="mt-10 flex items-center justify-center gap-3 flex-wrap">
-        <a data-dashboard href="/dashboard" class="rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 px-7 py-3 font-semibold text-white shadow-xl shadow-violet-500/30 hover:opacity-90 transition">🚀 进入看板</a>
+        <a data-dashboard href="/dashboard" class="rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 px-7 py-3 font-semibold text-white shadow-xl shadow-violet-500/30 hover:opacity-90 transition">🚀 进入启动器</a>
         <a href="#about" class="rounded-xl border border-white/15 bg-white/5 px-7 py-3 hover:bg-white/10 transition">了解更多</a>
       </div>
-      <p id="local-hint" class="hidden mt-4 text-xs text-slate-500">提示：进入看板需要电脑端已启动 StarWaves 服务（双击 start.bat）；手机访问请在打开页里填写电脑的局域网地址</p>
+      <p id="local-hint" class="hidden mt-4 text-xs text-slate-500">提示：启动游戏需要电脑端已启动 Sryaestart 服务（双击 start.bat）；手机访问请在打开页里填写电脑的局域网地址或公网服务器地址</p>
 
       <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-        <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">3+</p><p class="text-xs text-slate-500 mt-1">款游戏数据</p></div>
-        <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">4</p><p class="text-xs text-slate-500 mt-1">种更新方式</p></div>
+        <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">3+</p><p class="text-xs text-slate-500 mt-1">款游戏</p></div>
+        <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">1</p><p class="text-xs text-slate-500 mt-1">键远程启动</p></div>
         <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">30</p><p class="text-xs text-slate-500 mt-1">条历史快照</p></div>
         <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">1</p><p class="text-xs text-slate-500 mt-1">条分享链接</p></div>
       </div>
@@ -98,7 +100,7 @@
         <div class="card rounded-2xl p-6"><p class="text-2xl">📸</p><h4 class="mt-3 font-bold">截图 OCR 识别</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">上传游戏截图自动识别数字，先核对再入库，误差可控。</p></div>
         <div class="card rounded-2xl p-6"><p class="text-2xl">🔗</p><h4 class="mt-3 font-bold">UID 官方式接入</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">星铁输入 UID 即拉取米游社战绩：角色柜台（命座/命途）、忘却之庭·虚构叙事·末日幻影·模拟宇宙进度全同步；鸣潮用本地导出 JSON / OCR。</p></div>
         <div class="card rounded-2xl p-6"><p class="text-2xl">📈</p><h4 class="mt-3 font-bold">体力历史曲线</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">最近 30 条快照自动成图，回看自己的清体力节奏。</p></div>
-        <div class="card rounded-2xl p-6"><p class="text-2xl">🚀</p><h4 class="mt-3 font-bold">一键启动游戏</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">服务跑在本机，看板上点一下直接拉起星铁 / 鸣潮。</p></div>
+        <div class="card rounded-2xl p-6"><p class="text-2xl">🚀</p><h4 class="mt-3 font-bold">一键启动游戏</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">手机或电脑点一下，电脑直接拉起星铁 / 鸣潮——提权自动完成，人在哪都能启动。</p></div>
       </div>
     </section>
 
@@ -131,7 +133,7 @@
           <h4 class="font-bold">为什么做这个</h4>
           <p class="mt-3 text-sm text-slate-400 leading-relaxed">
             几款游戏的数据分散在不同客户端里，每次想看体力、成就还得切游戏。
-             StarWaves 把它们汇总成一张"游戏名片"：自己看、发朋友看，都行。
+             Sryaestart 把它们汇总成一张"游戏名片"：自己看、发朋友看，都行。
              所有数据归你本人所有，存于你自己的数据库；账号密码仅存散列摘要，手机号对外仅脱敏展示。
           </p>
         </div>
@@ -160,14 +162,14 @@
     </section>
 
     <section class="py-16 text-center">
-      <h3 class="text-3xl font-black">准备好展示你的档案了吗</h3>
-      <p class="mt-3 text-sm text-slate-400">启动本地服务，上传第一张截图，生成你的分享链接。</p>
-      <a data-dashboard href="/dashboard" class="mt-8 inline-block rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 px-8 py-3 font-semibold text-white shadow-xl shadow-violet-500/30 hover:opacity-90 transition">🚀 进入看板</a>
+      <h3 class="text-3xl font-black">准备好启动你的游戏了吗</h3>
+      <p class="mt-3 text-sm text-slate-400">启动本地服务，把游戏装进同一个启动器，随时远程开玩。</p>
+      <a data-dashboard href="/dashboard" class="mt-8 inline-block rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 px-8 py-3 font-semibold text-white shadow-xl shadow-violet-500/30 hover:opacity-90 transition">🚀 进入启动器</a>
     </section>
   </main>
 
   <footer class="border-t border-white/5 py-8 text-center text-xs text-slate-600 leading-relaxed">
-    StarWaves · 与米哈游 / 库洛游戏无关 · 非官方工具，仅供个人学习使用<br/>
+    Sryaestart · 与米哈游 / 库洛游戏无关 · 非官方工具，仅供个人学习使用<br/>
     所有游戏数据归玩家本人所有
   </footer>
 

@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api", tags=["public"])
 
 @router.get("/health")
 def health() -> dict:
-    return {"status": "ok", "app": "StarWaves", "version": "0.3.0"}
+    return {"status": "ok", "app": "Sryaestart", "version": "0.4.0"}
 
 
 @router.get("/share/{share_id}")
