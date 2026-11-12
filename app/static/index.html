@@ -288,7 +288,7 @@
 
       <div id="bind-auto-box" class="hidden mt-4 rounded-xl border border-emerald-400/25 bg-emerald-400/10 p-4">
         <p class="text-xs font-semibold text-emerald-200">🔑 账号密码自动接入（免手动抓 Cookie）</p>
-        <p class="text-[11px] text-emerald-100/70 leading-relaxed mt-1">填写上方 UID 后，先尝试用米游社账号密码直接登录；遇到人机验证会自动打开 Edge 登录页，登录成功后系统自动抓取 Cookie 并同步。密码仅用于本次登录，不会保存。</p>
+        <p class="text-[11px] text-emerald-100/70 leading-relaxed mt-1">填写上方 UID 与米游社账号密码后，点击下方按钮即可全自动完成：自动填表 → 自动提交 → 自动过人机验证 → 自动抓取 Cookie → 自动同步战绩。若米哈游要求短信验证，只需在弹出的窗口中输入手机收到的 6 位验证码，其余步骤仍全自动。密码仅用于本次登录，不会保存。</p>
         <div class="mt-2 grid grid-cols-2 gap-2">
           <input id="auto-account" class="field" placeholder="米游社账号（手机/邮箱）" />
           <input id="auto-password" type="password" class="field" placeholder="米游社密码（可选）" />
@@ -322,7 +322,7 @@
       var seg = location.pathname.split('/').filter(Boolean);
       var base = (seg.length >= 2 && seg[seg.length - 2] === 'share') ? '../' : './';
       var s = document.createElement('script');
-      s.src = base + 'app.js?v=4';
+      s.src = base + 'app.js?v=5';
       document.body.appendChild(s);
     })();
   </script>

@@ -1143,6 +1143,21 @@ $('#btn-bind-unbind')?.addEventListener('click', async () => {
 });
 
 let autoLoginPoll = null;
+
+const AUTO_STEP_LABELS = {
+  opening: '正在启动浏览器…',
+  waiting: '等待登录完成…',
+  filling: '正在自动填写账号密码…',
+  submitting: '正在提交登录…',
+  captcha: '检测到人机验证，正在自动通过…',
+  sms: '需要短信验证：请输入手机收到的 6 位验证码，其余自动完成',
+  logged_in: '检测到已登录，正在复用登录态…',
+  captured: '登录成功，Cookie 已保存',
+  syncing: '正在同步游戏数据…',
+  done: '全部完成',
+  failed: '失败',
+};
+
 $('#btn-auto-login')?.addEventListener('click', async () => {
   const uid = $('#bind-uid').value.trim();
   const account = $('#auto-account').value.trim();
@@ -1151,10 +1166,15 @@ $('#btn-auto-login')?.addEventListener('click', async () => {
     setBindStatus('请先在上方填写游戏 UID', false);
     return;
   }
+  if (!account || !password) {
+    setBindStatus('请填写米游社账号和密码，后续步骤会自动完成', false);
+    return;
+  }
   const btn = $('#btn-auto-login');
   btn.disabled = true;
   btn.textContent = '⏳ 接入中…';
-  setBindStatus('⏳ 正在尝试自动登录米游社…');
+  setBindStatus('⏳ 正在尝试账号密码直登（无需人工操作）…');
+  clearInterval(autoLoginPoll);
   try {
     const res = await api('/api/hoyolab/auto-login', {
       method: 'POST',
@@ -1165,36 +1185,32 @@ $('#btn-auto-login')?.addEventListener('click', async () => {
       $('#bind-modal').classList.add('hidden');
       toast('✓ 已自动登录并同步 UID ' + uid);
       await load();
-    } else if (res.status === 'browser') {
-      setBindStatus('🌐 ' + res.message);
+    } else if (res.status === 'auto') {
+      setBindStatus('🤖 已启动全自动接入：自动填表 → 提交 → 过人机验证 → 抓取 Cookie → 同步，请保持弹出的窗口打开');
       let tries = 0;
-      clearInterval(autoLoginPoll);
       autoLoginPoll = setInterval(async () => {
         tries += 1;
         try {
           const st = await api('/api/hoyolab/auto-login/status');
-          if (st.status === 'running') {
-            setBindStatus(`🌐 请在弹出的 Edge 中完成米游社登录…（已等待 ${st.elapsed} 秒，最长 10 分钟，重复点击不会新开窗口）`);
-          } else if (st.status === 'captured' || st.cookie_configured) {
+          const label = AUTO_STEP_LABELS[st.step] || AUTO_STEP_LABELS[st.status] || '处理中…';
+          if (st.status === 'waiting') {
+            setBindStatus(`🤖 ${label}（已运行 ${st.elapsed} 秒）`);
+          } else if (st.status === 'captured' || st.status === 'syncing') {
+            setBindStatus(`🤖 ${label}${st.message ? '：' + st.message : ''}`);
+          } else if (st.status === 'done') {
             clearInterval(autoLoginPoll);
-            toast('✓ 米游社 Cookie 已自动保存');
-            setBindStatus('✅ Cookie 已自动获取，正在同步 UID ' + uid + ' …');
-            await api(`/api/bind/${encodeURIComponent(bindGame)}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ uid }),
-            });
             $('#bind-modal').classList.add('hidden');
+            setBindStatus('✅ 全部完成');
             toast('✓ 已自动登录并同步 UID ' + uid);
             await load();
           } else if (st.status === 'failed') {
             clearInterval(autoLoginPoll);
-            setBindStatus(`❌ 自动抓取失败：${st.message}，请重试`, false);
+            setBindStatus(`❌ 自动抓取失败：${st.message || '请重试'}`, false);
           }
         } catch (e) { /* 轮询期间接口抖动忽略 */ }
-        if (tries >= 300) {
+        if (tries >= 360) {
           clearInterval(autoLoginPoll);
-          setBindStatus('⏱ 等待登录超时（10 分钟），请重新尝试', false);
+          setBindStatus('⏱ 自动接入超时（12 分钟），请重新尝试', false);
         }
       }, 2000);
     }

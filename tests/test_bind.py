@@ -183,7 +183,7 @@ def test_auto_login_falls_back_to_browser(client, auth_headers, monkeypatch):
     def fake_login(account, password):
         raise sync_router.NeedCaptcha("captcha")
 
-    def fake_browser():
+    def fake_browser(account, password, on_captured=None):
         called["browser"] = True
 
     monkeypatch.setattr(sync_router, "login_by_password", fake_login)
@@ -195,7 +195,7 @@ def test_auto_login_falls_back_to_browser(client, auth_headers, monkeypatch):
         headers=auth_headers,
     )
     assert resp.status_code == 200
-    assert resp.json()["status"] == "browser"
+    assert resp.json()["status"] == "auto"
     assert called["browser"] is True
 
 

@@ -7,11 +7,13 @@
 from __future__ import annotations
 
 import time
+import threading
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
+from ..database import SessionLocal
 from ..games import merged_games
 from ..models import User
 from ..models import SiteSetting
@@ -22,6 +24,7 @@ from ..services.hoyolab_login import (
     capture_state,
     login_by_password,
     save_cookie_to_db,
+    set_capture_state,
     start_browser_capture,
 )
 from ..services.profiles import apply_profile_update
@@ -31,11 +34,9 @@ from .deps import get_current_user, require_api_key
 router = APIRouter(prefix="/api", tags=["sync"])
 
 
-def _sync_hsr(user: User, db: Session, uid: str | None = None) -> dict:
-    try:
-        record = fetch_hsr_record(uid=uid, db=db)
-    except SyncError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+def sync_hsr_for_user(user: User, db: Session, uid: str | None = None) -> dict:
+    """星铁战绩同步核心（无 HTTP 层），供路由与后台线程共用。"""
+    record = fetch_hsr_record(uid=uid, db=db)
     player = apply_profile_update(
         db,
         "hsr",
@@ -54,6 +55,13 @@ def _sync_hsr(user: User, db: Session, uid: str | None = None) -> dict:
         user,
     )
     return share_payload(db, player)
+
+
+def _sync_hsr(user: User, db: Session, uid: str | None = None) -> dict:
+    try:
+        return sync_hsr_for_user(user, db, uid)
+    except SyncError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.post("/sync/hsr", dependencies=[Depends(require_api_key)])
@@ -128,28 +136,50 @@ def hoyolab_auto_login(
     account = str((payload or {}).get("account") or "").strip()
     password = str((payload or {}).get("password") or "").strip()
 
+    def sync_after_captured(user_id: int) -> None:
+        """Cookie 抓取成功后，在后台线程里自动同步 UID 数据。"""
+
+        def run() -> None:
+            set_capture_state(status="syncing", step="syncing", message="正在同步游戏数据…")
+            db = SessionLocal()
+            try:
+                sync_hsr_for_user(db.get(User, user_id), db, uid=uid)
+                set_capture_state(
+                    status="done",
+                    step="done",
+                    message="全部完成：Cookie 已保存，游戏数据已同步",
+                )
+            except SyncError as exc:
+                set_capture_state(
+                    status="failed",
+                    step="failed",
+                    message=f"Cookie 已保存，但同步失败：{exc}",
+                )
+            except Exception as exc:
+                set_capture_state(status="failed", step="failed", message=str(exc) or "同步失败")
+            finally:
+                db.close()
+
+        threading.Thread(target=run, daemon=True).start()
+
     if account and password:
         try:
             cookie = login_by_password(account, password)
-        except NeedCaptcha:
-            pass
-        except RuntimeError as exc:
-            raise HTTPException(
-                status_code=400,
-                detail=f"自动登录失败：{exc}（可以清空账号密码，改用浏览器登录自动抓取）",
-            ) from exc
-        else:
             save_cookie_to_db(cookie)
             _sync_hsr(user, db, uid=uid)
             return {"status": "synced", "uid": uid}
+        except NeedCaptcha:
+            pass  # 需要人机验证：回退到浏览器全自动通道
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=str(exc) or "直登失败") from exc
 
-    start_browser_capture()
+    start_browser_capture(account, password, on_captured=lambda: sync_after_captured(user.id))
     return {
-        "status": "browser",
+        "status": "auto",
         "uid": uid,
         "message": (
-            "已打开 Edge 米游社社区，请完成登录（含人机验证）。"
-            "登录成功后系统会自动抓取 Cookie 并同步该 UID，本窗口请勿关闭。"
+            "已启动全自动接入：自动填表、提交、过人机验证、抓取 Cookie 并同步。"
+            "请保持弹出的窗口打开，等待下方进度完成。"
         ),
     }
 
