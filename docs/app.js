@@ -972,12 +972,103 @@ $('#btn-save-cookie')?.addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cookie: $('#bind-cookie').value.trim() }),
     });
-    $('#bind-cookie-status').textContent = res.configured ? `已保存（尾号 ${res.tail}）` : '已清除';
-    $('#bind-cookie-status').className = 'text-[11px] text-emerald-300';
-    toast('Cookie 已保存（仅存本机数据库）');
+    if (res.configured) {
+      $('#bind-cookie-status').textContent = `✓ Cookie 已保存（尾号 ${res.tail}）`;
+      $('#bind-cookie-status').className = 'text-[11px] font-semibold text-emerald-300';
+      setBindStatus('✅ Cookie 已保存！输入 UID 后点「🔄 自动同步」即可拉取战绩。', true);
+      toast('✓ Cookie 已保存（仅存本机数据库）');
+    } else {
+      $('#bind-cookie-status').textContent = '已清除';
+      $('#bind-cookie-status').className = 'text-[11px] text-amber-300';
+      toast('Cookie 已清除');
+    }
   } catch (err) {
     toast(err.message, false);
   }
+});
+
+const FILL_TEMPLATES = {
+  hsr: {
+    nickname: '开拓者',
+    characters: [
+      { name: '黄泉', rarity: 5, level: 80, element: '雷', eidolon: 1, extra: { path: '虚无' } },
+      { name: '流萤', rarity: 5, level: 80, element: '火', eidolon: 0, extra: { path: '毁灭' } },
+      { name: '三月七', rarity: 4, level: 70, element: '冰', eidolon: 6, extra: { path: '存护' } },
+    ],
+    resources: { jades: 8000, special_pass: 20, star_pass: 10 },
+    challenges: {
+      moc: {
+        name: '忘却之庭', season: '本期·混沌回忆',
+        progress: { current: 27, max: 36, unit: '星' },
+        nodes: [{ name: '第11层', value: 3, max: 3 }, { name: '第12层', value: 1, max: 3 }],
+      },
+      su: { name: '模拟宇宙', stats: [{ label: '最高积分', value: 60000 }] },
+    },
+  },
+  wuwa: {
+    nickname: '漂泊者',
+    characters: [
+      { name: '忌炎', rarity: 5, level: 80, element: '气动', eidolon: 1 },
+      { name: '卡卡罗', rarity: 5, level: 80, element: '导电', eidolon: 0 },
+      { name: '散华', rarity: 4, level: 70, element: '冷凝', eidolon: 6 },
+    ],
+    resources: { astrites: 6000, waveplates: 180, shell_credits: 120000 },
+    challenges: {
+      tower: {
+        name: '逆境深塔', season: '1.4 版本',
+        progress: { current: 24, max: 30, unit: '星' },
+        nodes: [{ name: '左塔', value: 10, max: 12 }, { name: '右塔', value: 10, max: 12 }],
+      },
+    },
+  },
+};
+
+function fillJson(json) {
+  $('#bind-json').value = JSON.stringify(json, null, 2);
+  setBindStatus('已自动填入 JSON，检查数字后点「导入 JSON 并保存」即可。');
+}
+
+$('#btn-fill-template')?.addEventListener('click', () => {
+  const tpl = FILL_TEMPLATES[bindGame] || {
+    nickname: '示例玩家',
+    characters: [{ name: '示例角色', rarity: 5, level: 80, element: '', eidolon: 0 }],
+    resources: {},
+    challenges: {},
+  };
+  fillJson({
+    uid: $('#bind-uid').value.trim() || '',
+    nickname: tpl.nickname,
+    level: 60,
+    active_days: 300,
+    achievements: 400,
+    stamina: { current: 120, max: specOf(bindGame).cap || 240 },
+    resources: tpl.resources,
+    characters: tpl.characters,
+    challenges: tpl.challenges,
+  });
+});
+
+$('#btn-fill-current')?.addEventListener('click', () => {
+  const game = CURRENT && CURRENT.games && CURRENT.games[bindGame];
+  if (!game || !game.profile || !game.profile.uid) {
+    toast('该游戏还没有档案数据，可先点「✨ 填入模板」', false);
+    return;
+  }
+  fillJson({
+    uid: game.profile.uid,
+    nickname: game.profile.nickname,
+    level: game.profile.level,
+    active_days: game.profile.active_days,
+    achievements: game.profile.achievements,
+    stamina: { current: game.stamina.current, max: game.stamina.max },
+    resources: game.resources || {},
+    characters: (game.characters || []).map((c) => ({
+      name: c.name, rarity: c.rarity, level: c.level, element: c.element,
+      eidolon: c.eidolon || 0, extra: c.extra || {},
+    })),
+    challenges: game.challenges || {},
+  });
+  setBindStatus('已把当前档案序列化为 JSON 填入，可修改后导入。');
 });
 
 $('#btn-bind-sync')?.addEventListener('click', async () => {
@@ -1084,6 +1175,7 @@ $('#btn-auto-login')?.addEventListener('click', async () => {
           const st = await api('/api/settings/hoyolab-cookie');
           if (st.configured) {
             clearInterval(autoLoginPoll);
+            toast('✓ 米游社 Cookie 已自动保存');
             setBindStatus('✅ Cookie 已自动获取，正在同步 UID ' + uid + ' …');
             await api(`/api/bind/${encodeURIComponent(bindGame)}`, {
               method: 'POST',
