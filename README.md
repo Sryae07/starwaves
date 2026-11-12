@@ -107,6 +107,14 @@ docker compose up -d --build
   （镜像体积会明显变大，请自行评估）
 - `.env` 中的变量会自动注入容器
 
+## 开机自启（可选）
+
+想让手机随时能连（重启电脑后不用手动点 start.bat / start-tunnel.bat）：
+
+- 运行 `tools\autostart.ps1` 即可静默启动后端 + 公网隧道（幂等，已运行则跳过）
+- 已配置开机自启时，启动项位于 `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Sryaestart.vbs`
+- 每次开机隧道地址都会变，最新地址写入 `data\tunnel_url.txt`（打开文件即可看到手机要用的新地址）
+
 ## GitHub Pages 官网
 
 仓库已开启 GitHub Pages，首页镜像托管于：
