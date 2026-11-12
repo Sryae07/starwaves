@@ -1149,7 +1149,7 @@ const AUTO_STEP_LABELS = {
   waiting: '等待登录完成…',
   filling: '正在自动填写账号密码…',
   submitting: '正在提交登录…',
-  captcha: '检测到人机验证，正在自动通过…',
+  captcha: '需要人机验证：请在弹出的窗口中手动完成滑块/拼图，完成后自动继续',
   sms: '需要短信验证：请输入手机收到的 6 位验证码，其余自动完成',
   logged_in: '检测到已登录，正在复用登录态…',
   captured: '登录成功，Cookie 已保存',
@@ -1186,7 +1186,7 @@ $('#btn-auto-login')?.addEventListener('click', async () => {
       toast('✓ 已自动登录并同步 UID ' + uid);
       await load();
     } else if (res.status === 'auto') {
-      setBindStatus('🤖 已启动全自动接入：自动填表 → 提交 → 过人机验证 → 抓取 Cookie → 同步，请保持弹出的窗口打开');
+      setBindStatus('🤖 已启动自动接入：自动填表 → 提交 → 抓取 Cookie → 同步；若出现人机验证，请在弹窗中手动完成一次');
       let tries = 0;
       autoLoginPoll = setInterval(async () => {
         tries += 1;

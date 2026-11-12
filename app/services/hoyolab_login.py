@@ -35,7 +35,7 @@ window.addEventListener('DOMContentLoaded', () => {
     + 'background:#0b1220;color:#67e8f9;text-align:center;padding:12px 16px;'
     + 'font-size:15px;font-weight:bold;border-bottom:2px solid #22d3ee;'
     + 'font-family:system-ui,sans-serif;';
-  bar.textContent = '🌟 StarWaves 自动接入进行中：正在自动登录米游社，请勿关闭本窗口（人机验证会自动尝试通过）';
+  bar.textContent = '🌟 StarWaves 自动接入进行中：正在自动登录米游社，请勿关闭本窗口（如出现人机验证请手动完成一次，其余步骤全自动）';
   document.body && document.body.appendChild(bar);
 });
 """
@@ -186,45 +186,16 @@ def _wait_login_frame(page, timeout_ms: int = 30000):
     return page.main_frame
 
 
-def _try_solve_geetest(page) -> bool:
-    """尝试自动通过极验：智能按钮直接点；滑块则模拟人类轨迹拖拽。
-    极验可能出现在登录 iframe 或独立验证 iframe 中，遍历所有 frame。"""
-    import random
-
+def _captcha_visible(page) -> bool:
+    """检测任意 frame 中是否出现极验人机验证组件（只检测，绝不自动点击）。"""
     for frame in page.frames:
         try:
-            smart = frame.locator(
-                ".geetest_smart_button, .geetest_btn, .geetest_success_radar_tip"
+            loc = frame.locator(
+                ".geetest_slider_button, .geetest_slide_button, "
+                ".geetest_radar_btn, .geetest_smart_button, .geetest_btn"
             )
-            if smart.first.is_visible():
-                smart.first.click(force=True)
+            if loc.count() > 0 and loc.first.is_visible():
                 return True
-        except Exception:
-            pass
-    for frame in page.frames:
-        try:
-            slider = frame.locator(
-                ".geetest_slider_button, .geetest_slide_button, .geetest_radar_btn"
-            ).first
-            if not slider.is_visible():
-                continue
-            box = slider.bounding_box()
-            if not box:
-                continue
-            x = box["x"] + box["width"] / 2
-            y = box["y"] + box["height"] / 2
-            page.mouse.move(x, y)
-            page.wait_for_timeout(random.randint(150, 300))
-            page.mouse.down()
-            distance = 260
-            steps = random.randint(24, 42)
-            for i in range(1, steps + 1):
-                nx = x + distance * i / steps + random.uniform(-2, 2)
-                ny = y + random.uniform(-1.5, 1.5)
-                page.mouse.move(nx, ny)
-                page.wait_for_timeout(random.randint(6, 22))
-            page.mouse.up()
-            return True
         except Exception:
             continue
     return False
@@ -355,7 +326,6 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
                     raise RuntimeError("提交登录失败：" + str(exc)) from exc
 
             last_token_try = 0.0
-            captcha_tries = 0
             sms_sent_at = 0.0
             sms_clicks = 0
             sms_last_submitted = ""
@@ -401,7 +371,11 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
                         sms_sent_at = 0.0  # 需要短信验证：触发下方发送逻辑
                         continue
                     if retcode == 1034:
-                        continue  # 人机验证：交给下方 geetest 逻辑
+                        _set_step(
+                            "captcha",
+                            "检测到人机验证：请在弹出的窗口中手动完成（拖动滑块/拼图），完成后系统会自动继续",
+                        )
+                        continue
                     if retcode not in (0, None):
                         raise RuntimeError(
                             msg or f"米游社登录失败（retcode={retcode}）"
@@ -483,19 +457,14 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
                 if error and not sms_visible:
                     raise RuntimeError(f"米游社提示：{error}（请检查账号密码后重试）")
 
-                if captcha_tries < 3 and _try_solve_geetest(page):
-                    captcha_tries += 1
-                    _set_step("captcha", f"检测到人机验证，正在自动通过（第 {captcha_tries} 次）…")
-                    page.wait_for_timeout(2500)
-                    continue
-                if captcha_tries >= 3:
+                if _captcha_visible(page):
                     _set_step(
                         "captcha",
-                        "人机验证自动通过失败，请在弹出的窗口中手动完成一次滑块验证",
+                        "检测到人机验证：请在弹出的窗口中手动完成（拖动滑块/拼图），完成后系统会自动继续",
                     )
 
                 time.sleep(2)
-            raise TimeoutError("自动登录超时（3 分钟），若一直出现人机验证请稍后重试")
+            raise TimeoutError("自动登录超时（3 分钟），若人机验证一直未完成请稍后重试")
         except Exception as exc:
             if "closed" in str(exc).lower() or "target page" in str(exc).lower():
                 raise RuntimeError(
