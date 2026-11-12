@@ -8,14 +8,13 @@
 
 from __future__ import annotations
 
-import glob
 import os
 import subprocess
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from ..config import GAME_RULES, LAUNCH_HSR_PATH, LAUNCH_WUWA_PATH
+from ..games import GAMES, get_spec, known_game
 from .deps import require_api_key
 
 router = APIRouter(prefix="/api", tags=["launch"])
@@ -25,42 +24,35 @@ DETACH_FLAGS = 0x00000008 | 0x00000200
 
 
 def _resolve_path(game: str) -> Path | None:
-    configured = LAUNCH_HSR_PATH if game == "hsr" else LAUNCH_WUWA_PATH
+    spec = get_spec(game)
+    configured = os.getenv(spec.launch_env_key, "").strip() if spec.launch_env_key else ""
     if configured and Path(configured).is_file():
         return Path(configured)
-    candidates: list[str] = []
-    if game == "hsr":
-        candidates += [
-            r"C:\Program Files\Star Rail\Games\StarRail.exe",
-            r"C:\Program Files (x86)\Star Rail\Games\StarRail.exe",
-        ]
-        # 未找到星铁本体时，退回到米哈游启动器（用户再点一下进入游戏）
-        candidates += sorted(glob.glob(r"C:\Program Files\miHoYo Launcher\*\HYP.exe"))
-    else:
-        candidates += [
-            r"C:\Program Files\Wuthering Waves\Wuthering Waves Game\Client\Binaries\Win64\Client-Win64-Shipping.exe",
-        ]
-        candidates += sorted(
-            glob.glob(r"C:\Program Files\Wuthering Waves\*\Client\Binaries\Win64\Client-Win64-Shipping.exe")
-        )
-    for candidate in candidates:
-        if Path(candidate).is_file():
+    from glob import glob
+
+    for candidate in spec.launch_candidates:
+        if any(ch in candidate for ch in "*?["):
+            for match in sorted(glob(candidate)):
+                if Path(match).is_file():
+                    return Path(match)
+        elif Path(candidate).is_file():
             return Path(candidate)
     return None
 
 
 @router.post("/launch/{game}", dependencies=[Depends(require_api_key)])
 def launch_game(game: str) -> dict:
-    if game not in GAME_RULES:
-        raise HTTPException(status_code=404, detail=f"未知游戏: {game}")
+    if not known_game(game):
+        raise HTTPException(status_code=404, detail=f"未知游戏: {game}，支持: {', '.join(GAMES)}")
     if os.name != "nt":
         raise HTTPException(status_code=501, detail="启动游戏仅支持 Windows 本机部署")
     path = _resolve_path(game)
     if path is None:
-        env_key = "LAUNCH_HSR_PATH" if game == "hsr" else "LAUNCH_WUWA_PATH"
+        spec = get_spec(game)
+        env_key = spec.launch_env_key
         raise HTTPException(
             status_code=400,
-            detail=f"未找到{GAME_RULES[game]['label']}安装路径，请在 .env 中设置 {env_key}",
+            detail=f"未找到{spec.label}安装路径，请在 .env 中设置 {env_key}",
         )
     try:
         subprocess.Popen(

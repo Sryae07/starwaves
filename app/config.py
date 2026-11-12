@@ -22,12 +22,5 @@ HKRPG_COOKIE = os.getenv("HKRPG_COOKIE", "").strip()
 HKRPG_SERVER = os.getenv("HKRPG_SERVER", "cn").strip()
 HKRPG_UID = os.getenv("HKRPG_UID", "").strip()
 
-# 启动游戏：留空则按常见安装路径自动探测（仅 Windows 本机部署有效）
-LAUNCH_HSR_PATH = os.getenv("LAUNCH_HSR_PATH", "").strip()
-LAUNCH_WUWA_PATH = os.getenv("LAUNCH_WUWA_PATH", "").strip()
-
-# 体力恢复规则：每点所需分钟数 / 上限
-GAME_RULES = {
-    "hsr": {"label": "星穹铁道", "stamina_name": "开拓力", "minutes_per_point": 6, "cap": 240},
-    "wuwa": {"label": "鸣潮", "stamina_name": "结晶波片", "minutes_per_point": 6, "cap": 240},
-}
+# 游戏规则、启动路径、资讯源等按游戏维度的配置已收敛到 app/games.py 注册表，
+# 新增游戏时无需再改动本文件（启动路径的环境变量覆盖仍按 GameSpec.launch_env_key 读取）。

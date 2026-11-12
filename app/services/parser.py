@@ -1,34 +1,17 @@
 """OCR 文本解析：把 PaddleOCR 输出的原始文本行转成结构化字段。
 
-关键词表是数据驱动的，游戏截图排版变化时只需在 GAME_FIELDS 里增减关键词，
-不需要改动解析逻辑。
+关键词表是数据驱动的，来自 app/games.py 注册表的 ocr_keywords，
+游戏截图排版变化或新增游戏时只需改注册表，不需要改动解析逻辑。
 """
 
 from __future__ import annotations
 
 import re
 
+from ..games import get_spec
+
 FULLWIDTH_MAP = {ord(c): d for c, d in zip("０１２３４５６７８９", "0123456789")}
 FULLWIDTH_MAP.update({ord("／"): "/", ord("："): ":", ord("．"): "."})
-
-GAME_FIELDS = {
-    "hsr": {
-        "uid": ["uid"],
-        "level": ["开拓等级", "等级"],
-        "active_days": ["活跃天数"],
-        "achievements": ["成就"],
-        "stamina": ["开拓力"],
-        "characters": ["角色数量", "拥有角色", "角色数"],
-    },
-    "wuwa": {
-        "uid": ["uid"],
-        "level": ["联觉等级", "等级"],
-        "active_days": ["活跃天数"],
-        "achievements": ["成就"],
-        "stamina": ["结晶波片", "波片"],
-        "characters": ["角色数量", "共鸣者数量", "角色数"],
-    },
-}
 
 
 def normalize(text: str) -> str:
@@ -37,9 +20,7 @@ def normalize(text: str) -> str:
 
 
 def parse_ocr_text(text: str, game: str) -> dict:
-    if game not in GAME_FIELDS:
-        raise ValueError(f"未知游戏: {game}，支持: {', '.join(GAME_FIELDS)}")
-    fields = GAME_FIELDS[game]
+    fields = get_spec(game).ocr_keywords
     lines = [normalize(line).strip() for line in text.splitlines() if line.strip()]
     parsed = {
         "uid": None,

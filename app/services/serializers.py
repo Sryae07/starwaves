@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
-from ..config import GAME_RULES
+from ..games import get_spec
 from ..models import Player, Profile
 
 
@@ -19,12 +19,12 @@ def _iso(dt: datetime | None) -> str | None:
 
 
 def _stamina_payload(profile: Profile) -> dict:
-    rule = GAME_RULES[profile.game]
+    spec = get_spec(profile.game)
     snapshot = profile.snapshots[0] if profile.snapshots else None
     base = {
-        "name": rule["stamina_name"],
+        "name": spec.stamina_name,
         "current": 0,
-        "max": rule["cap"],
+        "max": spec.cap,
         "full": False,
         "minutes_to_full": None,
         "full_at": None,
@@ -32,11 +32,11 @@ def _stamina_payload(profile: Profile) -> dict:
     if snapshot is None:
         return base
     current = snapshot.stamina_current
-    cap = snapshot.stamina_max or rule["cap"]
+    cap = snapshot.stamina_max or spec.cap
     if current >= cap:
         base.update(current=current, max=cap, full=True, minutes_to_full=0)
         return base
-    minutes = (cap - current) * rule["minutes_per_point"]
+    minutes = (cap - current) * spec.minutes_per_point
     full_at = snapshot.captured_at
     if full_at.tzinfo is None:
         full_at = full_at.replace(tzinfo=timezone.utc)
@@ -51,19 +51,21 @@ def _stamina_payload(profile: Profile) -> dict:
 
 
 def game_payload(profile: Profile) -> dict:
+    spec = get_spec(profile.game)
     snapshot = profile.snapshots[0] if profile.snapshots else None
     history = [
         {
             "at": _iso(s.captured_at),
             "current": s.stamina_current,
-            "max": s.stamina_max or GAME_RULES[profile.game]["cap"],
+            "max": s.stamina_max or spec.cap,
             "source": s.source,
         }
         for s in profile.snapshots[:30]
     ]
     history.reverse()  # 最近 30 条，按时间升序便于前端画曲线
     return {
-        "label": GAME_RULES[profile.game]["label"],
+        "key": profile.game,
+        "label": spec.label,
         "profile": {
             "uid": profile.uid,
             "nickname": profile.nickname,

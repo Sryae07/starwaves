@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from ..config import GAME_RULES
+from ..games import get_spec
 from ..models import Character, Player, Profile, Snapshot
 from ..schemas import ProfileUpdate
 
 
 def apply_profile_update(db: Session, game: str, payload: ProfileUpdate) -> Player:
-    rule = GAME_RULES[game]
+    spec = get_spec(game)
     player = db.query(Player).order_by(Player.id.asc()).first()
     if player is None:
         player = Player(nickname="旅行者")
@@ -36,7 +36,7 @@ def apply_profile_update(db: Session, game: str, payload: ProfileUpdate) -> Play
         Snapshot(
             profile=profile,
             stamina_current=payload.stamina_current,
-            stamina_max=payload.stamina_max or rule["cap"],
+            stamina_max=payload.stamina_max or spec.cap,
             resources=payload.resources or {},
             source=payload.source,
         )

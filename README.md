@@ -1,9 +1,10 @@
-# StarWaves · 星穹铁道 × 鸣潮 双游档案
+# StarWaves · 多游戏档案 + 官方资讯聚合
 
-一个自托管的个人游戏数据看板：把《崩坏：星穹铁道》与《鸣潮》的账号数据
+一个自托管的个人游戏数据看板：把《崩坏：星穹铁道》《鸣潮》《绝区零》的账号数据
 （等级 / 活跃天数 / 成就 / 体力 / 角色 / 资源）汇总到同一个页面，
 带体力回满倒计时与历史曲线，支持生成公开分享链接、自定义网页背景，
-还能在看板上一键启动游戏。
+还能在看板上一键启动游戏，并内置一个实时聚合官方公告 / 动态的资讯中心。
+游戏列表由注册表（`app/games.py`）驱动，后续接入新游戏无需改前端。
 
 > 非官方工具，仅供个人学习使用。米游社接口为社区逆向协议，存在风控与失效风险。
 
@@ -11,7 +12,11 @@
 
 ## 功能特性
 
-- 双游戏合并看板：体力进度条 + 回满倒计时、等级/活跃天数/成就统计、资源、角色图鉴
+- 多游戏合并看板：体力进度条 + 回满倒计时、等级/活跃天数/成就统计、资源、角色图鉴
+- 📡 资讯中心（`/news`）：聚合各游戏官方公告 / 新闻 / 活动（星铁·绝区零走米游社论坛、鸣潮走库洛官网 JSON），
+  后端 5 分钟 TTL 缓存 + 页面自动轮询，数据源故障自动降级
+- 注册表驱动的游戏接入：新增游戏只需在 `app/games.py` 登记一条 `GameSpec`
+  （体力规则 / 主题色 / OCR 关键词 / 资讯源），看板与资讯页自动渲染
 - 体力历史曲线：最近 30 条快照自动画成趋势图
 - 网页背景自定义：上传一张图即全站生效（首页 / 看板 / 分享页），可一键恢复默认
 - 一键启动游戏：服务跑在本机，看板上点一下直接拉起星铁 / 鸣潮
@@ -29,7 +34,8 @@
 ## 页面结构
 
 - `/` 官网首页：项目作用、功能介绍、关于版块
-- `/dashboard` 数据看板：双游戏档案 + 更新数据（管理端）
+- `/dashboard` 数据看板：多游戏档案 + 更新数据（管理端）
+- `/news` 资讯中心：官方公告 / 动态实时聚合，每 5 分钟自动刷新
 - `/share/{share_id}` 公开档案：只读分享页，无需登录
 
 ## 架构
@@ -40,10 +46,11 @@
 │  (Tailwind)  │                   │  ├─ /api/profiles  手动入库  │
 └──────▲───────┘                   │  ├─ /api/upload   截图 OCR   │
        │ JSON 只读分享              │  ├─ /api/sync/hsr 米游社同步 │
-       └───────────────────────────│  ├─ /api/launch   启动游戏   │
+       └───────────────────────────│  ├─ /api/news     官方资讯   │
+                                   │  ├─ /api/launch   启动游戏   │
                                    │  └─ SQLite (SQLAlchemy)      │
-                                   └──────────┬──────────────────┘
-                          PaddleOCR（可选）    米游社（可选，非官方）
+                                   └────┬───────────┬────────────┘
+                          PaddleOCR（可选） 米游社/库洛官网资讯源
 ```
 
 ## 快速开始
@@ -170,6 +177,8 @@ python tools/wuwa_export.py --example
 | GET | `/api/background` | 获取当前背景图 | 无 |
 | GET | `/api/me` | 我的档案（含分享 id） | X-API-Key |
 | GET | `/api/share/{share_id}` | 公开只读档案 | 无 |
+| GET | `/api/games` | 游戏注册表元数据（前端动态渲染用） | 无 |
+| GET | `/api/news?game=hsr&limit=12` | 官方资讯聚合（默认全部游戏） | 无 |
 | GET | `/api/health` | 健康检查 | 无 |
 
 写接口鉴权规则：`.env` 未配置 `API_KEY` 时放行（仅限本机调试），
@@ -187,6 +196,24 @@ python tools/wuwa_export.py --example
 | `HKRPG_UID` | 指定角色 UID（可选） | 空 |
 | `LAUNCH_HSR_PATH` | 星铁启动路径（可选，自动探测兜底） | 空 |
 | `LAUNCH_WUWA_PATH` | 鸣潮启动路径（可选，自动探测兜底） | 空 |
+| `LAUNCH_ZZZ_PATH` | 绝区零启动路径（可选，自动探测兜底） | 空 |
+
+## 添加新游戏（注册表驱动）
+
+接入新游戏不需要改前端。以新增「原神」为例：
+
+1. 在 `app/games.py` 的 `GAMES` 里加一条 `GameSpec`：
+   - 体力规则：`stamina_name`（如"原粹树脂"）、`minutes_per_point`（8）、`cap`（200）；
+   - 主题色：`color_a` / `color_b`（看板卡片与进度条颜色）；
+   - OCR 关键词：`ocr_keywords`（截图识别所需的字段关键词表）；
+   - 资讯源：`news` 字段复用已有 Provider（如 `{"provider": "miyoushe", "forum_id": 26, ...}`）
+     或先在 `app/services/news.py` 新写一个 Provider 类并登记到 `PROVIDERS`；
+   - 可选：`syncable=True` + `services/hoyolab.py` 对应抓取函数 + `routers/sync.py` 一条路由（米游社同步）；
+   - 可选：`launch_env_key` / `launch_candidates`（一键启动）。
+2. 重启服务。看板、更新弹窗页签、资讯页筛选都会自动出现新游戏，
+   数据库表结构无需变更（`Profile.game` 为字符串字段）。
+
+注意：`key` 一旦有玩家数据就不要改名，历史快照按它归档。
 
 ## 目录结构
 
@@ -194,11 +221,12 @@ python tools/wuwa_export.py --example
 app/
   main.py            # FastAPI 入口（含页面路由）
   config.py          # 环境变量配置
+  games.py           # 游戏注册表（新增游戏在这里登记）
   models.py          # SQLAlchemy 模型（Player/Profile/Snapshot/Character）
   schemas.py         # 请求体模型
-  routers/           # public / profiles / uploads / sync / launch / settings
-  services/          # parser(OCR解析) / ocr / profiles / serializers / hoyolab
-  static/            # home.html(官网) / index.html + app.js(看板)
+  routers/           # public / profiles / uploads / sync / launch / settings / news
+  services/          # parser(OCR解析) / ocr / profiles / serializers / hoyolab / news(资讯聚合)
+  static/            # home.html(官网) / index.html + app.js(看板) / news.html(资讯中心)
 tools/wuwa_export.py # 鸣潮 JSON 上传桥接
 docs/                # GitHub Pages 官网镜像
 tests/               # pytest 测试
@@ -213,11 +241,14 @@ start.bat            # Windows 一键启动脚本
    绝不要把 Cookie 放到公网前端
 3. **OCR 有识别误差**：字体、背景、模糊都会导致数字识别错误，
    所以设计成"先识别 → 人工校对 → 再入库"两段式流程
+4. **资讯源非官方承诺**：米游社论坛为社区协议、库洛官网 JSON 为官网静态资源，
+   均可能随时调整字段或风控；后端做了 TTL 缓存与降级，失败时旧缓存兜底或显示为空
 
 ## Roadmap
 
 - 鸣潮 PC 端本地缓存读取适配器（需要逆向本地数据格式，另开仓库更合适）
 - 定时自动刷新（星铁侧，可配合系统计划任务调用 /api/sync/hsr）
+- 鸣潮 B 站官方动态源（B 站 API 对本机 IP 有风控，暂以库洛官网资讯替代）
 - 多玩家注册登录、分享页自定义主题
 
 ## 免责声明

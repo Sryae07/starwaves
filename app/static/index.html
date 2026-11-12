@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StarWaves · 星穹铁道 × 鸣潮 双游档案</title>
+  <title>StarWaves · 多游戏档案看板</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -44,14 +44,20 @@
     <div class="flex items-center gap-3">
       <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400 grid place-items-center text-lg font-black text-white shadow-lg shadow-violet-500/30">星</div>
       <div>
-        <h1 class="text-lg font-bold tracking-wide">StarWaves <span class="text-slate-400 font-medium">· 双游档案</span></h1>
-        <p class="text-xs text-slate-500">星穹铁道 × 鸣潮 · 统一游戏看板</p>
+        <h1 class="text-lg font-bold tracking-wide">StarWaves <span class="text-slate-400 font-medium">· 游戏档案</span></h1>
+        <p class="text-xs text-slate-500">多游戏统一看板 · 由注册表驱动</p>
       </div>
     </div>
-    <div id="admin-actions" class="hidden items-center gap-2">
-      <button id="btn-bg" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">🖼 背景</button>
-      <button id="btn-share" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">🔗 分享主页</button>
-      <button id="btn-update" class="rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">⬆ 更新数据</button>
+    <div class="flex items-center gap-2 flex-wrap justify-end">
+      <nav class="flex items-center gap-1.5">
+        <a href="/" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">首页</a>
+        <a href="/news" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">📡 资讯</a>
+      </nav>
+      <div id="admin-actions" class="hidden items-center gap-2">
+        <button id="btn-bg" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">🖼 背景</button>
+        <button id="btn-share" class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 transition">🔗 分享主页</button>
+        <button id="btn-update" class="rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">⬆ 更新数据</button>
+      </div>
     </div>
   </header>
 
@@ -71,14 +77,11 @@
       </div>
     </section>
 
-    <section class="mt-6 grid gap-6 md:grid-cols-2">
-      <div id="game-hsr"></div>
-      <div id="game-wuwa"></div>
-    </section>
+    <section id="games-grid" class="mt-6 grid gap-6 md:grid-cols-2"></section>
 
     <footer class="mt-16 text-center text-xs text-slate-600 leading-relaxed">
       StarWaves · 数据来源：米游社同步 / 截图 OCR / 手动录入 · 非官方工具，仅供个人学习使用<br/>
-      鸣潮无官方开放数据接口，相关数据需本地工具或截图方式更新
+      鸣潮无官方开放数据接口，相关数据需本地工具或截图方式更新 · 支持游戏由后端注册表动态渲染
     </footer>
   </main>
 
@@ -90,10 +93,7 @@
         <button data-close class="h-8 w-8 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition">✕</button>
       </div>
 
-      <div class="grid grid-cols-2 gap-2 mb-5">
-        <button data-game="hsr" class="game-tab rounded-xl border border-white/10 bg-white/5 py-2.5 text-sm font-semibold transition">🚂 星穹铁道</button>
-        <button data-game="wuwa" class="game-tab rounded-xl border border-white/10 bg-white/5 py-2.5 text-sm font-semibold transition">🌊 鸣潮</button>
-      </div>
+      <div id="game-tabs" class="grid grid-cols-2 gap-2 mb-5"></div>
 
       <div id="dropzone" class="rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] p-8 text-center cursor-pointer hover:border-violet-400/60 hover:bg-white/[0.06] transition">
         <p class="text-2xl mb-1">🖼️</p>
@@ -112,12 +112,12 @@
         <div class="grid grid-cols-2 gap-3">
           <label class="text-xs text-slate-400">UID<input id="f-uid" class="field mt-1" placeholder="游戏 UID" /></label>
           <label class="text-xs text-slate-400">昵称<input id="f-nickname" class="field mt-1" placeholder="游戏内昵称" /></label>
-          <label class="text-xs text-slate-400">等级<input id="f-level" type="number" min="0" class="field mt-1" placeholder="开拓等级 / 联觉等级" /></label>
+          <label class="text-xs text-slate-400"><span id="lbl-level">等级</span><input id="f-level" type="number" min="0" class="field mt-1" /></label>
           <label class="text-xs text-slate-400">活跃天数<input id="f-days" type="number" min="0" class="field mt-1" /></label>
           <label class="text-xs text-slate-400">成就数<input id="f-ach" type="number" min="0" class="field mt-1" /></label>
           <div class="grid grid-cols-2 gap-2">
-            <label class="text-xs text-slate-400">体力当前<input id="f-stamina" type="number" min="0" class="field mt-1" /></label>
-            <label class="text-xs text-slate-400">体力上限<input id="f-stamina-max" type="number" min="1" value="240" class="field mt-1" /></label>
+            <label class="text-xs text-slate-400"><span id="lbl-stamina">体力当前</span><input id="f-stamina" type="number" min="0" class="field mt-1" /></label>
+            <label class="text-xs text-slate-400"><span id="lbl-stamina-max">体力上限</span><input id="f-stamina-max" type="number" min="1" value="240" class="field mt-1" /></label>
           </div>
         </div>
 

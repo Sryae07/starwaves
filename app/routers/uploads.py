@@ -14,8 +14,9 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
-from ..config import GAME_RULES, UPLOAD_DIR
+from ..config import UPLOAD_DIR
 from ..database import get_db
+from ..games import GAMES, get_spec, known_game
 from ..schemas import ProfileUpdate
 from ..services.ocr import OcrUnavailable, ocr_image
 from ..services.parser import parse_ocr_text
@@ -35,7 +36,7 @@ def _to_profile_update(game: str, parsed: dict, source: str) -> ProfileUpdate:
         active_days=parsed.get("active_days") or 0,
         achievements=parsed.get("achievements") or 0,
         stamina_current=parsed.get("stamina_current") or 0,
-        stamina_max=parsed.get("stamina_max") or GAME_RULES[game]["cap"],
+        stamina_max=parsed.get("stamina_max") or get_spec(game).cap,
         source=source,
     )
 
@@ -47,8 +48,8 @@ async def upload_screenshot(
     apply: bool = Form(False),
     db: Session = Depends(get_db),
 ) -> dict:
-    if game not in GAME_RULES:
-        raise HTTPException(status_code=404, detail=f"未知游戏: {game}")
+    if not known_game(game):
+        raise HTTPException(status_code=404, detail=f"未知游戏: {game}，支持: {', '.join(GAMES)}")
     ext = Path(file.filename or "shot.png").suffix.lower()
     if ext not in ALLOWED_EXTS:
         raise HTTPException(status_code=415, detail=f"仅支持图片格式: {', '.join(sorted(ALLOWED_EXTS))}")

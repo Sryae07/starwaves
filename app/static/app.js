@@ -1,4 +1,6 @@
-/* StarWaves 前端逻辑：管理页与分享页共用一套渲染。 */
+/* StarWaves 前端逻辑：管理页与分享页共用一套渲染。
+   游戏卡片、更新弹窗页签、主题色全部由后端注册表（/api/games）动态渲染，
+   新增游戏无需改动本文件。 */
 
 const KEY_NAME = 'starwaves_api_key';
 let apiKey = localStorage.getItem(KEY_NAME) || '';
@@ -10,31 +12,45 @@ const isShare = Boolean(shareId);
 
 const $ = (sel) => document.querySelector(sel);
 
-const GAME_THEME = {
-  hsr: {
-    label: '星穹铁道', emoji: '🚂', ring: 'border-amber-300/25', glow: 'shadow-amber-500/10',
-    bar: 'from-amber-300 to-violet-500',
-    chip: 'border-amber-300/25 bg-amber-400/10 text-amber-200',
-    c1: '#fcd34d', c2: '#8b5cf6',
-  },
-  wuwa: {
-    label: '鸣潮', emoji: '🌊', ring: 'border-cyan-300/25', glow: 'shadow-cyan-500/10',
-    bar: 'from-cyan-300 to-blue-500',
-    chip: 'border-cyan-300/25 bg-cyan-400/10 text-cyan-200',
-    c1: '#67e8f9', c2: '#3b82f6',
-  },
+let REGISTRY = [];
+
+/* 注册表接口不可用时的兜底主题（与后端 games.py 保持一致） */
+const FALLBACK_THEMES = {
+  hsr: { label: '星穹铁道', emoji: '🚂', c1: '#fcd34d', c2: '#8b5cf6', stamina_name: '开拓力', cap: 240, syncable: true },
+  wuwa: { label: '鸣潮', emoji: '🌊', c1: '#67e8f9', c2: '#3b82f6', stamina_name: '结晶波片', cap: 240, syncable: false },
+  zzz: { label: '绝区零', emoji: '⚡', c1: '#fbbf24', c2: '#06b6d4', stamina_name: '电量', cap: 240, syncable: false },
 };
+
+function specOf(key) {
+  const spec = REGISTRY.find((g) => g.key === key);
+  if (spec) return spec;
+  const fallback = FALLBACK_THEMES[key] || {};
+  return {
+    key,
+    label: fallback.label || key,
+    emoji: fallback.emoji || '🎮',
+    tagline: '',
+    stamina_name: fallback.stamina_name || '体力',
+    cap: fallback.cap || 240,
+    syncable: Boolean(fallback.syncable),
+    colors: { a: fallback.c1 || '#a78bfa', b: fallback.c2 || '#67e8f9' },
+    resource_labels: {},
+  };
+}
 
 const ELEMENT_COLORS = {
   物理: '#e5e7eb', 风: '#4ade80', 雷: '#a78bfa', 冰: '#7dd3fc', 火: '#f87171',
   量子: '#c084fc', 虚数: '#fde047',
   冷凝: '#7dd3fc', 热熔: '#f87171', 导电: '#a78bfa', 衍射: '#fde047', 气动: '#4ade80', 湮灭: '#94a3b8',
+  电: '#a78bfa', 以太: '#c084fc',
 };
 
 const RESOURCE_LABELS = {
   jades: '星琼', credits: '信用点', starlight: '星芒', embers: '余烬',
   special_pass: '星轨专票', star_pass: '星轨通票',
   astrites: '星声', shell_credits: '贝币', waveplates: '结晶波片',
+  polychrome: '菲林', denny: '丁尼', master_tape: '加密母带',
+  boopons: '邦布券', battery: '电量',
 };
 
 /* ---------- 基础工具 ---------- */
@@ -56,6 +72,27 @@ async function api(path, options = {}) {
     throw new Error(detail);
   }
   return resp.json();
+}
+
+async function loadRegistry() {
+  try {
+    const res = await fetch('/api/games');
+    if (res.ok) REGISTRY = (await res.json()).games || [];
+  } catch (e) {
+    REGISTRY = [];
+  }
+  buildGameTabs();
+}
+
+function buildGameTabs() {
+  const box = $('#game-tabs');
+  if (!box) return;
+  box.innerHTML = REGISTRY.map(
+    (g) => `<button type="button" data-game="${esc(g.key)}" class="game-tab rounded-xl border py-2.5 text-sm font-semibold transition ${g.key === editorGame ? 'border-violet-400/60 bg-gradient-to-r from-violet-500/30 to-cyan-500/30' : 'border-white/10 bg-white/5'}">${esc(g.emoji)} ${esc(g.label)}</button>`
+  ).join('');
+  box.querySelectorAll('.game-tab').forEach((btn) =>
+    btn.addEventListener('click', () => setGameTab(btn.dataset.game))
+  );
 }
 
 function toast(message, ok = true) {
@@ -115,8 +152,16 @@ function render(data) {
     $('#share-hint').textContent = `分享链接：${location.origin}/share/${data.player.share_id}`;
   }
   $('#updated-at').textContent = data.updated_at ? `最后更新：${fmtTime(data.updated_at)}` : '';
-  renderGame('hsr', data.games.hsr);
-  renderGame('wuwa', data.games.wuwa);
+
+  const games = data.games || {};
+  const keys = REGISTRY.map((g) => g.key);
+  Object.keys(games).forEach((k) => { if (!keys.includes(k)) keys.push(k); });
+  if (!keys.length) keys.push('hsr', 'wuwa');
+
+  const grid = $('#games-grid');
+  grid.className = `mt-6 grid gap-6 ${keys.length >= 3 ? 'md:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2'}`;
+  grid.innerHTML = keys.map((k) => `<div id="game-${esc(k)}"></div>`).join('');
+  keys.forEach((k) => renderGame(specOf(k), games[k]));
   startTimers(data);
 }
 
@@ -163,19 +208,24 @@ function renderChart(key, history, theme) {
       </svg>
     </div>`;
 }
-
-function renderGame(key, game) {
+function renderGame(spec, game) {
+  const key = spec.key;
   const root = $(`#game-${key}`);
-  const theme = GAME_THEME[key];
+  if (!root) return;
+  const a = spec.colors.a;
+  const b = spec.colors.b;
+  const theme = { c1: a, c2: b };
+  const cardStyle = `border-color:${a}45;box-shadow:0 18px 50px -18px ${b}66`;
+
   if (!game) {
-    const syncButton = key === 'hsr' && !isShare
-      ? `<button class="sync-btn mt-2 rounded-lg border border-amber-300/30 bg-amber-400/10 px-4 py-1.5 text-sm text-amber-200 hover:bg-amber-400/20 transition" data-game="${key}">🔄 米游社一键同步</button>`
+    const syncButton = spec.syncable && !isShare
+      ? `<button class="sync-btn mt-2 rounded-lg border px-4 py-1.5 text-sm transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
       : '';
     root.innerHTML = `
-      <div class="rounded-2xl border ${theme.ring} bg-white/[0.04] backdrop-blur p-6 shadow-xl ${theme.glow} flex flex-col items-center justify-center text-center min-h-[280px]">
-        <p class="text-3xl">${theme.emoji}</p>
-        <p class="mt-3 font-bold">${theme.label}</p>
-        <p class="text-xs text-slate-500 mt-1">还没有数据</p>
+      <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-6 flex flex-col items-center justify-center text-center min-h-[280px]" style="${cardStyle}">
+        <p class="text-3xl">${esc(spec.emoji)}</p>
+        <p class="mt-3 font-bold">${esc(spec.label)}</p>
+        <p class="text-xs text-slate-500 mt-1">${esc(spec.tagline || '还没有数据')}</p>
         ${isShare ? '' : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button></div>`}
       </div>`;
     return;
@@ -194,12 +244,14 @@ function renderGame(key, game) {
           ${c.element ? `<div class="mt-1">${elementBadge(c.element)}</div>` : ''}
         </div>`).join('')
     : '<p class="text-xs text-slate-500 py-4">暂无角色数据</p>';
+  const labels = Object.assign({}, RESOURCE_LABELS, spec.resource_labels || {});
   const resources = Object.entries(game.resources || {});
   const resourceHtml = resources.length
-    ? resources.map(([k, v]) => `<span class="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-xs">${esc(RESOURCE_LABELS[k] || k)} <b class="text-slate-100">${Number(v).toLocaleString()}</b></span>`).join('')
-    : '<span class="text-xs text-slate-500">暂无资源数据</span>';
-  const syncButton = key === 'hsr' && !isShare
-    ? `<button class="sync-btn rounded-lg border border-amber-300/30 bg-amber-400/10 px-2.5 py-1 text-[11px] text-amber-200 hover:bg-amber-400/20 transition" data-game="${key}">🔄 米游社同步</button>`
+    ? resources.map(([k, v]) => `<span class="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] text-slate-300">${esc(labels[k] || k)} <b class="text-slate-100">${Number(v || 0).toLocaleString()}</b></span>`).join('')
+    : '<span class="text-[11px] text-slate-600">暂无资源数据</span>';
+
+  const syncButton = spec.syncable && !isShare
+    ? `<button class="sync-btn rounded-lg border px-2.5 py-1 text-[11px] transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
     : '';
   const launchButton = !isShare
     ? `<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button>`
@@ -207,32 +259,32 @@ function renderGame(key, game) {
   const chartHtml = renderChart(key, game.history, theme);
 
   root.innerHTML = `
-    <div class="rounded-2xl border ${theme.ring} bg-white/[0.04] backdrop-blur p-5 shadow-xl ${theme.glow}">
+    <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-5" style="${cardStyle}">
       <div class="flex items-start justify-between gap-2">
         <div class="flex items-center gap-2">
-          <span class="text-xl">${theme.emoji}</span>
+          <span class="text-xl">${esc(spec.emoji)}</span>
           <div>
-            <h3 class="font-bold">${theme.label}${p.nickname ? ` · ${esc(p.nickname)}` : ''}</h3>
+            <h3 class="font-bold">${esc(spec.label)}${p.nickname ? ` · ${esc(p.nickname)}` : ''}</h3>
             <p class="text-xs text-slate-500">UID ${esc(p.uid) || '未绑定'}</p>
           </div>
         </div>
         <div class="flex items-center gap-1.5">
           ${launchButton}
           ${syncButton}
-          ${game.last_update ? `<span class="rounded-full border ${theme.chip} px-2 py-0.5 text-[11px]">${sourceLabel}</span>` : ''}
+          ${game.last_update ? `<span class="rounded-full border px-2 py-0.5 text-[11px]" style="color:${a};border-color:${a}55;background:${a}15">${sourceLabel}</span>` : ''}
         </div>
       </div>
 
       <div class="mt-4 rounded-xl border border-white/10 bg-black/25 p-4">
         <div class="flex items-end justify-between">
           <div>
-            <p class="text-xs text-slate-500">${esc(st.name)}</p>
+            <p class="text-xs text-slate-500">${esc(st.name || spec.stamina_name)}</p>
             <p class="text-2xl font-black mt-0.5">${st.current}<span class="text-sm font-medium text-slate-500"> / ${st.max}</span></p>
           </div>
           <p id="cd-${key}" class="text-xs text-slate-400">${st.full ? '已回满 ✓' : '计算中…'}</p>
         </div>
         <div class="mt-2 h-2 rounded-full bg-white/10 overflow-hidden">
-          <div class="h-full rounded-full bg-gradient-to-r ${theme.bar} transition-all duration-700" style="width:${pct}%"></div>
+          <div class="h-full rounded-full transition-all duration-700" style="width:${pct}%;background:linear-gradient(90deg,${a},${b})"></div>
         </div>
       </div>
 
@@ -256,7 +308,7 @@ function renderGame(key, game) {
 function startTimers(data) {
   timers.forEach(clearInterval);
   timers = [];
-  for (const key of ['hsr', 'wuwa']) {
+  for (const key of Object.keys(data.games || {})) {
     const game = data.games[key];
     if (!game || game.stamina.full || !game.stamina.full_at) continue;
     const fullAt = new Date(game.stamina.full_at);
@@ -276,7 +328,7 @@ let editorGame = 'hsr';
 let ocrUsed = false;
 
 function openModal(game) {
-  editorGame = game || editorGame;
+  editorGame = game || (REGISTRY[0] && REGISTRY[0].key) || editorGame;
   ocrUsed = false;
   setGameTab(editorGame);
   clearForm();
@@ -289,6 +341,7 @@ function closeModal() {
 
 function setGameTab(game) {
   editorGame = game;
+  const spec = specOf(game);
   document.querySelectorAll('.game-tab').forEach((btn) => {
     const active = btn.dataset.game === game;
     btn.className = `game-tab rounded-xl border py-2.5 text-sm font-semibold transition ${
@@ -296,13 +349,17 @@ function setGameTab(game) {
              : 'border-white/10 bg-white/5'
     }`;
   });
+  if ($('#lbl-level')) $('#lbl-level').textContent = `${spec.label}等级`;
+  if ($('#lbl-stamina')) $('#lbl-stamina').textContent = `${spec.stamina_name}当前`;
+  if ($('#lbl-stamina-max')) $('#lbl-stamina-max').textContent = `${spec.stamina_name}上限`;
+  $('#f-stamina-max').value = spec.cap || 240;
 }
 
 function clearForm() {
   for (const id of ['f-uid', 'f-nickname', 'f-level', 'f-days', 'f-ach', 'f-stamina', 'f-resources']) {
     $(`#${id}`).value = '';
   }
-  $('#f-stamina-max').value = '240';
+  $('#f-stamina-max').value = specOf(editorGame).cap || 240;
   $('#char-list').innerHTML = '';
   $('#ocr-status').classList.add('hidden');
   $('#ocr-raw').classList.add('hidden');
@@ -315,7 +372,7 @@ function fillForm(parsed) {
   $('#f-days').value = parsed.active_days ?? '';
   $('#f-ach').value = parsed.achievements ?? '';
   $('#f-stamina').value = parsed.stamina_current ?? '';
-  $('#f-stamina-max').value = parsed.stamina_max ?? 240;
+  $('#f-stamina-max').value = parsed.stamina_max ?? (specOf(editorGame).cap || 240);
 }
 
 const FIELD_LABELS = {
@@ -401,7 +458,7 @@ function collectForm() {
     active_days: Number($('#f-days').value) || 0,
     achievements: Number($('#f-ach').value) || 0,
     stamina_current: Number($('#f-stamina').value) || 0,
-    stamina_max: Number($('#f-stamina-max').value) || 240,
+    stamina_max: Number($('#f-stamina-max').value) || (specOf(editorGame).cap || 240),
     resources,
     characters: chars,
     source: ocrUsed ? 'ocr' : 'manual',
@@ -409,7 +466,7 @@ function collectForm() {
 }
 
 /* ---------- 事件绑定 ---------- */
-$('#btn-update')?.addEventListener('click', () => openModal('hsr'));
+$('#btn-update')?.addEventListener('click', () => openModal());
 $('#btn-share')?.addEventListener('click', async () => {
   try {
     const data = await api('/api/me');
@@ -421,9 +478,6 @@ $('#btn-share')?.addEventListener('click', async () => {
   }
 });
 
-document.querySelectorAll('.game-tab').forEach((btn) =>
-  btn.addEventListener('click', () => setGameTab(btn.dataset.game))
-);
 document.querySelectorAll('[data-close]').forEach((el) =>
   el.addEventListener('click', closeModal)
 );
@@ -471,17 +525,19 @@ document.body.addEventListener('click', (e) => {
   const btn = e.target.closest('.update-btn');
   if (btn) openModal(btn.dataset.game);
   const syncBtn = e.target.closest('.sync-btn');
-  if (syncBtn) syncHsr(syncBtn);
+  if (syncBtn) syncGame(syncBtn);
   const launchBtn = e.target.closest('.launch-btn');
   if (launchBtn) launchGame(launchBtn);
 });
 
-async function syncHsr(btn) {
+async function syncGame(btn) {
+  const game = btn.dataset.game;
+  const label = specOf(game).label;
   btn.disabled = true;
   btn.textContent = '同步中…';
   try {
-    await api('/api/sync/hsr', { method: 'POST' });
-    toast('星穹铁道数据已同步');
+    await api(`/api/sync/${game}`, { method: 'POST' });
+    toast(`${label}数据已同步`);
     await load();
   } catch (err) {
     toast(err.message, false);
@@ -493,10 +549,10 @@ async function syncHsr(btn) {
 async function launchGame(btn) {
   btn.disabled = true;
   const game = btn.dataset.game;
-  const label = game === 'hsr' ? '星穹铁道' : '鸣潮';
+  const label = specOf(game).label;
   btn.textContent = '启动中…';
   try {
-    const res = await api(`/api/launch/${game}`, { method: 'POST' });
+    await api(`/api/launch/${game}`, { method: 'POST' });
     toast(`🚀 ${label}已启动`);
     setTimeout(() => { btn.disabled = false; btn.textContent = '🚀 启动游戏'; }, 2500);
   } catch (err) {
@@ -555,6 +611,7 @@ $('#btn-bg-reset')?.addEventListener('click', async () => {
 /* ---------- 启动 ---------- */
 async function load() {
   try {
+    if (!REGISTRY.length) await loadRegistry();
     const data = isShare
       ? await api(`/api/share/${encodeURIComponent(shareId)}`)
       : await api('/api/me');
