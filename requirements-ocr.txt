@@ -1,4 +1,6 @@
 # OCR 为可选能力：安装体积较大（PaddlePaddle ~200MB），且需要 Python <= 3.12
 # 不安装也能用"手动录入 / 米游社同步 / 鸣潮 JSON 上传"三种方式更新数据
-paddlepaddle>=2.6
-paddleocr>=2.7
+# 注：paddleocr 3.x + paddle 3.x 在部分 Windows CPU 上 oneDNN 推理崩溃，
+# 固定在 2.x 稳定组合（代码同时兼容 2.x / 3.x）
+paddlepaddle==2.6.2
+paddleocr==2.10.0

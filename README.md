@@ -53,8 +53,16 @@ python run.py
 pip install -r requirements-ocr.txt
 ```
 
-首次识别会下载中文模型（约数十 MB）。PaddlePaddle 目前不支持 Python 3.13+，
-若你的 Python 版本过新，可用 3.11/3.12 建虚拟环境，或改用另外两种数据来源。
+首次识别会下载中文模型（约 25MB）。几点说明：
+
+- 版本固定在 paddleocr 2.10 + paddlepaddle 2.6.2：3.x 在部分 Windows CPU
+  上 oneDNN 推理会崩溃，代码同时兼容两代 API
+- 需要 Python 3.12 及以下（PaddlePaddle 2.x 无 3.13+ 轮子）
+- 中文用户名路径（如 `C:\Users\张三`）会导致 Paddle 的 C++ 推理层无法读取
+  模型文件，`app/services/ocr.py` 会自动把模型缓存重定向到
+  `C:\Users\Public\.paddleocr`，无需手动处理
+- 若首次下载模型失败（网络原因），可设置
+  `$env:PADDLE_PDX_MODEL_SOURCE='ModelScope'` 换模型源后重试
 
 ## 米游社自动同步（星穹铁道，可选、有风险）
 
