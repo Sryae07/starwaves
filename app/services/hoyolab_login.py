@@ -9,12 +9,12 @@
 from __future__ import annotations
 
 import secrets
-import tempfile
 import threading
 import time
 
 import httpx
 
+from ..config import DATA_DIR
 from ..database import SessionLocal
 from ..models import SiteSetting
 
@@ -22,8 +22,23 @@ USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 )
+LOGIN_URL = "https://user.mihoyo.com/#/login/password"
 BBS_HOME = "https://bbs.mihoyo.com/"
-COOKIE_SCOPE_URL = "https://bbs.mihoyo.com/"
+BROWSER_PROFILE_DIR = DATA_DIR / "mhy_browser_profile"
+
+BANNER_JS = """
+window.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('starwaves-hint')) return;
+  const bar = document.createElement('div');
+  bar.id = 'starwaves-hint';
+  bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483647;'
+    + 'background:#0b1220;color:#67e8f9;text-align:center;padding:12px 16px;'
+    + 'font-size:15px;font-weight:bold;border-bottom:2px solid #22d3ee;'
+    + 'font-family:system-ui,sans-serif;';
+  bar.textContent = '🌟 StarWaves 自动接入：请在此窗口登录米游社，登录成功后会自动完成，请勿关闭本窗口';
+  document.body && document.body.appendChild(bar);
+});
+"""
 
 
 class NeedCaptcha(RuntimeError):
@@ -123,25 +138,33 @@ def _cookie_token_by_stoken(stoken: str, uid: str) -> str:
 
 
 def capture_cookie_from_browser(timeout_s: int = 600) -> str:
-    """拉起本机 Edge 打开米游社社区，等用户登录后抓取 Cookie。
+    """拉起本机 Edge 打开米游社密码登录页，等用户登录后抓取 Cookie。
 
-    登录成功后自动补全 cookie_token（优先页面种下，其次用 stoken 换），
-    因此抓取成功与否不再依赖登录页是否回跳社区。"""
+    - 浏览器用固定 profile 目录：登录一次后，后续重试无需再次登录；
+    - Cookie 从整个浏览器上下文读取（不限域名），登录页种在哪个子域都能抓到；
+    - 页面顶部注入醒目横幅提示；窗口前置；
+    - 窗口被关闭时给出明确错误，不再静默超时。"""
     from playwright.sync_api import sync_playwright
 
     deadline = time.time() + timeout_s
+    BROWSER_PROFILE_DIR.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
         context = p.chromium.launch_persistent_context(
-            tempfile.mkdtemp(prefix="starwaves_mhy_"),
+            str(BROWSER_PROFILE_DIR),
             channel="msedge",
             headless=False,
         )
         try:
+            context.add_init_script(BANNER_JS)
             page = context.new_page()
-            page.goto(BBS_HOME, wait_until="domcontentloaded")
+            page.goto(LOGIN_URL, wait_until="domcontentloaded")
+            try:
+                page.bring_to_front()
+            except Exception:
+                pass
             last_token_try = 0.0
             while time.time() < deadline:
-                jar = {c["name"]: c["value"] for c in context.cookies(COOKIE_SCOPE_URL)}
+                jar = {c["name"]: c["value"] for c in context.cookies()}
                 if jar.get("ltoken") and jar.get("ltuid"):
                     if jar.get("cookie_token"):
                         return (
@@ -159,7 +182,7 @@ def capture_cookie_from_browser(timeout_s: int = 600) -> str:
                                 )
                         except Exception:
                             pass
-                    # 登录完成但 cookie_token 还没种下：回社区首页触发种 cookie
+                    # 登录完成但 cookie_token 还没种下：访问社区首页触发种 cookie
                     try:
                         page.goto(BBS_HOME, wait_until="domcontentloaded", timeout=15000)
                     except Exception:
@@ -168,6 +191,13 @@ def capture_cookie_from_browser(timeout_s: int = 600) -> str:
                     continue
                 time.sleep(2)
             raise TimeoutError("等待米游社登录超时（10 分钟）")
+        except Exception as exc:
+            if "closed" in str(exc).lower() or "target page" in str(exc).lower():
+                raise RuntimeError(
+                    "检测到登录窗口被关闭，登录中断。请重新点击「自动登录并接入」，"
+                    "并保持弹出的 Edge 窗口打开，直到提示成功。"
+                ) from exc
+            raise
         finally:
             context.close()
 
