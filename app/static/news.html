@@ -89,9 +89,23 @@
       </div>
     </section>
 
+    <section class="mt-4 flex items-center gap-2 flex-wrap">
+      <div class="relative flex-1 min-w-[240px] max-w-md">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">🔍</span>
+        <input id="search-input" type="search" placeholder="搜索公告标题 / 内容关键词…" class="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-9 pr-9 text-sm text-slate-200 placeholder:text-slate-600 focus:border-violet-400/60 focus:outline-none transition" />
+        <button id="btn-clear-search" class="hidden absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 rounded-lg text-slate-500 hover:text-white hover:bg-white/10 transition">✕</button>
+      </div>
+      <span id="result-count" class="text-xs text-slate-600"></span>
+    </section>
+
     <section id="source-status" class="mt-4 flex items-center gap-2 flex-wrap text-xs"></section>
 
     <section id="feed" class="mt-8 grid gap-4 md:grid-cols-2"></section>
+    <section id="feed-empty" class="hidden mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center">
+      <p class="text-3xl">🔍</p>
+      <p class="mt-3 font-bold">没有找到匹配的资讯</p>
+      <p class="mt-2 text-sm text-slate-500">换个关键词试试，或清除搜索条件。</p>
+    </section>
 
     <section id="feed-error" class="hidden mt-8 rounded-2xl border border-red-400/30 bg-red-400/10 p-8 text-center">
       <p class="text-3xl">🛰️</p>
@@ -125,6 +139,9 @@
     let selected = new Set();
     let countdownTimer = null;
     let nextRefreshAt = 0;
+    let query = '';
+    let lastItems = [];
+    let lastSources = {};
 
     async function loadRegistry() {
       try {
@@ -192,14 +209,28 @@
     function renderFeed(data) {
       const feed = document.getElementById('feed');
       const errorBox = document.getElementById('feed-error');
-      const items = (data.items || []).filter((i) => selected.has(i.game));
+      const emptyBox = document.getElementById('feed-empty');
+      lastItems = data.items || [];
+      lastSources = data.sources || lastSources;
+      const q = query.trim().toLowerCase();
+      const items = lastItems
+        .filter((i) => selected.has(i.game))
+        .filter((i) => !q || [i.title, i.summary, i.category, i.source, specOf(i.game)?.label || ''].join(' ').toLowerCase().includes(q));
+      document.getElementById('result-count').textContent = items.length ? `共 ${items.length} 条` : '';
       renderSources(data.sources || {});
       if (!items.length) {
         feed.innerHTML = '';
-        errorBox.classList.remove('hidden');
+        if (lastItems.length === 0) {
+          errorBox.classList.remove('hidden');
+          emptyBox.classList.add('hidden');
+        } else {
+          errorBox.classList.add('hidden');
+          emptyBox.classList.remove('hidden');
+        }
         return;
       }
       errorBox.classList.add('hidden');
+      emptyBox.classList.add('hidden');
       feed.innerHTML = items.map((it) => {
         const g = specOf(it.game) || {};
         const cover = it.cover
@@ -245,6 +276,12 @@
         </div>`).join('');
     }
 
+    function onSearchInput() {
+      query = document.getElementById('search-input').value;
+      document.getElementById('btn-clear-search').classList.toggle('hidden', !query);
+      if (lastItems.length) renderFeed({ items: lastItems, sources: lastSources });
+    }
+
     async function loadNews(silent = false) {
       if (!silent) renderSkeleton();
       const btn = document.getElementById('btn-refresh');
@@ -284,6 +321,17 @@
       nextRefreshAt = Date.now() + REFRESH_MS;
       document.getElementById('refresh-hint').textContent = '已更新';
       setTimeout(() => tickCountdown(), 1200);
+    });
+
+    let searchTimer = null;
+    document.getElementById('search-input').addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(onSearchInput, 200);
+    });
+    document.getElementById('btn-clear-search').addEventListener('click', () => {
+      document.getElementById('search-input').value = '';
+      onSearchInput();
+      document.getElementById('search-input').focus();
     });
 
     (async function init() {

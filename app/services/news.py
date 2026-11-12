@@ -21,7 +21,7 @@ from datetime import datetime, timedelta, timezone
 
 import httpx
 
-from ..games import GameSpec
+from ..games import GAMES, GameSpec
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -180,15 +180,14 @@ def _lock_for(game: str) -> threading.Lock:
         return _fetch_locks.setdefault(game, threading.Lock())
 
 
-def fetch_game_news(game: str, limit: int = 12) -> dict:
+def fetch_game_news(game: str, limit: int = 12, registry: dict[str, GameSpec] | None = None) -> dict:
     """拉取单个游戏的资讯：命中缓存直接返回，失败时降级为旧缓存或空列表。"""
-    spec = None
-    try:
-        from ..games import get_spec
-
-        spec = get_spec(game)
-    except ValueError:
+    specs = registry or GAMES
+    spec = specs.get(game)
+    if spec is None:
         return {"items": [], "source": "", "error": f"未注册的游戏: {game}"}
+    if not spec.news:
+        return {"items": [], "source": "", "error": None}
 
     now = time.time()
     with _caches_lock:

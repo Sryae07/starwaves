@@ -108,7 +108,7 @@ def test_background_upload_and_reset(client):
 def test_launch_without_path(client, monkeypatch):
     from app.routers import launch
 
-    monkeypatch.setattr(launch, "_resolve_path", lambda game: None)
+    monkeypatch.setattr(launch, "_resolve_path", lambda game, spec=None: None)
     resp = client.post("/api/launch/hsr")
     assert resp.status_code == 400
     assert "未找到" in resp.json()["detail"]

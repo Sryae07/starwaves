@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 
 from ..config import UPLOAD_DIR
 from ..database import get_db
-from ..games import GAMES, get_spec, known_game
+from ..games import merged_games
 from ..schemas import ProfileUpdate
 from ..services.ocr import OcrUnavailable, ocr_image
 from ..services.parser import parse_ocr_text
@@ -29,14 +29,14 @@ ALLOWED_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
 MAX_SIZE = 10 * 1024 * 1024
 
 
-def _to_profile_update(game: str, parsed: dict, source: str) -> ProfileUpdate:
+def _to_profile_update(game: str, parsed: dict, source: str, registry: dict) -> ProfileUpdate:
     return ProfileUpdate(
         uid=parsed.get("uid") or "",
         level=parsed.get("level") or 0,
         active_days=parsed.get("active_days") or 0,
         achievements=parsed.get("achievements") or 0,
         stamina_current=parsed.get("stamina_current") or 0,
-        stamina_max=parsed.get("stamina_max") or get_spec(game).cap,
+        stamina_max=parsed.get("stamina_max") or registry[game].cap,
         source=source,
     )
 
@@ -48,8 +48,9 @@ async def upload_screenshot(
     apply: bool = Form(False),
     db: Session = Depends(get_db),
 ) -> dict:
-    if not known_game(game):
-        raise HTTPException(status_code=404, detail=f"未知游戏: {game}，支持: {', '.join(GAMES)}")
+    registry = merged_games(db)
+    if game not in registry:
+        raise HTTPException(status_code=404, detail=f"未知游戏: {game}，支持: {', '.join(registry)}")
     ext = Path(file.filename or "shot.png").suffix.lower()
     if ext not in ALLOWED_EXTS:
         raise HTTPException(status_code=415, detail=f"仅支持图片格式: {', '.join(sorted(ALLOWED_EXTS))}")
@@ -66,7 +67,7 @@ async def upload_screenshot(
     except OcrUnavailable as exc:
         raise HTTPException(status_code=501, detail=str(exc))
 
-    parsed = parse_ocr_text(ocr_text, game)
+    parsed = parse_ocr_text(ocr_text, game, registry)
     saved = None
     if apply:
         if parsed.get("level") is None and parsed.get("stamina_current") is None:
@@ -74,6 +75,6 @@ async def upload_screenshot(
                 status_code=422,
                 detail="OCR 未识别出关键数值（等级/体力），请换截图重试或改用手动录入",
             )
-        player = apply_profile_update(db, game, _to_profile_update(game, parsed, source="ocr"))
+        player = apply_profile_update(db, game, _to_profile_update(game, parsed, "ocr", registry))
         saved = share_payload(db, player)
     return {"saved": apply, "ocr_text": ocr_text, "parsed": parsed, "profile": saved}

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 
-from ..games import get_spec
+from ..games import GameSpec, get_spec
 
 FULLWIDTH_MAP = {ord(c): d for c, d in zip("０１２３４５６７８９", "0123456789")}
 FULLWIDTH_MAP.update({ord("／"): "/", ord("："): ":", ord("．"): "."})
@@ -19,8 +19,11 @@ def normalize(text: str) -> str:
     return text.translate(FULLWIDTH_MAP)
 
 
-def parse_ocr_text(text: str, game: str) -> dict:
-    fields = get_spec(game).ocr_keywords
+def parse_ocr_text(text: str, game: str, registry: dict[str, GameSpec] | None = None) -> dict:
+    spec = (registry or {}).get(game)
+    if spec is None:
+        spec = get_spec(game)
+    fields = spec.ocr_keywords
     lines = [normalize(line).strip() for line in text.splitlines() if line.strip()]
     parsed = {
         "uid": None,

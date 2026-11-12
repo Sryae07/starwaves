@@ -84,3 +84,21 @@ class Character(Base):
     extra: Mapped[dict] = mapped_column(JSON, default=dict)
 
     profile: Mapped[Profile] = relationship(back_populates="characters")
+
+
+class CustomGame(Base):
+    """用户在网页上「接入」的自定义游戏（看板内新增，无需改代码）。"""
+
+    __tablename__ = "custom_games"
+
+    key: Mapped[str] = mapped_column(String(16), primary_key=True)
+    label: Mapped[str] = mapped_column(String(64))
+    tagline: Mapped[str] = mapped_column(String(128), default="")
+    emoji: Mapped[str] = mapped_column(String(8), default="🎮")
+    stamina_name: Mapped[str] = mapped_column(String(32), default="体力")
+    minutes_per_point: Mapped[int] = mapped_column(Integer, default=6)
+    cap: Mapped[int] = mapped_column(Integer, default=240)
+    color_a: Mapped[str] = mapped_column(String(7), default="#a78bfa")
+    color_b: Mapped[str] = mapped_column(String(7), default="#67e8f9")
+    resource_labels: Mapped[dict] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

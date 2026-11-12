@@ -33,6 +33,9 @@ function specOf(key) {
     stamina_name: fallback.stamina_name || '体力',
     cap: fallback.cap || 240,
     syncable: Boolean(fallback.syncable),
+    custom: false,
+    launchable: true,
+    news: true,
     colors: { a: fallback.c1 || '#a78bfa', b: fallback.c2 || '#67e8f9' },
     resource_labels: {},
   };
@@ -221,12 +224,19 @@ function renderGame(spec, game) {
     const syncButton = spec.syncable && !isShare
       ? `<button class="sync-btn mt-2 rounded-lg border px-4 py-1.5 text-sm transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
       : '';
+    const removeButton = spec.custom && !isShare
+      ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2.5 py-1 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
+      : '';
+    const launchButton = spec.launchable !== false && !isShare
+      ? `<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button>`
+      : '';
     root.innerHTML = `
       <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-6 flex flex-col items-center justify-center text-center min-h-[280px]" style="${cardStyle}">
+        <div class="self-end -mt-2 -mr-2">${removeButton}</div>
         <p class="text-3xl">${esc(spec.emoji)}</p>
         <p class="mt-3 font-bold">${esc(spec.label)}</p>
-        <p class="text-xs text-slate-500 mt-1">${esc(spec.tagline || '还没有数据')}</p>
-        ${isShare ? '' : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button></div>`}
+        <p class="text-xs text-slate-500 mt-1">${esc(spec.tagline || '还没有数据')}${spec.custom ? ' · 自定义接入' : ''}</p>
+        ${isShare ? '' : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}${launchButton}</div>`}
       </div>`;
     return;
   }
@@ -253,8 +263,11 @@ function renderGame(spec, game) {
   const syncButton = spec.syncable && !isShare
     ? `<button class="sync-btn rounded-lg border px-2.5 py-1 text-[11px] transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
     : '';
-  const launchButton = !isShare
+  const launchButton = spec.launchable !== false && !isShare
     ? `<button class="launch-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🚀 启动游戏</button>`
+    : '';
+  const removeButton = spec.custom && !isShare
+    ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2 py-0.5 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
     : '';
   const chartHtml = renderChart(key, game.history, theme);
 
@@ -264,12 +277,13 @@ function renderGame(spec, game) {
         <div class="flex items-center gap-2">
           <span class="text-xl">${esc(spec.emoji)}</span>
           <div>
-            <h3 class="font-bold">${esc(spec.label)}${p.nickname ? ` · ${esc(p.nickname)}` : ''}</h3>
+            <h3 class="font-bold">${esc(spec.label)}${p.nickname ? ` · ${esc(p.nickname)}` : ''}${spec.custom ? ` <span class="rounded-full border px-1.5 py-0.5 text-[10px] font-normal" style="color:${a};border-color:${a}55;background:${a}15">自定义</span>` : ''}</h3>
             <p class="text-xs text-slate-500">UID ${esc(p.uid) || '未绑定'}</p>
           </div>
         </div>
         <div class="flex items-center gap-1.5">
           ${launchButton}
+          ${removeButton}
           ${syncButton}
           ${game.last_update ? `<span class="rounded-full border px-2 py-0.5 text-[11px]" style="color:${a};border-color:${a}55;background:${a}15">${sourceLabel}</span>` : ''}
         </div>
@@ -482,7 +496,10 @@ document.querySelectorAll('[data-close]').forEach((el) =>
   el.addEventListener('click', closeModal)
 );
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') {
+    closeModal();
+    $('#add-game-modal')?.classList.add('hidden');
+  }
 });
 
 const dz = $('#dropzone');
@@ -524,11 +541,81 @@ $('#editor').addEventListener('submit', async (e) => {
 document.body.addEventListener('click', (e) => {
   const btn = e.target.closest('.update-btn');
   if (btn) openModal(btn.dataset.game);
+  const removeBtn = e.target.closest('.remove-btn');
+  if (removeBtn) removeGame(removeBtn);
   const syncBtn = e.target.closest('.sync-btn');
   if (syncBtn) syncGame(syncBtn);
   const launchBtn = e.target.closest('.launch-btn');
   if (launchBtn) launchGame(launchBtn);
 });
+
+/* ---------- 接入游戏 ---------- */
+$('#btn-add-game')?.addEventListener('click', () => {
+  $('#add-game-form').reset();
+  $('#ag-cap').value = '240';
+  $('#ag-minutes').value = '6';
+  $('#ag-color-a').value = '#a78bfa';
+  $('#ag-color-b').value = '#67e8f9';
+  $('#add-game-modal').classList.remove('hidden');
+});
+document.querySelectorAll('[data-add-game-close]').forEach((el) =>
+  el.addEventListener('click', () => $('#add-game-modal').classList.add('hidden'))
+);
+
+$('#add-game-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  let resourceLabels = {};
+  const raw = $('#ag-resources').value.trim();
+  if (raw) {
+    try {
+      resourceLabels = JSON.parse(raw);
+    } catch (err) {
+      toast('资源标签 JSON 格式错误，请检查后重试', false);
+      return;
+    }
+  }
+  const payload = {
+    key: $('#ag-key').value.trim().toLowerCase(),
+    label: $('#ag-label').value.trim(),
+    tagline: $('#ag-tagline').value.trim(),
+    emoji: $('#ag-emoji').value.trim() || '🎮',
+    stamina_name: $('#ag-stamina').value.trim() || '体力',
+    minutes_per_point: Number($('#ag-minutes').value) || 6,
+    cap: Number($('#ag-cap').value) || 240,
+    color_a: $('#ag-color-a').value,
+    color_b: $('#ag-color-b').value,
+    resource_labels: resourceLabels,
+  };
+  try {
+    await api('/api/games', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    $('#add-game-modal').classList.add('hidden');
+    toast(`✓ 已接入 ${payload.label}，现在就能录入数据`);
+    await loadRegistry();
+    await load();
+  } catch (err) {
+    toast(err.message, false);
+  }
+});
+
+async function removeGame(btn) {
+  const key = btn.dataset.game;
+  const label = specOf(key).label;
+  if (!confirm(`确定移除「${label}」吗？已有游戏数据时无法移除（避免历史记录丢失）。`)) return;
+  btn.disabled = true;
+  try {
+    await api(`/api/games/${encodeURIComponent(key)}`, { method: 'DELETE' });
+    toast(`已移除 ${label}`);
+    await loadRegistry();
+    await load();
+  } catch (err) {
+    toast(err.message, false);
+    btn.disabled = false;
+  }
+}
 
 async function syncGame(btn) {
   const game = btn.dataset.game;

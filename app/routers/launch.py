@@ -13,8 +13,10 @@ import subprocess
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
-from ..games import GAMES, get_spec, known_game
+from ..database import get_db
+from ..games import GameSpec, merged_games
 from .deps import require_api_key
 
 router = APIRouter(prefix="/api", tags=["launch"])
@@ -23,8 +25,11 @@ router = APIRouter(prefix="/api", tags=["launch"])
 DETACH_FLAGS = 0x00000008 | 0x00000200
 
 
-def _resolve_path(game: str) -> Path | None:
-    spec = get_spec(game)
+def _resolve_path(game: str, spec: GameSpec | None = None) -> Path | None:
+    if spec is None:
+        from ..games import get_spec
+
+        spec = get_spec(game)
     configured = os.getenv(spec.launch_env_key, "").strip() if spec.launch_env_key else ""
     if configured and Path(configured).is_file():
         return Path(configured)
@@ -41,15 +46,18 @@ def _resolve_path(game: str) -> Path | None:
 
 
 @router.post("/launch/{game}", dependencies=[Depends(require_api_key)])
-def launch_game(game: str) -> dict:
-    if not known_game(game):
-        raise HTTPException(status_code=404, detail=f"未知游戏: {game}，支持: {', '.join(GAMES)}")
+def launch_game(game: str, db: Session = Depends(get_db)) -> dict:
+    registry = merged_games(db)
+    spec = registry.get(game)
+    if spec is None:
+        raise HTTPException(status_code=404, detail=f"未知游戏: {game}，支持: {', '.join(registry)}")
     if os.name != "nt":
         raise HTTPException(status_code=501, detail="启动游戏仅支持 Windows 本机部署")
-    path = _resolve_path(game)
+    path = _resolve_path(game, spec)
     if path is None:
-        spec = get_spec(game)
         env_key = spec.launch_env_key
+        if not env_key:
+            raise HTTPException(status_code=400, detail=f"{spec.label}未配置启动路径（自定义游戏可在 .env 之外通过注册表扩展）")
         raise HTTPException(
             status_code=400,
             detail=f"未找到{spec.label}安装路径，请在 .env 中设置 {env_key}",

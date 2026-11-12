@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
-from ..games import get_spec
+from ..games import GAMES, GameSpec, get_spec, merged_games
 from ..models import Player, Profile
 
 
@@ -18,8 +18,9 @@ def _iso(dt: datetime | None) -> str | None:
     return dt.astimezone(timezone.utc).isoformat()
 
 
-def _stamina_payload(profile: Profile) -> dict:
-    spec = get_spec(profile.game)
+def _stamina_payload(profile: Profile, registry: dict[str, GameSpec] | None = None) -> dict:
+    specs = registry or GAMES
+    spec = specs.get(profile.game) or get_spec(profile.game)
     snapshot = profile.snapshots[0] if profile.snapshots else None
     base = {
         "name": spec.stamina_name,
@@ -50,8 +51,9 @@ def _stamina_payload(profile: Profile) -> dict:
     return base
 
 
-def game_payload(profile: Profile) -> dict:
-    spec = get_spec(profile.game)
+def game_payload(profile: Profile, registry: dict[str, GameSpec] | None = None) -> dict:
+    specs = registry or GAMES
+    spec = specs.get(profile.game) or get_spec(profile.game)
     snapshot = profile.snapshots[0] if profile.snapshots else None
     history = [
         {
@@ -73,7 +75,7 @@ def game_payload(profile: Profile) -> dict:
             "active_days": profile.active_days,
             "achievements": profile.achievements,
         },
-        "stamina": _stamina_payload(profile),
+        "stamina": _stamina_payload(profile, specs),
         "resources": snapshot.resources if snapshot else {},
         "characters": [
             {
@@ -94,7 +96,8 @@ def game_payload(profile: Profile) -> dict:
 
 
 def share_payload(db: Session, player: Player) -> dict:
-    games = {p.game: game_payload(p) for p in player.profiles}
+    registry = merged_games(db)
+    games = {p.game: game_payload(p, registry) for p in player.profiles}
     latest = None
     for p in player.profiles:
         if p.updated_at and (latest is None or p.updated_at > latest):

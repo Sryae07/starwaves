@@ -8,6 +8,10 @@
 3. 如需独立的资讯数据源，在 services/news.py 增加一个 Provider 并引用；
 4. 前端看板与资讯页均按注册表动态渲染，无需修改 HTML。
 
+此外，看板上提供「接入游戏」功能：用户在网页上登记的自定义游戏
+（存于数据库 custom_games 表）会与内置注册表合并，走同一套渲染与数据流程。
+自定义游戏仅支持手动录入 / 截图 OCR，没有自动同步与资讯源。
+
 字段说明：
 - key: 唯一标识，写入数据库的 game 字段，发布后不要修改（历史数据按它归档）；
 - stamina_name / minutes_per_point / cap: 体力名称、每点恢复分钟数、体力上限；
@@ -150,6 +154,42 @@ GAMES: dict[str, GameSpec] = {
     ),
 }
 
+BUILTIN_KEYS = set(GAMES)
+
+
+def custom_spec(row) -> GameSpec:
+    """把数据库里的自定义游戏行转成 GameSpec（OCR 关键词按体力名自动推导）。"""
+    return GameSpec(
+        key=row.key,
+        label=row.label,
+        tagline=row.tagline or "",
+        emoji=row.emoji or "🎮",
+        color_a=row.color_a or "#a78bfa",
+        color_b=row.color_b or "#67e8f9",
+        stamina_name=row.stamina_name or "体力",
+        minutes_per_point=row.minutes_per_point or 6,
+        cap=row.cap or 240,
+        ocr_keywords={
+            "uid": ["uid"],
+            "level": ["等级"],
+            "active_days": ["活跃天数"],
+            "achievements": ["成就"],
+            "stamina": [row.stamina_name or "体力", "体力"],
+            "characters": ["角色数量", "角色数"],
+        },
+        resource_labels=row.resource_labels or {},
+    )
+
+
+def merged_games(db) -> dict[str, GameSpec]:
+    """内置注册表 + 数据库自定义游戏（自定义同 key 时内置优先）。"""
+    from .models import CustomGame
+
+    merged = dict(GAMES)
+    for row in db.query(CustomGame).order_by(CustomGame.created_at.asc()).all():
+        merged.setdefault(row.key, custom_spec(row))
+    return merged
+
 
 def known_game(key: str) -> bool:
     return key in GAMES
@@ -175,8 +215,9 @@ def game_rules() -> dict:
     }
 
 
-def game_meta() -> list[dict]:
+def game_meta(specs: dict[str, GameSpec] | None = None) -> list[dict]:
     """前端 /api/games 使用的注册表元数据。"""
+    specs = specs or GAMES
     return [
         {
             "key": spec.key,
@@ -187,8 +228,11 @@ def game_meta() -> list[dict]:
             "minutes_per_point": spec.minutes_per_point,
             "cap": spec.cap,
             "syncable": spec.syncable,
+            "custom": spec.key not in BUILTIN_KEYS,
+            "launchable": bool(spec.launch_candidates or spec.launch_env_key),
+            "news": bool(spec.news),
             "colors": {"a": spec.color_a, "b": spec.color_b},
             "resource_labels": spec.resource_labels,
         }
-        for spec in GAMES.values()
+        for spec in specs.values()
     ]

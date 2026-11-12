@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from . import models  # noqa: F401  确保模型注册到 Base.metadata
 from .config import DATA_DIR, STATIC_DIR, UPLOAD_DIR
 from .database import Base, engine
-from .routers import launch, news, profiles, public, settings, sync, uploads
+from .routers import games, launch, news, profiles, public, settings, sync, uploads
 
 
 @asynccontextmanager
@@ -29,6 +29,7 @@ app.include_router(sync.router)
 app.include_router(settings.router)
 app.include_router(launch.router)
 app.include_router(news.router)
+app.include_router(games.router)
 
 
 @app.get("/", include_in_schema=False)
