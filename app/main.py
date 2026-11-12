@@ -26,6 +26,10 @@ def ensure_schema() -> None:
         if "user_id" not in cols:
             conn.exec_driver_sql("ALTER TABLE players ADD COLUMN user_id INTEGER REFERENCES users(id)")
             conn.commit()
+        pcols = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(profiles)")}
+        if "challenges" not in pcols:
+            conn.exec_driver_sql("ALTER TABLE profiles ADD COLUMN challenges TEXT DEFAULT '{}'")
+            conn.commit()
 
 
 def migrate_legacy_player() -> None:

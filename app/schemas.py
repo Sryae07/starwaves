@@ -41,6 +41,7 @@ class CharacterIn(BaseModel):
     rarity: int = Field(default=4, ge=1, le=6)
     level: int = Field(default=1, ge=1, le=120)
     element: str = Field(default="", max_length=32)
+    eidolon: int = Field(default=0, ge=0, le=6)  # 命座 / 共鸣链
     extra: dict = Field(default_factory=dict)
 
 
@@ -54,6 +55,7 @@ class ProfileUpdate(BaseModel):
     stamina_max: Optional[int] = Field(default=None, ge=1)
     resources: dict = Field(default_factory=dict)
     characters: list[CharacterIn] = Field(default_factory=list)
+    challenges: dict = Field(default_factory=dict)  # 挑战进度（深渊/虚构叙事/末日幻影/模拟宇宙…）
     source: str = "manual"  # manual | ocr | sync
 
 

@@ -392,6 +392,49 @@ function renderChart(key, history, theme) {
       </svg>
     </div>`;
 }
+
+function renderChallenges(challenges, theme) {
+  const entries = Object.entries(challenges || {});
+  if (!entries.length) return '';
+  const sections = entries.map(([key, sec]) => {
+    if (!sec || !sec.name) return '';
+    const progress = sec.progress || {};
+    let head = '';
+    if (progress.max > 0) {
+      const pct = Math.min(100, Math.round(((progress.current || 0) / progress.max) * 100));
+      head = `<div class="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden"><div class="h-full rounded-full transition-all duration-700" style="width:${pct}%;background:linear-gradient(90deg,${theme.c1},${theme.c2})"></div></div>`;
+    }
+    const nodes = (sec.nodes || []).map((n) => {
+      let mark = `<b>${Number(n.value || 0)}</b>`;
+      if (progress.unit === '星') {
+        const filled = '★'.repeat(Math.max(0, Math.min(n.value || 0, n.max || 0)));
+        const empty = '☆'.repeat(Math.max(0, (n.max || 0) - (n.value || 0)));
+        mark = `<span class="text-amber-300">${filled}</span><span class="text-slate-600">${empty}</span>`;
+      }
+      return `<div class="flex items-center justify-between gap-2 text-[11px] py-0.5"><span class="text-slate-400 truncate">${esc(n.name)}</span><span class="text-slate-200 whitespace-nowrap">${mark}${n.max ? ` <span class="text-slate-600">/${n.max}</span>` : ''}</span></div>`;
+    }).join('');
+    const stats = (sec.stats || []).map((s) =>
+      `<span class="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] text-slate-300">${esc(s.label)} <b class="text-slate-100">${Number(s.value || 0).toLocaleString()}</b></span>`
+    ).join('');
+    const records = (sec.records || []).map((r) =>
+      `<div class="flex items-center justify-between gap-2 text-[11px] py-0.5"><span class="text-slate-400 truncate">${esc(r.name)}</span><span class="text-slate-200 whitespace-nowrap">${r.finished ? '✓ ' : ''}${Number(r.score || 0).toLocaleString()}</span></div>`
+    ).join('');
+    const progressText = progress.max ? `${progress.current} / ${progress.max} ${progress.unit}` : '';
+    return `<div class="mt-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-xs font-semibold">⚔ ${esc(sec.name)}</p>
+        <span class="text-[10px] text-slate-500 whitespace-nowrap">${sec.season ? esc(sec.season) + ' · ' : ''}${progressText}</span>
+      </div>
+      ${head}
+      ${nodes}
+      ${stats ? `<div class="mt-2 flex flex-wrap gap-1.5">${stats}</div>` : ''}
+      ${records}
+    </div>`;
+  }).filter(Boolean).join('');
+  if (!sections) return '';
+  return `<div class="mt-4"><p class="text-xs text-slate-500 mb-2">挑战进度</p>${sections}</div>`;
+}
+
 function renderGame(spec, game) {
   const key = spec.key;
   const root = $(`#game-${key}`);
@@ -405,6 +448,9 @@ function renderGame(spec, game) {
     const syncButton = spec.syncable && !isShare
       ? `<button class="sync-btn mt-2 rounded-lg border px-4 py-1.5 text-sm transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
       : '';
+    const bindButton = !isShare
+      ? `<button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🔗 接入</button>`
+      : '';
     const removeButton = spec.custom && !isShare
       ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2.5 py-1 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
       : '';
@@ -417,7 +463,7 @@ function renderGame(spec, game) {
         <p class="text-3xl">${esc(spec.emoji)}</p>
         <p class="mt-3 font-bold">${esc(spec.label)}</p>
         <p class="text-xs text-slate-500 mt-1">${esc(spec.tagline || '还没有数据')}${spec.custom ? ' · 自定义接入' : ''}</p>
-        ${isShare ? '' : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}${launchButton}</div>`}
+        ${isShare ? '' : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🔗 接入</button><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}${launchButton}</div>`}
       </div>`;
     return;
   }
@@ -427,14 +473,23 @@ function renderGame(spec, game) {
   const sourceLabel = { manual: '手动录入', ocr: '截图 OCR', sync: '自动同步' }[game.last_update?.source] || '历史数据';
   const chars = (game.characters || []).slice(0, 12);
   const charHtml = chars.length
-    ? chars.map((c) => `
-        <div class="shrink-0 w-24 rounded-xl border border-white/10 bg-white/[0.04] p-2 text-center">
-          <div class="text-amber-300 text-sm">${'★'.repeat(Math.max(1, Math.min(5, c.rarity)))}</div>
-          <div class="text-sm font-semibold truncate mt-1">${esc(c.name)}</div>
+    ? chars.map((c) => {
+        const el = ELEMENT_COLORS[c.element] || '#94a3b8';
+        const eidolon = Number(c.eidolon || 0);
+        const path = c.extra && c.extra.path ? c.extra.path : '';
+        return `
+        <div class="shrink-0 w-[92px] rounded-xl border bg-white/[0.03] p-2 text-center" style="border-color:${el}55">
+          <div class="text-amber-300 text-[13px] leading-none">${'★'.repeat(Math.max(1, Math.min(5, c.rarity)))}</div>
+          <div class="text-sm font-semibold truncate mt-1.5" style="color:${el}">${esc(c.name)}</div>
           <div class="text-[11px] text-slate-500">Lv.${c.level}</div>
-          ${c.element ? `<div class="mt-1">${elementBadge(c.element)}</div>` : ''}
-        </div>`).join('')
-    : '<p class="text-xs text-slate-500 py-4">暂无角色数据</p>';
+          <div class="mt-1 flex items-center justify-center gap-1 flex-wrap">
+            ${c.element ? elementBadge(c.element) : ''}
+            ${path ? `<span class="text-[10px] px-1.5 py-0.5 rounded border" style="color:#e2e8f0;border-color:#ffffff30;background:#ffffff10">${esc(path)}</span>` : ''}
+          </div>
+          ${eidolon > 0 ? `<div class="mt-1 text-[10px] tracking-tighter" style="color:${el}">${'◆'.repeat(eidolon)}</div>` : ''}
+        </div>`;
+      }).join('')
+    : '<p class="text-xs text-slate-500 py-4">暂无角色数据（🔗 接入后可自动同步角色柜台）</p>';
   const labels = Object.assign({}, RESOURCE_LABELS, spec.resource_labels || {});
   const resources = Object.entries(game.resources || {});
   const resourceHtml = resources.length
@@ -451,6 +506,7 @@ function renderGame(spec, game) {
     ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2 py-0.5 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
     : '';
   const chartHtml = renderChart(key, game.history, theme);
+  const challengesHtml = renderChallenges(game.challenges, theme);
 
   root.innerHTML = `
     <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-5" style="${cardStyle}">
@@ -463,6 +519,7 @@ function renderGame(spec, game) {
           </div>
         </div>
         <div class="flex items-center gap-1.5">
+          ${isShare ? '' : `<button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🔗 接入</button>`}
           ${launchButton}
           ${removeButton}
           ${syncButton}
@@ -493,6 +550,8 @@ function renderGame(spec, game) {
         <p class="text-xs text-slate-500 mb-2">角色图鉴 <span class="text-slate-600">(${(game.characters || []).length} 名)</span></p>
         <div class="flex gap-2 overflow-x-auto pb-1">${charHtml}</div>
       </div>
+
+      ${challengesHtml}
 
       ${chartHtml}
 
@@ -680,6 +739,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeModal();
     $('#add-game-modal')?.classList.add('hidden');
+    $('#bind-modal')?.classList.add('hidden');
     $('#auth-modal')?.classList.add('hidden');
   }
 });
@@ -727,6 +787,8 @@ document.body.addEventListener('click', (e) => {
   if (removeBtn) removeGame(removeBtn);
   const syncBtn = e.target.closest('.sync-btn');
   if (syncBtn) syncGame(syncBtn);
+  const bindBtn = e.target.closest('.bind-btn');
+  if (bindBtn) openBindModal(bindBtn.dataset.game);
   const launchBtn = e.target.closest('.launch-btn');
   if (launchBtn) launchGame(launchBtn);
 });
@@ -798,6 +860,147 @@ async function removeGame(btn) {
     btn.disabled = false;
   }
 }
+
+/* ---------- 官方接入：输入 UID 自动同步 / 本地 JSON 导入 ---------- */
+let bindGame = 'hsr';
+
+function setBindStatus(message, ok = null) {
+  const el = $('#bind-status');
+  el.textContent = message;
+  el.className = `mt-3 rounded-xl border px-4 py-3 text-sm ${
+    ok === false ? 'border-red-400/30 bg-red-400/10 text-red-200'
+      : ok === true ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'
+        : 'border-white/10 bg-white/5 text-slate-300'
+  }`;
+  el.classList.remove('hidden');
+}
+
+function buildBindTabs() {
+  const box = $('#bind-game-tabs');
+  if (!box) return;
+  box.innerHTML = REGISTRY.map(
+    (g) => `<button type="button" data-bind-game="${esc(g.key)}" class="bind-tab rounded-xl border py-2 text-sm font-semibold transition">${esc(g.emoji)} ${esc(g.label)}</button>`
+  ).join('');
+  box.querySelectorAll('.bind-tab').forEach((btn) =>
+    btn.addEventListener('click', () => setBindGame(btn.dataset.bindGame))
+  );
+}
+
+function setBindGame(game) {
+  bindGame = game;
+  const spec = specOf(game);
+  document.querySelectorAll('.bind-tab').forEach((btn) => {
+    const active = btn.dataset.bindGame === game;
+    btn.className = `bind-tab rounded-xl border py-2 text-sm font-semibold transition ${
+      active ? 'border-violet-400/60 bg-gradient-to-r from-violet-500/30 to-cyan-500/30' : 'border-white/10 bg-white/5'
+    }`;
+  });
+  $('#bind-status').classList.add('hidden');
+  $('#bind-uid').value = '';
+  $('#bind-json').value = '';
+  if (spec.syncable) {
+    $('#btn-bind-sync').classList.remove('hidden');
+    $('#bind-cookie-box').classList.remove('hidden');
+    $('#bind-uid-note').textContent = `${spec.label}：输入 UID 后自动拉取米游社战绩（等级 / 活跃天数 / 成就 / 角色 / 忘却之庭 / 虚构叙事 / 末日幻影 / 模拟宇宙），需先配置 Cookie。`;
+    loadCookieStatus();
+  } else {
+    $('#btn-bind-sync').classList.add('hidden');
+    $('#bind-cookie-box').classList.add('hidden');
+    $('#bind-uid-note').textContent = `${spec.label}没有公开的玩家数据接口，无法按 UID 自动同步。请用下方「本地导出 JSON」导入，或回到看板用截图 OCR / 手动录入。`;
+  }
+}
+
+async function loadCookieStatus() {
+  try {
+    const res = await api('/api/settings/hoyolab-cookie');
+    $('#bind-cookie').value = res.value || '';
+    $('#bind-cookie-status').textContent = res.configured ? `已配置（尾号 ${res.tail}）` : '未配置';
+    $('#bind-cookie-status').className = res.configured ? 'text-[11px] text-emerald-300' : 'text-[11px] text-amber-300';
+  } catch (err) {
+    $('#bind-cookie-status').textContent = '读取失败';
+  }
+}
+
+function openBindModal(game) {
+  if (!REGISTRY.length) loadRegistry().then(() => openBindModal(game));
+  else {
+    buildBindTabs();
+    setBindGame(game || (REGISTRY[0] && REGISTRY[0].key));
+    $('#bind-modal').classList.remove('hidden');
+  }
+}
+
+$('#btn-save-cookie')?.addEventListener('click', async () => {
+  try {
+    const res = await api('/api/settings/hoyolab-cookie', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cookie: $('#bind-cookie').value.trim() }),
+    });
+    $('#bind-cookie-status').textContent = res.configured ? `已保存（尾号 ${res.tail}）` : '已清除';
+    $('#bind-cookie-status').className = 'text-[11px] text-emerald-300';
+    toast('Cookie 已保存（仅存本机数据库）');
+  } catch (err) {
+    toast(err.message, false);
+  }
+});
+
+$('#btn-bind-sync')?.addEventListener('click', async () => {
+  const uid = $('#bind-uid').value.trim();
+  if (!uid) {
+    setBindStatus('请先填写游戏 UID', false);
+    return;
+  }
+  const btn = $('#btn-bind-sync');
+  btn.disabled = true;
+  btn.textContent = '同步中…';
+  setBindStatus('⏳ 正在拉取米游社战绩…');
+  try {
+    await api(`/api/bind/${encodeURIComponent(bindGame)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid }),
+    });
+    $('#bind-modal').classList.add('hidden');
+    toast(`✓ ${specOf(bindGame).label} 已接入并同步`);
+    await load();
+  } catch (err) {
+    setBindStatus(`❌ ${err.message}`, false);
+  }
+  btn.disabled = false;
+  btn.textContent = '🔄 自动同步（米游社战绩）';
+});
+
+$('#btn-bind-import')?.addEventListener('click', async () => {
+  let data;
+  try {
+    data = JSON.parse($('#bind-json').value.trim());
+  } catch (err) {
+    setBindStatus('JSON 格式错误，请检查后重试', false);
+    return;
+  }
+  const btn = $('#btn-bind-import');
+  btn.disabled = true;
+  btn.textContent = '导入中…';
+  try {
+    await api(`/api/import/${encodeURIComponent(bindGame)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    $('#bind-modal').classList.add('hidden');
+    toast(`✓ ${specOf(bindGame).label} 数据已导入`);
+    await load();
+  } catch (err) {
+    setBindStatus(`❌ ${err.message}`, false);
+  }
+  btn.disabled = false;
+  btn.textContent = '导入 JSON 并保存';
+});
+
+document.querySelectorAll('[data-bind-close]').forEach((el) =>
+  el.addEventListener('click', () => $('#bind-modal').classList.add('hidden'))
+);
 
 async function syncGame(btn) {
   const game = btn.dataset.game;

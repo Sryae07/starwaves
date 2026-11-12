@@ -32,23 +32,23 @@ EXAMPLE = {
         {"name": "忌炎", "rarity": 5, "level": 80, "element": "雷"},
         {"name": "漂泊者", "rarity": 5, "level": 70, "element": "气动"},
     ],
+    "challenges": {
+        "tower": {
+            "name": "逆境深塔",
+            "season": "1.4 版本",
+            "progress": {"current": 24, "max": 30, "unit": "星"},
+            "nodes": [
+                {"name": "左塔", "value": 10, "max": 12},
+                {"name": "右塔", "value": 14, "max": 18},
+            ],
+        }
+    },
 }
 
 
 def build_payload(raw: dict) -> dict:
-    stamina = raw.get("stamina") or {}
-    return {
-        "uid": str(raw.get("uid", "")),
-        "nickname": raw.get("nickname", ""),
-        "level": int(raw.get("level", 0)),
-        "active_days": int(raw.get("active_days", 0)),
-        "achievements": int(raw.get("achievements", 0)),
-        "stamina_current": int(stamina.get("current", 0)),
-        "stamina_max": int(stamina.get("max", 240)),
-        "resources": raw.get("resources", {}),
-        "characters": raw.get("characters", []),
-        "source": "sync",
-    }
+    """本地导出 JSON 契约原样上传（含 characters / challenges），由服务端 /api/import 解析。"""
+    return raw
 
 
 def upload(server: str, payload: dict, token: str | None, api_key: str | None) -> None:
@@ -58,7 +58,7 @@ def upload(server: str, payload: dict, token: str | None, api_key: str | None) -
     if api_key:
         headers["X-API-Key"] = api_key
     req = urllib.request.Request(
-        f"{server.rstrip('/')}/api/profiles/wuwa",
+        f"{server.rstrip('/')}/api/import/wuwa",
         data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
         headers=headers,
         method="POST",

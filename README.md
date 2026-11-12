@@ -15,6 +15,11 @@
 - 多游戏合并看板：体力进度条 + 回满倒计时、等级/活跃天数/成就统计、资源、角色图鉴
 - 👤 账号系统：手机验证码注册、用户名（或手机号）+ 密码登录；用户名即档案名，
   不填自动生成「用户＋随机不重复编号」，多账号数据互相隔离、各自一条分享链接
+- 🔗 官方式接入（星穹铁道）：看板输入 UID 一键拉取米游社「战绩」——
+  等级 / 活跃天数 / 成就 / 体力 / 角色柜台（含命座与命途）/ 忘却之庭 / 虚构叙事 /
+  末日幻影 / 模拟宇宙挑战进度，单个挑战接口失败不影响整体同步
+- 📦 本地 JSON 导入（鸣潮等）：粘贴本地工具导出的 JSON 即入库，
+  角色、资源与挑战进度（如逆境深塔）与星铁共用同一套展示
 - 📡 资讯中心（`/news`）：聚合各游戏官方公告 / 新闻 / 活动（星铁·绝区零走米游社论坛、鸣潮走库洛官网 JSON），
   后端 5 分钟 TTL 缓存 + 页面自动轮询，数据源故障自动降级，支持关键词搜索过滤
 - 注册表驱动的游戏接入：新增游戏只需在 `app/games.py` 登记一条 `GameSpec`
@@ -120,6 +125,9 @@ pip install -r requirements-ocr.txt
 
 ## 米游社自动同步（星穹铁道，可选、有风险）
 
+配置 Cookie 两种方式任选：看板「🔗 接入」弹窗里直接粘贴保存（存本机数据库），
+或按下面步骤写入 `.env`：
+
 1. 浏览器登录米游社网页版（`webstatic.mihoyo.com`）
 2. F12 打开开发者工具，抓任意 `api-takumi-record.mihoyo.com` 请求
 3. 复制请求头里的完整 Cookie 串，写入 `.env` 的 `HKRPG_COOKIE`
@@ -127,10 +135,24 @@ pip install -r requirements-ocr.txt
 
 注意事项：
 
-- Cookie 只保存在本机 `.env`，不写入日志、数据库或响应
+- Cookie 只保存在本机数据库 / `.env`，不写入日志与响应
 - Cookie 过期或请求过频会被风控；接口字段随版本变化，容错解析见
   `app/services/hoyolab.py`，字段变化时改候选键即可
 - 这是社区逆向协议，不要高频调用，后果自负
+
+### 官方式接入：输入 UID 自动同步
+
+看板任意星铁卡片点「🔗 接入」→ 输入游戏 UID → 自动同步：
+
+- 基本信息：昵称 / 等级 / 活跃天数 / 成就 / 开拓力
+- 角色柜台：稀有度、等级、属性、命座、命途
+- 挑战进度：忘却之庭 / 虚构叙事 / 末日幻影（层数与星级）、模拟宇宙（积分与战绩）
+- 自动同步只能读取你 Cookie 对应米游社账号下的角色，输入别人的 UID 会被拒绝
+
+**鸣潮说明（实话实说）**：库洛没有公开玩家数据接口，输入 UID 自动同步不可行。
+「🔗 接入」弹窗里的 JSON 导入通道即为其官方替代：本地辅助工具产出
+`tools/wuwa_export.py` 约定的 JSON（可含 `challenges` 挑战进度），粘贴即可，
+展示效果与星铁一致。也可以继续用截图 OCR / 手动录入。
 
 ## 启动游戏（仅 Windows 本机部署）
 
@@ -161,7 +183,15 @@ pip install -r requirements-ocr.txt
   "resources": {"astrites": 12345, "shell_credits": 67890},
   "characters": [
     {"name": "忌炎", "rarity": 5, "level": 80, "element": "雷"}
-  ]
+  ],
+  "challenges": {
+    "tower": {
+      "name": "逆境深塔",
+      "season": "1.4 版本",
+      "progress": {"current": 24, "max": 30, "unit": "星"},
+      "nodes": [{"name": "左塔", "value": 10, "max": 12}]
+    }
+  }
 }
 ```
 
@@ -185,7 +215,10 @@ python tools/wuwa_export.py --example
 | POST | `/api/auth/logout` | 退出登录，令牌作废 | Bearer |
 | POST | `/api/profiles/{game}` | 手动 / OCR 校对后写入（game: hsr/wuwa） | Bearer + X-API-Key |
 | POST | `/api/upload/{game}` | 截图上传 OCR，`apply=true` 直接入库 | Bearer + X-API-Key |
-| POST | `/api/sync/hsr` | 米游社同步星铁数据 | Bearer + X-API-Key |
+| POST | `/api/sync/hsr` | 米游社同步星铁数据（请求体可选 `{"uid": "..."}`） | Bearer + X-API-Key |
+| POST | `/api/bind/{game}` | 官方式接入：输入 UID 自动同步（仅星铁；鸣潮返回 501 说明） | Bearer + X-API-Key |
+| POST | `/api/import/{game}` | 本地导出 JSON 一键导入（含 characters / challenges） | Bearer + X-API-Key |
+| GET/PUT | `/api/settings/hoyolab-cookie` | 查看 / 保存米游社 Cookie（存本机数据库，.env 兜底） | Bearer + X-API-Key |
 | POST | `/api/launch/{game}` | 启动本机游戏进程（仅 Windows） | Bearer + X-API-Key |
 | POST | `/api/background` | 上传自定义背景图 | Bearer + X-API-Key |
 | DELETE | `/api/background` | 恢复默认背景 | Bearer + X-API-Key |

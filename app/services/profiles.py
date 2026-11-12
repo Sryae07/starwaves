@@ -38,6 +38,8 @@ def apply_profile_update(db: Session, game: str, payload: ProfileUpdate, user: U
     profile.level = payload.level
     profile.active_days = payload.active_days
     profile.achievements = payload.achievements
+    if payload.challenges:
+        profile.challenges = dict(payload.challenges)
 
     db.add(
         Snapshot(
@@ -57,7 +59,7 @@ def apply_profile_update(db: Session, game: str, payload: ProfileUpdate, user: U
                 rarity=item.rarity,
                 level=item.level,
                 element=item.element,
-                extra=item.extra or {},
+                extra={**item.extra, "eidolon": item.eidolon or 0},
             )
         )
 

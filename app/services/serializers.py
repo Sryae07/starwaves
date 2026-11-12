@@ -83,10 +83,12 @@ def game_payload(profile: Profile, registry: dict[str, GameSpec] | None = None) 
                 "rarity": c.rarity,
                 "level": c.level,
                 "element": c.element,
+                "eidolon": (c.extra or {}).get("eidolon", 0),
                 "extra": c.extra or {},
             }
             for c in profile.characters
         ],
+        "challenges": profile.challenges or {},
         "last_update": (
             {"at": _iso(snapshot.captured_at), "source": snapshot.source} if snapshot else None
         ),

@@ -89,6 +89,7 @@ class Profile(Base):
     level: Mapped[int] = mapped_column(Integer, default=0)
     active_days: Mapped[int] = mapped_column(Integer, default=0)
     achievements: Mapped[int] = mapped_column(Integer, default=0)
+    challenges: Mapped[dict] = mapped_column(JSON, default=dict)  # 挑战进度（深渊/虚构叙事/末日幻影/模拟宇宙等）
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
     )
@@ -149,3 +150,15 @@ class CustomGame(Base):
     color_b: Mapped[str] = mapped_column(String(7), default="#67e8f9")
     resource_labels: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class SiteSetting(Base):
+    """站点级键值配置（如米游社 Cookie，仅存本机数据库）。"""
+
+    __tablename__ = "site_settings"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    value: Mapped[str] = mapped_column(String(4096), default="")
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, onupdate=utcnow
+    )
