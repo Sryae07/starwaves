@@ -1,5 +1,4 @@
-# StarWaves 提权启动助手：由计划任务 StarWavesLaunchGame（最高权限）调用。
-# 读取后端写入的 data\launch_target.txt，以管理员权限启动游戏。
+# Elevated launch helper: called by scheduled task StarWavesLaunchGame (highest privileges).
 $root = Split-Path -Parent $PSScriptRoot
 $targetFile = Join-Path $root 'data\launch_target.txt'
 $log = Join-Path $root 'data\launch.log'
