@@ -130,7 +130,9 @@
   </footer>
 
   <script>
-    const apiBase = /^(127\.0\.0\.1|localhost)$/.test(location.hostname) ? '' : 'http://127.0.0.1:8000';
+    const isPages = location.hostname.endsWith('github.io');
+    const savedServer = (localStorage.getItem('sw_server') || '').replace(/^https?:\/\//, '').replace(/\/+$/, '');
+    const apiBase = isPages ? 'http://' + (savedServer || '127.0.0.1:8000') : '';
     const REFRESH_MS = 5 * 60 * 1000;
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
       { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
@@ -143,6 +145,7 @@
     let query = '';
     let lastItems = [];
     let lastSources = {};
+    let staticSnapshot = null;
 
     async function loadRegistry() {
       try {
@@ -151,6 +154,14 @@
         registry = (await res.json()).games || [];
       } catch (err) {
         registry = [];
+        try {
+          const snap = await fetch('news-data.json');
+          if (snap.ok) {
+            const data = await snap.json();
+            registry = data.games || [];
+            staticSnapshot = data;
+          }
+        } catch (e2) { /* 静态快照不可用则保持空注册表 */ }
       }
       const box = document.getElementById('game-filters');
       registry.forEach((g) => {
@@ -293,8 +304,15 @@
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         renderFeed(data);
+        document.getElementById('refresh-hint').classList.remove('text-amber-300');
       } catch (err) {
-        if (!silent) {
+        if (staticSnapshot) {
+          renderFeed(staticSnapshot);
+          const hint = document.getElementById('refresh-hint');
+          hint.textContent = '🗄 静态快照 · 每 3 小时更新';
+          hint.classList.add('text-amber-300');
+          nextRefreshAt = Date.now() + REFRESH_MS;
+        } else if (!silent) {
           document.getElementById('feed').innerHTML = '';
           document.getElementById('feed-error').classList.remove('hidden');
         }

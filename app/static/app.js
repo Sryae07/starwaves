@@ -2,6 +2,24 @@
    游戏卡片、更新弹窗页签、主题色全部由后端注册表（/api/games）动态渲染，
    新增游戏无需改动本文件。 */
 
+/* GitHub Pages 上的看板入口：已保存服务器地址则直接跳转，否则显示网关页 */
+(() => {
+  if (!location.hostname.endsWith('github.io')) return;
+  if (location.search.includes('reset=1')) {
+    localStorage.removeItem('sw_server');
+    return;
+  }
+  const saved = localStorage.getItem('sw_server');
+  if (saved) {
+    const host = saved.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+    location.replace('http://' + host + '/dashboard');
+    throw new Error('__redirect_to_dashboard__');
+  }
+})();
+
+const ON_PAGES = location.hostname.endsWith('github.io');
+const GATEWAY_MODE = ON_PAGES && !localStorage.getItem('sw_server');
+
 const KEY_NAME = 'starwaves_api_key';
 const TOKEN_KEY = 'starwaves_token';
 const USER_KEY = 'starwaves_user';
@@ -1325,5 +1343,27 @@ async function load() {
   }
 }
 
-applyBackground();
-load();
+function showGateway() {
+  const el = $('#server-gateway');
+  if (!el) return;
+  el.classList.remove('hidden');
+  const input = $('#gw-host');
+  input.value = '127.0.0.1:8000';
+  const go = () => {
+    const raw = input.value.trim();
+    const host = raw.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+    if (!host) { input.focus(); return; }
+    localStorage.setItem('sw_server', host);
+    location.href = 'http://' + host + '/dashboard';
+  };
+  $('#gw-go').addEventListener('click', go);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+  input.focus();
+}
+
+if (GATEWAY_MODE) {
+  showGateway();
+} else {
+  applyBackground();
+  load();
+}
