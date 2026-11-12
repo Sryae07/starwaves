@@ -1,6 +1,7 @@
 # One-time setup: create highest-privilege scheduled task StarWavesLaunchGame.
 # Root is taken from SW_ROOT env (when invoked via encoded command) or from script location.
 $root = if ($env:SW_ROOT) { $env:SW_ROOT.TrimEnd('\') } elseif ($PSScriptRoot) { Split-Path -Parent $PSScriptRoot } else { '' }
+Set-Content -LiteralPath (Join-Path $root 'data\setup_log.txt') -Value ('started ' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss')) -Encoding UTF8
 $helper = Join-Path $root 'tools\run_elevated_launch.ps1'
 $ps = "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe"
 $tr = '"{0}" -NoProfile -ExecutionPolicy Bypass -File "{1}"' -f $ps, $helper
