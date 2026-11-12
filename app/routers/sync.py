@@ -20,7 +20,6 @@ from ..models import SiteSetting
 from ..schemas import CharacterIn, ProfileUpdate
 from ..services.hoyolab import SyncError, fetch_hsr_record
 from ..services.hoyolab_login import (
-    NeedCaptcha,
     capture_state,
     login_by_password,
     save_cookie_to_db,
@@ -127,8 +126,8 @@ def hoyolab_auto_login(
     db: Session = Depends(get_db),
 ) -> dict:
     """输入 UID + 米游社账号密码，自动接入 Cookie：
-    先尝试密码直登并直接同步；遇到人机验证时自动拉起本机 Edge，
-    用户登录后系统自动抓取 Cookie（前端轮询到已配置后自动同步 UID）。
+    先尝试接口直登；被风控/加密限制时自动拉起本机 Edge 全自动完成
+    填表、提交、同意协议、人机验证、抓取 Cookie，随后自动同步 UID。
     密码仅在本机进程内使用，不落盘。"""
     uid = str((payload or {}).get("uid") or "").strip()
     if not uid:
@@ -165,13 +164,12 @@ def hoyolab_auto_login(
     if account and password:
         try:
             cookie = login_by_password(account, password)
+        except Exception:
+            cookie = None  # 直登受限（参数不合法/风控/人机验证）：一律回退浏览器全自动通道
+        if cookie:
             save_cookie_to_db(cookie)
             _sync_hsr(user, db, uid=uid)
             return {"status": "synced", "uid": uid}
-        except NeedCaptcha:
-            pass  # 需要人机验证：回退到浏览器全自动通道
-        except Exception as exc:
-            raise HTTPException(status_code=400, detail=str(exc) or "直登失败") from exc
 
     start_browser_capture(account, password, on_captured=lambda: sync_after_captured(user.id))
     return {

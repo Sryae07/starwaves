@@ -1,6 +1,7 @@
 """官方接入（UID 自动同步）+ 本地 JSON 导入 + 米游社 Cookie 设置。"""
 
 from app.routers import sync as sync_router
+from app.services.hoyolab_login import NeedCaptcha
 
 FAKE_RECORD = {
     "uid": "100000001",
@@ -181,7 +182,7 @@ def test_auto_login_falls_back_to_browser(client, auth_headers, monkeypatch):
     called = {}
 
     def fake_login(account, password):
-        raise sync_router.NeedCaptcha("captcha")
+        raise NeedCaptcha("captcha")
 
     def fake_browser(account, password, on_captured=None):
         called["browser"] = True
@@ -199,15 +200,22 @@ def test_auto_login_falls_back_to_browser(client, auth_headers, monkeypatch):
     assert called["browser"] is True
 
 
-def test_auto_login_bad_credentials_400(client, auth_headers, monkeypatch):
+def test_auto_login_bad_credentials_falls_back(client, auth_headers, monkeypatch):
+    called = {}
+
     def boom(account, password):
         raise RuntimeError("账号或密码错误")
 
+    def fake_browser(account, password, on_captured=None):
+        called["browser"] = True
+
     monkeypatch.setattr(sync_router, "login_by_password", boom)
+    monkeypatch.setattr(sync_router, "start_browser_capture", fake_browser)
     resp = client.post(
         "/api/hoyolab/auto-login",
         json={"account": "a", "password": "b", "uid": "100000001"},
         headers=auth_headers,
     )
-    assert resp.status_code == 400
-    assert "账号或密码错误" in resp.json()["detail"]
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "auto"
+    assert called["browser"] is True

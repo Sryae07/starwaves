@@ -161,6 +161,20 @@ def _login_frame(page):
     return page.main_frame
 
 
+def _submit_button(frame):
+    """登录页提交按钮：兼容 button / a / [role=button] 与文本中可能存在的空格。"""
+    import re
+
+    for selector in ("button", "a", '[role="button"]'):
+        loc = frame.locator(selector).filter(has_text=re.compile(r"登\s*录"))
+        try:
+            if loc.count() > 0:
+                return loc.first
+        except Exception:
+            continue
+    return None
+
+
 def _wait_login_frame(page, timeout_ms: int = 30000):
     """等待登录 iframe 出现并返回（页面跳转后 iframe 可能延迟创建）。"""
     deadline = time.time() + timeout_ms / 1000
@@ -278,13 +292,19 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
                 page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(3000)
             frame = _wait_login_frame(page)
-            try:
-                tab = frame.locator("text=密码登录").first
-                if tab.is_visible():
-                    tab.click()
-                    page.wait_for_timeout(1500)
-            except Exception:
-                pass
+            for _ in range(3):
+                try:
+                    tab = frame.locator("text=密码登录").first
+                    if tab.is_visible():
+                        tab.click()
+                        page.wait_for_timeout(1500)
+                except Exception:
+                    pass
+                try:
+                    if frame.locator('input[name="password"], input[type="password"]').first.is_visible():
+                        break
+                except Exception:
+                    pass
             try:
                 frame.wait_for_selector('input[name="password"], input[type="password"]', timeout=20000)
             except Exception:
@@ -326,10 +346,8 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
 
                 _set_step("submitting", "正在提交登录…")
                 try:
-                    submit = frame.locator(
-                        'button:text-is("登录"), button:text-is("登 录")'
-                    ).first
-                    if submit.count():
+                    submit = _submit_button(frame)
+                    if submit is not None:
                         submit.click(force=True)
                     else:
                         password_loc.press("Enter")
@@ -397,10 +415,8 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
                         agree.click(force=True)
                         _set_step("submitting", "已自动同意用户协议，正在重新提交登录…")
                         page.wait_for_timeout(1500)
-                        submit2 = frame.locator(
-                            'button:text-is("登录"), button:text-is("登 录")'
-                        ).first
-                        if submit2.is_visible():
+                        submit2 = _submit_button(frame)
+                        if submit2 is not None and submit2.is_visible():
                             submit2.click(force=True)
                         continue
                 except Exception:
