@@ -84,7 +84,7 @@ pip install -r requirements-ocr.txt
 1. 浏览器登录米游社网页版（`webstatic.mihoyo.com`）
 2. F12 打开开发者工具，抓任意 `api-takumi-record.mihoyo.com` 请求
 3. 复制请求头里的完整 Cookie 串，写入 `.env` 的 `HKRPG_COOKIE`
-4. 重启服务后 `POST /api/sync/hsr`（页面后续可加一键按钮）
+4. 重启服务后，点击看板星铁卡片右上角的"🔄 米游社同步"按钮（或 `POST /api/sync/hsr`）
 
 > 看板页面的星铁卡片右上角已内置"🔄 米游社同步"按钮，配好 Cookie 后
 > 直接点按钮即可，无需手动调接口。
