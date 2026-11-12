@@ -130,6 +130,7 @@
   </footer>
 
   <script>
+    const apiBase = /^(127\.0\.0\.1|localhost)$/.test(location.hostname) ? '' : 'http://127.0.0.1:8000';
     const REFRESH_MS = 5 * 60 * 1000;
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
       { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
@@ -145,7 +146,7 @@
 
     async function loadRegistry() {
       try {
-        const res = await fetch('/api/games');
+        const res = await fetch(apiBase + '/api/games');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         registry = (await res.json()).games || [];
       } catch (err) {
@@ -288,7 +289,7 @@
       btn.disabled = true;
       const params = registry.map((g) => 'game=' + encodeURIComponent(g.key)).join('&');
       try {
-        const res = await fetch('/api/news?' + params + '&limit=15');
+        const res = await fetch(apiBase + '/api/news?' + params + '&limit=15');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         renderFeed(data);

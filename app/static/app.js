@@ -8,6 +8,9 @@ const USER_KEY = 'starwaves_user';
 let apiKey = localStorage.getItem(KEY_NAME) || '';
 let authToken = localStorage.getItem(TOKEN_KEY) || '';
 
+/* API 基址：本机直接走相对路径；托管在 GitHub Pages 时回落调用本机后端（需本机服务已启动）。 */
+const API_BASE = /^(127\.0\.0\.1|localhost)$/.test(location.hostname) ? '' : 'http://127.0.0.1:8000';
+
 const params = new URLSearchParams(location.search);
 const pathShare = location.pathname.match(/^\/share\/([A-Za-z0-9_-]+)/);
 const shareId = params.get('share') || (pathShare ? decodeURIComponent(pathShare[1]) : null);
@@ -64,7 +67,7 @@ async function api(path, options = {}) {
   const headers = Object.assign({}, options.headers || {});
   if (apiKey) headers['X-API-Key'] = apiKey;
   if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-  const resp = await fetch(path, Object.assign({}, options, { headers }));
+  const resp = await fetch(API_BASE + path, Object.assign({}, options, { headers }));
   if (resp.status === 401 && !options.retried) {
     let detail = '';
     try { detail = (await resp.json()).detail || ''; } catch (e) { /* ignore */ }
@@ -90,7 +93,7 @@ async function api(path, options = {}) {
 
 async function loadRegistry() {
   try {
-    const res = await fetch('/api/games');
+    const res = await fetch(API_BASE + '/api/games');
     if (res.ok) REGISTRY = (await res.json()).games || [];
   } catch (e) {
     REGISTRY = [];
@@ -293,12 +296,17 @@ function applyBackground() {
   const img = new Image();
   img.onload = () => {
     document.body.style.backgroundImage =
-      `linear-gradient(rgba(5,7,15,.78), rgba(5,7,15,.78)), url('/api/background?t=${Date.now()}')`;
+      `linear-gradient(rgba(5,7,15,.78), rgba(5,7,15,.78)), url('${API_BASE}/api/background?t=${Date.now()}')`;
     document.body.style.backgroundSize = 'cover';
     document.body.style.backgroundPosition = 'center';
     document.body.style.backgroundAttachment = 'fixed';
   };
-  img.src = '/api/background';
+  img.src = API_BASE + '/api/background';
+}
+
+function shareUrlOf(shareId) {
+  const base = API_BASE || location.origin;
+  return `${base}/share/${shareId}`;
 }
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
@@ -321,8 +329,10 @@ function fmtDuration(ms) {
 
 /* ---------- 渲染 ---------- */
 let timers = [];
+let CURRENT = null;
 
 function render(data) {
+  CURRENT = data;
   $('#player-name').textContent = data.player.nickname;
   $('#locked-view').classList.add('hidden');
   if (isShare) {
@@ -333,7 +343,7 @@ function render(data) {
     $('#admin-actions').classList.remove('hidden');
     $('#admin-actions').classList.add('flex');
     $('#share-hint').classList.remove('hidden');
-    $('#share-hint').textContent = `分享链接：${location.origin}/share/${data.player.share_id}`;
+    $('#share-hint').textContent = `分享链接：${shareUrlOf(data.player.share_id)}`;
   }
   $('#updated-at').textContent = data.updated_at ? `最后更新：${fmtTime(data.updated_at)}` : '';
 
@@ -519,7 +529,7 @@ function renderGame(spec, game) {
           </div>
         </div>
         <div class="flex items-center gap-1.5">
-          ${isShare ? '' : `<button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🔗 接入</button>`}
+          ${isShare ? '' : `<button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🔗 重新绑定</button>`}
           ${launchButton}
           ${removeButton}
           ${syncButton}
@@ -721,10 +731,29 @@ function collectForm() {
 
 /* ---------- 事件绑定 ---------- */
 $('#btn-update')?.addEventListener('click', () => openModal());
+$('#btn-refresh')?.addEventListener('click', async () => {
+  const btn = $('#btn-refresh');
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '⏳ 刷新中…';
+  try {
+    if (!REGISTRY.length) await loadRegistry();
+    await load();
+    toast('✓ 数据已刷新');
+  } catch (err) {
+    toast(err.message, false);
+  }
+  btn.disabled = false;
+  btn.textContent = '🔄 刷新';
+});
+$('#btn-force-refresh')?.addEventListener('click', () => {
+  const sep = location.search ? '&' : '?';
+  location.replace(location.pathname + location.search + sep + '_t=' + Date.now());
+});
 $('#btn-share')?.addEventListener('click', async () => {
   try {
     const data = await api('/api/me');
-    const url = `${location.origin}/share/${data.player.share_id}`;
+    const url = shareUrlOf(data.player.share_id);
     await navigator.clipboard.writeText(url);
     toast('分享链接已复制到剪贴板');
   } catch (err) {
@@ -896,7 +925,11 @@ function setBindGame(game) {
     }`;
   });
   $('#bind-status').classList.add('hidden');
-  $('#bind-uid').value = '';
+  const bound = CURRENT && CURRENT.games && CURRENT.games[game];
+  const boundUid = (bound && bound.profile && bound.profile.uid) || '';
+  $('#bind-uid').value = boundUid;
+  $('#bind-uid').placeholder = boundUid ? '已绑定 UID，可输入新 UID 更换' : '输入对应游戏 UID，如 100000001';
+  $('#btn-bind-unbind').classList.toggle('hidden', !boundUid);
   $('#bind-json').value = '';
   if (spec.syncable) {
     $('#btn-bind-sync').classList.remove('hidden');
@@ -996,6 +1029,24 @@ $('#btn-bind-import')?.addEventListener('click', async () => {
   }
   btn.disabled = false;
   btn.textContent = '导入 JSON 并保存';
+});
+
+$('#btn-bind-unbind')?.addEventListener('click', async () => {
+  const label = specOf(bindGame).label;
+  if (!confirm(`确定解除「${label}」的绑定吗？该游戏档案、角色与挑战数据将被清空。`)) return;
+  const btn = $('#btn-bind-unbind');
+  btn.disabled = true;
+  btn.textContent = '解除中…';
+  try {
+    await api(`/api/bind/${encodeURIComponent(bindGame)}`, { method: 'DELETE' });
+    $('#bind-modal').classList.add('hidden');
+    toast(`✓ 已解除 ${label} 绑定，可重新接入`);
+    await load();
+  } catch (err) {
+    setBindStatus(`❌ ${err.message}`, false);
+    btn.disabled = false;
+    btn.textContent = '解除绑定';
+  }
 });
 
 document.querySelectorAll('[data-bind-close]').forEach((el) =>

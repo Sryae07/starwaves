@@ -122,3 +122,20 @@ def test_cookie_settings_roundtrip(client, auth_headers):
     got = client.get("/api/settings/hoyolab-cookie", headers=auth_headers).json()
     assert got["value"].startswith("ltoken=abc")
     assert got["tail"] == "oken=xyz"
+
+
+def test_unbind_clears_profile(client, auth_headers, monkeypatch):
+    def fake_fetch(uid=None, cookie=None, db=None):
+        return FAKE_RECORD
+
+    monkeypatch.setattr(sync_router, "fetch_hsr_record", fake_fetch)
+    assert client.post("/api/bind/hsr", json={"uid": "100000001"}, headers=auth_headers).status_code == 200
+    assert "hsr" in client.get("/api/me", headers=auth_headers).json()["games"]
+
+    resp = client.delete("/api/bind/hsr", headers=auth_headers)
+    assert resp.status_code == 200
+    assert resp.json()["unbound"] is True
+    assert "hsr" not in client.get("/api/me", headers=auth_headers).json()["games"]
+
+    assert client.delete("/api/bind/hsr", headers=auth_headers).json()["unbound"] is False
+    assert client.delete("/api/bind/nope", headers=auth_headers).status_code == 404

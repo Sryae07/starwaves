@@ -5,8 +5,10 @@ import logging
 import secrets
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import Response
 
 from . import models  # noqa: F401  确保模型注册到 Base.metadata
 from .config import DATA_DIR, STATIC_DIR, UPLOAD_DIR
@@ -71,6 +73,17 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="StarWaves", description="多游戏个人档案 + 官方资讯聚合", version="0.3.0", lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://sryae07.github.io",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(public.router)
 app.include_router(auth.router)
 app.include_router(profiles.router)
@@ -84,21 +97,29 @@ app.include_router(games.router)
 
 @app.get("/", include_in_schema=False)
 def landing_page() -> FileResponse:
-    return FileResponse(STATIC_DIR / "home.html")
+    return FileResponse(STATIC_DIR / "home.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 @app.get("/dashboard", include_in_schema=False)
 def dashboard_page() -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html")
+    return FileResponse(STATIC_DIR / "index.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 @app.get("/news", include_in_schema=False)
 def news_page() -> FileResponse:
-    return FileResponse(STATIC_DIR / "news.html")
+    return FileResponse(STATIC_DIR / "news.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 @app.get("/share/{share_id}", include_in_schema=False)
 def share_page(share_id: str) -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html")
+    return FileResponse(STATIC_DIR / "index.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
-app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+
+class NoCacheStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope) -> Response:
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-store, must-revalidate"
+        return response
+
+
+app.mount("/", NoCacheStaticFiles(directory=STATIC_DIR, html=True), name="static")

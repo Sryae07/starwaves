@@ -81,6 +81,27 @@ def bind_game(
     )
 
 
+@router.delete("/bind/{game}", dependencies=[Depends(require_api_key)])
+def unbind_game(
+    game: str,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """解除绑定：清空该游戏档案（角色 / 快照随档案级联删除），可重新接入。"""
+    registry = merged_games(db)
+    if game not in registry:
+        raise HTTPException(status_code=404, detail=f"未知游戏: {game}，支持: {', '.join(registry)}")
+    player = user.player
+    profile = None
+    if player is not None:
+        profile = next((p for p in player.profiles if p.game == game), None)
+    if profile is None:
+        return {"game": game, "unbound": False}
+    db.delete(profile)
+    db.commit()
+    return {"game": game, "unbound": True}
+
+
 @router.post("/import/{game}", dependencies=[Depends(require_api_key)])
 def import_json(
     game: str,
