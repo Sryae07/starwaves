@@ -47,7 +47,24 @@ def _resolve_path(game: str, spec: GameSpec | None = None) -> Path | None:
                     return Path(match)
         elif Path(candidate).is_file():
             return Path(candidate)
+    if spec.platform and spec.launch_protocol.startswith("steam://"):
+        return _steam_path_from_registry()
     return None
+
+
+def _steam_path_from_registry() -> Path | None:
+    """Steam 可能装在非默认目录，优先读注册表里记录的 SteamExe 路径。"""
+    if os.name != "nt":
+        return None
+    try:
+        import winreg
+
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam") as key:
+            value, _ = winreg.QueryValueEx(key, "SteamExe")
+        path = Path(str(value))
+        return path if path.is_file() else None
+    except (OSError, ImportError):
+        return None
 
 
 def _elevated_task_available() -> bool:
