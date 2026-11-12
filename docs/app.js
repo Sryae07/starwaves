@@ -11,11 +11,18 @@
   }
   const saved = localStorage.getItem('sw_server');
   if (saved) {
-    const host = saved.replace(/^https?:\/\//, '').replace(/\/+$/, '');
-    location.replace('http://' + host + '/dashboard');
+    location.replace(toServerUrl(saved) + '/dashboard');
     throw new Error('__redirect_to_dashboard__');
   }
 })();
+
+/* 规范化服务器地址：带协议直接用；IP/localhost 默认 http；域名默认 https（云端部署） */
+function toServerUrl(raw) {
+  const value = String(raw || '').trim().replace(/\/+$/, '');
+  if (/^https?:\/\//i.test(value)) return value;
+  const localish = /^(localhost|\d{1,3}(\.\d{1,3}){3})(:\d+)?$/i.test(value);
+  return (localish ? 'http://' : 'https://') + value;
+}
 
 const ON_PAGES = location.hostname.endsWith('github.io');
 const GATEWAY_MODE = ON_PAGES && !localStorage.getItem('sw_server');
@@ -26,8 +33,10 @@ const USER_KEY = 'starwaves_user';
 let apiKey = localStorage.getItem(KEY_NAME) || '';
 let authToken = localStorage.getItem(TOKEN_KEY) || '';
 
-/* API 基址：本机直接走相对路径；托管在 GitHub Pages 时回落调用本机后端（需本机服务已启动）。 */
-const API_BASE = /^(127\.0\.0\.1|localhost)$/.test(location.hostname) ? '' : 'http://127.0.0.1:8000';
+/* API 基址：本机与云端部署走同源相对路径；GitHub Pages 看板回落调用本机后端。 */
+const API_BASE = /^(127\.0\.0\.1|localhost)$/.test(location.hostname)
+  ? ''
+  : (location.hostname.endsWith('github.io') ? 'http://127.0.0.1:8000' : '');
 
 const params = new URLSearchParams(location.search);
 const pathShare = location.pathname.match(/^\/share\/([A-Za-z0-9_-]+)/);
@@ -1351,10 +1360,10 @@ function showGateway() {
   input.value = '127.0.0.1:8000';
   const go = () => {
     const raw = input.value.trim();
-    const host = raw.replace(/^https?:\/\//, '').replace(/\/+$/, '');
-    if (!host) { input.focus(); return; }
-    localStorage.setItem('sw_server', host);
-    location.href = 'http://' + host + '/dashboard';
+    const url = toServerUrl(raw);
+    if (!url) { input.focus(); return; }
+    localStorage.setItem('sw_server', url);
+    location.href = url + '/dashboard';
   };
   $('#gw-go').addEventListener('click', go);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });

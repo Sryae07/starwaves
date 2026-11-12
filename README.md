@@ -104,7 +104,31 @@ docker compose up -d --build
 
 - 镜像源文件在 `docs/index.html`，与 `app/static/home.html` 保持一致
 - GitHub Pages 免费档要求仓库公开；仓库内不含任何密钥（.env / 数据目录均被 gitignore）
-- 公网页面的"进入看板"按钮指向 `http://127.0.0.1:8000/dashboard`（本机服务）
+- 公网页面的"进入看板"打开 `docs/dashboard.html` 网关页：填本机局域网地址（同 Wi-Fi）
+  或云端服务器域名即可直达对应看板；资讯页在 Pages 上走随仓库发布的静态快照
+  （`docs/news-data.json`，GitHub Actions 每 3 小时更新），后端可达时自动切实时源
+
+## 云端部署（任何网络访问完整看板）
+
+想让手机在**任何网络**（不连同一 Wi-Fi）打开完整看板，把后端部署到 Render 即可：
+
+1. 登录 [render.com](https://render.com)（GitHub 账号授权），控制台 → New → **Blueprint**，
+   选择本仓库，按 `render.yaml` 直接创建（免费档，Docker 构建，几秒后健康检查通过）
+2. 部署完成会得到域名 `https://starwaves-xxxx.onrender.com`（可在设置里改成好记的名字）
+3. 手机打开 `https://sryae07.github.io/starwaves/dashboard.html`，在网关页填这个域名保存，
+   即可从任何网络进入完整看板（注册/登录/接入/分享全功能）
+
+存储与数据说明：
+
+- 默认 `DATABASE_URL` 是 SQLite（免费实例重启不清空，但**每次重新部署会清空**，
+  适合体验）；长期使用推荐在 Render 服务的 Environment 里把 `DATABASE_URL`
+  改成 [Neon](https://neon.tech) 免费 Postgres 连接串（`postgresql://...`），
+  数据永久保留、不随部署丢失
+- 云端没有图形浏览器，**自动抓 Cookie 不可用**：在你自己电脑上完成抓取后，
+  把 Cookie 粘贴到云端看板「接入游戏」弹窗（米游社接口从服务器 IP 请求，
+  风控概率高于本机，粘贴有效 Cookie 通常可用，失败时换一次新 Cookie 即可）
+- 自定义背景图存在实例磁盘上，重新部署后需要重新上传
+- 免费实例闲置约 15 分钟会休眠，第一次访问等几秒即可唤醒
 
 ## OCR 安装（可选）
 

@@ -1,0 +1,18 @@
+# Render 蓝图：一键部署云端后端（任何网络都能访问看板）
+# 用法：GitHub 仓库 → 上传本文件后，在 Render 控制台 New + Blueprint 选择仓库即可。
+# 存储默认 SQLite（免费实例重启不清空、但重新部署会清空）；
+# 长期使用建议把 DATABASE_URL 改成 Neon 免费 Postgres 连接串（见 README「云端部署」）。
+services:
+  - type: web
+    name: starwaves
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+        value: sqlite:////app/data/starwaves.db
+      - key: HOST
+        value: 0.0.0.0
+      - key: HKRPG_SERVER
+        value: cn

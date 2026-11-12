@@ -604,13 +604,23 @@ def start_browser_capture(
                 )
             if on_captured is not None:
                 on_captured()
-        except Exception as exc:  # 用户取消/超时：记录原因，前端可看到
+        except Exception as exc:  # 用户取消/超时/无浏览器环境：记录原因，前端可看到
+            message = str(exc) or "未知错误"
+            if any(
+                key in message.lower()
+                for key in ("executable", "playwright", "chromium", "msedge", "launch")
+            ):
+                message = (
+                    "当前服务器没有可用浏览器，无法自动抓取 Cookie。"
+                    "云端部署请改走「粘贴 Cookie」通道：在自己电脑上完成抓取后，"
+                    "把 Cookie 内容粘贴到看板「接入游戏」弹窗。（原始错误：" + message + "）"
+                )
             with _capture_lock:
                 _capture_state.update(
                     running=False,
                     status="failed",
                     step="failed",
-                    message=str(exc) or "未知错误",
+                    message=message,
                 )
 
     with _capture_lock:

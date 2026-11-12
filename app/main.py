@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.responses import Response
 
 from . import models  # noqa: F401  确保模型注册到 Base.metadata
-from .config import DATA_DIR, STATIC_DIR, UPLOAD_DIR
+from .config import DATA_DIR, DATABASE_URL, STATIC_DIR, UPLOAD_DIR
 from .database import Base, SessionLocal, engine
 from .models import Player, User
 from .security import hash_password
@@ -21,8 +21,11 @@ logger = logging.getLogger("starwaves.bootstrap")
 
 
 def ensure_schema() -> None:
-    """create_all 只建新表；对已有旧表补列（SQLite 轻量迁移）。"""
+    """create_all 只建新表；SQLite 下对已有旧表补列（轻量迁移）。
+    Postgres 云端部署跳过 PRAGMA 逻辑。"""
     Base.metadata.create_all(engine)
+    if not DATABASE_URL.startswith("sqlite"):
+        return
     with engine.connect() as conn:
         cols = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(players)")}
         if "user_id" not in cols:
