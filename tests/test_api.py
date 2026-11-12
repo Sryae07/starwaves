@@ -1,0 +1,69 @@
+from app.routers import deps
+
+HSR_PAYLOAD = {
+    "uid": "100000001",
+    "nickname": "列车长",
+    "level": 70,
+    "active_days": 500,
+    "achievements": 900,
+    "stamina_current": 100,
+    "stamina_max": 240,
+    "resources": {"jades": 12345, "credits": 67890},
+    "characters": [
+        {"name": "开拓者", "rarity": 5, "level": 80, "element": "虚数"},
+        {"name": "三月七", "rarity": 4, "level": 70, "element": "冰"},
+    ],
+    "source": "manual",
+}
+
+
+def test_manual_update_and_share(client):
+    resp = client.post("/api/profiles/hsr", json=HSR_PAYLOAD)
+    assert resp.status_code == 200
+
+    me = client.get("/api/me").json()
+    share_id = me["player"]["share_id"]
+    assert share_id
+
+    share = client.get(f"/api/share/{share_id}")
+    assert share.status_code == 200
+    body = share.json()
+    hsr = body["games"]["hsr"]
+    assert hsr["profile"]["level"] == 70
+    assert len(hsr["characters"]) == 2
+    assert hsr["stamina"]["current"] == 100
+    assert hsr["stamina"]["minutes_to_full"] == 840
+    assert hsr["stamina"]["full"] is False
+    assert hsr["snapshot_count"] == 1
+    assert "wuwa" not in body["games"]
+
+
+def test_full_stamina(client):
+    client.post(
+        "/api/profiles/wuwa",
+        json={"level": 60, "active_days": 300, "stamina_current": 240, "stamina_max": 240},
+    )
+    me = client.get("/api/me").json()
+    wuwa = me["games"]["wuwa"]
+    assert wuwa["stamina"]["full"] is True
+    assert wuwa["stamina"]["full_at"] is None
+
+
+def test_share_404(client):
+    assert client.get("/api/share/not-exist").status_code == 404
+
+
+def test_bad_game(client):
+    assert client.post("/api/profiles/genshin", json={}).status_code == 404
+
+
+def test_upload_bad_game(client):
+    resp = client.post("/api/upload/genshin", files={"file": ("a.png", b"xx", "image/png")})
+    assert resp.status_code == 404
+
+
+def test_api_key_guard(client, monkeypatch):
+    monkeypatch.setattr(deps, "API_KEY", "secret-123")
+    assert client.get("/api/me").status_code == 401
+    assert client.get("/api/me", headers={"X-API-Key": "wrong"}).status_code == 401
+    assert client.get("/api/me", headers={"X-API-Key": "secret-123"}).status_code == 200
