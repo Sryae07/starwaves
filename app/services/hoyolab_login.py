@@ -262,6 +262,17 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
             except Exception:
                 page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(3000)
+            if account and password:
+                # 用本次输入的账号密码全新登录，避免复用持久 profile 里的旧登录态
+                try:
+                    context.clear_cookies()
+                    page.evaluate(
+                        "() => { try { localStorage.clear(); sessionStorage.clear(); } catch (e) {} }"
+                    )
+                    page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=30000)
+                    page.wait_for_timeout(2000)
+                except Exception:
+                    pass
             frame = _wait_login_frame(page)
             for _ in range(3):
                 try:
@@ -330,6 +341,8 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
             sms_clicks = 0
             sms_last_submitted = ""
             agree_at = 0.0
+            captcha_pending = False
+            captcha_gone_at = 0.0
             while time.time() < deadline:
                 jar = _jar_of(context)
                 if jar.get("ltoken") and jar.get("ltuid"):
@@ -371,6 +384,8 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
                         sms_sent_at = 0.0  # 需要短信验证：触发下方发送逻辑
                         continue
                     if retcode == 1034:
+                        captcha_pending = True
+                        captcha_gone_at = 0.0
                         _set_step(
                             "captcha",
                             "检测到人机验证：请在弹出的窗口中手动完成（拖动滑块/拼图），完成后系统会自动继续",
@@ -382,19 +397,33 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
                         )
 
                 frame = _wait_login_frame(page, timeout_ms=3000)
-                try:
-                    agree = frame.locator('button:text-is("同意")').first
-                    if agree.is_visible() and time.time() - agree_at > 5:
-                        agree_at = time.time()
-                        agree.click(force=True)
-                        _set_step("submitting", "已自动同意用户协议，正在重新提交登录…")
-                        page.wait_for_timeout(1500)
-                        submit2 = _submit_button(frame)
-                        if submit2 is not None and submit2.is_visible():
-                            submit2.click(force=True)
-                        continue
-                except Exception:
-                    pass
+                if _captcha_visible(page):
+                    if not captcha_pending:
+                        captcha_pending = True
+                        captcha_gone_at = 0.0
+                        _set_step(
+                            "captcha",
+                            "检测到人机验证：请在弹出的窗口中手动完成（拖动滑块/拼图），完成后系统会自动继续",
+                        )
+                elif captcha_pending:
+                    if captcha_gone_at == 0.0:
+                        captcha_gone_at = time.time()
+                    elif time.time() - captcha_gone_at > 8:
+                        captcha_pending = False
+                if not captcha_pending:
+                    try:
+                        agree = frame.locator('button:text-is("同意")').first
+                        if agree.is_visible() and time.time() - agree_at > 5:
+                            agree_at = time.time()
+                            agree.click(force=True)
+                            _set_step("submitting", "已自动同意用户协议，正在重新提交登录…")
+                            page.wait_for_timeout(1500)
+                            submit2 = _submit_button(frame)
+                            if submit2 is not None and submit2.is_visible():
+                                submit2.click(force=True)
+                            continue
+                    except Exception:
+                        pass
                 sms_visible = False
                 try:
                     sms_input = frame.locator(
@@ -414,7 +443,7 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
                             )
                 except Exception:
                     sms_visible = False
-                if sms_visible:
+                if sms_visible and not captcha_pending:
                     if sms_clicks == 0:
                         _set_step("sms", "检测到短信验证：正在自动点击「获取验证码」…")
                     if time.time() - sms_sent_at > 45 and sms_clicks < 3:
@@ -454,14 +483,8 @@ def auto_login_capture(account: str, password: str, timeout_s: int = 180) -> str
                         pass
 
                 error = _detect_login_error(frame)
-                if error and not sms_visible:
+                if error and not sms_visible and not captcha_pending:
                     raise RuntimeError(f"米游社提示：{error}（请检查账号密码后重试）")
-
-                if _captcha_visible(page):
-                    _set_step(
-                        "captcha",
-                        "检测到人机验证：请在弹出的窗口中手动完成（拖动滑块/拼图），完成后系统会自动继续",
-                    )
 
                 time.sleep(2)
             raise TimeoutError("自动登录超时（3 分钟），若人机验证一直未完成请稍后重试")

@@ -118,27 +118,43 @@ def fetch_hsr_record(uid: str | None = None, cookie: str | None = None, db=None)
         "x-rpc-app_version": "2.51.1",
         "x-rpc-client_type": "5",
     }
+    candidates = []
+    for srv in (HKRPG_SERVER, "prod_gf_cn", "prod_qd_cn", "cn"):
+        if srv and srv not in candidates:
+            candidates.append(srv)
+    want_uid = (uid or "").strip() or HKRPG_UID
+    server = ""
+    role = None
     with httpx.Client(timeout=15, headers=headers) as client:
-        role_resp = client.get(
-            f"{HOST}/game_record/app/hkrpg/api/role/basicInfo",
-            params={"server": HKRPG_SERVER, "page": 1, "size": 20},
-        )
-        role_resp.raise_for_status()
-        role_json = role_resp.json()
-        _check_retcode(role_json)
-        roles = _dig(role_json, ["data.list"], []) or []
-        role = None
-        want_uid = (uid or "").strip() or HKRPG_UID
-        if want_uid:
-            role = next((r for r in roles if str(r.get("role_id")) == str(want_uid)), None)
-            if role is None:
+        for srv in candidates:
+            try:
+                role_resp = client.get(
+                    f"{HOST}/game_record/app/hkrpg/api/role/basicInfo",
+                    params={"server": srv, "page": 1, "size": 20},
+                )
+                role_resp.raise_for_status()
+                role_json = role_resp.json()
+                _check_retcode(role_json)
+                roles = _dig(role_json, ["data.list"], []) or []
+                role = (
+                    next(
+                        (r for r in roles if str(r.get("role_id")) == str(want_uid)),
+                        None,
+                    )
+                    if want_uid
+                    else (roles[0] if roles else None)
+                )
+                if role:
+                    server = srv
+                    break
+            except (httpx.HTTPError, SyncError, ValueError):
+                continue
+        if role is None:
+            if want_uid:
                 raise SyncError(
                     f"该账号下未找到 UID {want_uid} 的星穹铁道角色，"
                     "请确认 UID 与登录的米游社账号对应（自动同步只能读取自己账号的数据）。"
                 )
-        if role is None and roles:
-            role = roles[0]
-        if role is None:
             raise SyncError(
                 "未找到星穹铁道角色记录，请检查 HKRPG_SERVER / Cookie 是否匹配。"
             )
@@ -146,7 +162,7 @@ def fetch_hsr_record(uid: str | None = None, cookie: str | None = None, db=None)
 
         index_resp = client.get(
             f"{HOST}/game_record/app/hkrpg/api/index",
-            params={"server": HKRPG_SERVER, "role_id": role_id},
+            params={"server": server, "role_id": role_id},
         )
         index_resp.raise_for_status()
         index_json = index_resp.json()
@@ -158,7 +174,7 @@ def fetch_hsr_record(uid: str | None = None, cookie: str | None = None, db=None)
             try:
                 resp = client.get(
                     f"{HOST}/game_record/app/hkrpg/api/{path}",
-                    params={"server": HKRPG_SERVER, "role_id": role_id, "schedule_type": 1},
+                    params={"server": server, "role_id": role_id, "schedule_type": 1},
                 )
                 resp.raise_for_status()
                 payload = resp.json()
@@ -176,7 +192,7 @@ def fetch_hsr_record(uid: str | None = None, cookie: str | None = None, db=None)
         try:
             rogue_resp = client.get(
                 f"{HOST}/game_record/app/hkrpg/api/rogue",
-                params={"server": HKRPG_SERVER, "role_id": role_id, "schedule_type": 3},
+                params={"server": server, "role_id": role_id, "schedule_type": 3},
             )
             rogue_resp.raise_for_status()
             rogue_json = rogue_resp.json()
