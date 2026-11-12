@@ -42,6 +42,8 @@ class GameSpec:
     syncable: bool = False
     launch_env_key: str = ""
     launch_candidates: tuple[str, ...] = ()
+    launch_args: str = ""
+    launch_pre: tuple[str, str] | None = None
     ocr_keywords: dict = field(default_factory=dict)
     resource_labels: dict = field(default_factory=dict)
     news: dict = field(default_factory=dict)
@@ -100,7 +102,13 @@ GAMES: dict[str, GameSpec] = {
         launch_env_key="LAUNCH_WUWA_PATH",
         launch_candidates=(
             r"C:\Program Files\Wuthering Waves\Wuthering Waves Game\Client\Binaries\Win64\Client-Win64-Shipping.exe",
+            r"C:\Program Files\Wuthering Waves\Wuthering Waves Game\Wuthering Waves.exe",
             r"C:\Program Files\Wuthering Waves\*\Client\Binaries\Win64\Client-Win64-Shipping.exe",
+        ),
+        launch_args="-krqlv=HD",
+        launch_pre=(
+            r"C:\Program Files\Wuthering Waves\launcher.exe",
+            "launcher_main.exe",
         ),
         ocr_keywords={
             "uid": ["uid"],

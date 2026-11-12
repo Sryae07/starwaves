@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import time
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -64,9 +65,9 @@ def _elevated_task_available() -> bool:
         return False
 
 
-def _launch_elevated(path: Path) -> None:
-    """把目标路径写入文件，触发最高权限计划任务执行（免 UAC 弹窗）。"""
-    TARGET_FILE.write_text(str(path), encoding="utf-8")
+def _launch_elevated(path: Path, extra_args: str = "") -> None:
+    """把目标路径（可选第二行：启动参数）写入文件，触发最高权限计划任务执行。"""
+    TARGET_FILE.write_text(f"{path}\n{extra_args}", encoding="utf-8")
     result = subprocess.run(
         ["schtasks", "/run", "/tn", TASK_NAME],
         capture_output=True,
@@ -75,6 +76,31 @@ def _launch_elevated(path: Path) -> None:
     if result.returncode != 0:
         message = result.stderr.decode("utf-8", "ignore").strip() or "计划任务触发失败"
         raise OSError(message)
+
+
+def _ensure_pre_launch(spec: GameSpec) -> None:
+    """部分游戏（如鸣潮）需要启动器进程驻留，客户端通过管道向它索取加密密钥。
+    启动器不存在时先拉起（普通权限即可），稍等其初始化后再启动游戏。"""
+    pre = getattr(spec, "launch_pre", None) or None
+    if not pre:
+        return
+    exe, proc_name = pre
+    if not Path(exe).is_file():
+        return
+    check = subprocess.run(
+        ["tasklist", "/FI", f"IMAGENAME eq {proc_name}"],
+        capture_output=True,
+        timeout=10,
+    )
+    if proc_name.lower() in check.stdout.decode("utf-8", "ignore").lower():
+        return
+    subprocess.Popen(
+        [exe],
+        cwd=str(Path(exe).parent),
+        creationflags=DETACH_FLAGS,
+        close_fds=True,
+    )
+    time.sleep(8)
 
 
 @router.post("/launch/{game}", dependencies=[Depends(require_api_key), Depends(get_current_user)])
@@ -94,9 +120,11 @@ def launch_game(game: str, db: Session = Depends(get_db)) -> dict:
             status_code=400,
             detail=f"未找到{spec.label}安装路径，请在 .env 中设置 {env_key}",
         )
+    _ensure_pre_launch(spec)
+    extra_args = getattr(spec, "launch_args", "") or ""
     if _elevated_task_available():
         try:
-            _launch_elevated(path)
+            _launch_elevated(path, extra_args)
         except OSError as exc:
             raise HTTPException(status_code=500, detail=f"提权启动失败: {exc}") from exc
         return {"launched": True, "game": game, "path": str(path), "elevated": True}
