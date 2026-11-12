@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 from ..config import DATA_DIR
 from ..database import get_db
 from ..games import GameSpec, merged_games
-from .deps import get_current_user, require_api_key
+from .deps import require_api_key, require_owner
 
 router = APIRouter(prefix="/api", tags=["launch"])
 
@@ -103,7 +103,7 @@ def _ensure_pre_launch(spec: GameSpec) -> None:
     time.sleep(8)
 
 
-@router.post("/launch/{game}", dependencies=[Depends(require_api_key), Depends(get_current_user)])
+@router.post("/launch/{game}", dependencies=[Depends(require_api_key), Depends(require_owner)])
 def launch_game(game: str, db: Session = Depends(get_db)) -> dict:
     registry = merged_games(db)
     spec = registry.get(game)

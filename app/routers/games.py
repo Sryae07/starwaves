@@ -9,7 +9,7 @@ from ..database import get_db
 from ..games import BUILTIN_KEYS, game_meta, merged_games
 from ..models import CustomGame, Profile
 from ..schemas import GameCreate
-from .deps import get_current_user, require_api_key
+from .deps import require_api_key, require_owner
 
 router = APIRouter(prefix="/api", tags=["games"])
 
@@ -18,7 +18,7 @@ def _meta(db: Session) -> dict:
     return {"games": game_meta(merged_games(db))}
 
 
-@router.post("/games", dependencies=[Depends(require_api_key), Depends(get_current_user)])
+@router.post("/games", dependencies=[Depends(require_api_key), Depends(require_owner)])
 def create_game(payload: GameCreate, db: Session = Depends(get_db)) -> dict:
     if payload.key in BUILTIN_KEYS:
         raise HTTPException(status_code=400, detail=f"{payload.key} 是内置游戏标识，不能覆盖，请换一个 key")
@@ -42,7 +42,7 @@ def create_game(payload: GameCreate, db: Session = Depends(get_db)) -> dict:
     return {"created": True, **_meta(db)}
 
 
-@router.delete("/games/{key}", dependencies=[Depends(require_api_key), Depends(get_current_user)])
+@router.delete("/games/{key}", dependencies=[Depends(require_api_key), Depends(require_owner)])
 def delete_game(key: str, db: Session = Depends(get_db)) -> dict:
     if key in BUILTIN_KEYS:
         raise HTTPException(status_code=400, detail=f"{key} 是内置游戏，不能移除")

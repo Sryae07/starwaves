@@ -55,6 +55,7 @@ def _user_payload(user: User) -> dict:
         "username": user.username,
         "phone": mask_phone(user.phone) if user.phone else None,
         "created_at": user.created_at.isoformat() if user.created_at else None,
+        "is_owner": bool(user.is_owner),
     }
 
 
@@ -120,6 +121,8 @@ def register(payload: RegisterIn, db: Session = Depends(get_db)) -> dict:
         raise HTTPException(status_code=409, detail="该用户名已被占用，换一个试试")
 
     user = User(username=username, phone=payload.phone, password_hash=hash_password(payload.password))
+    if db.query(User).filter_by(is_owner=True).first() is None:
+        user.is_owner = True
     db.add(user)
     db.flush()
     player = Player(user_id=user.id, nickname=username)

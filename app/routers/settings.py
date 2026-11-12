@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from ..config import DATA_DIR
 from ..database import get_db
 from ..models import SiteSetting
-from .deps import get_current_user, require_api_key
+from .deps import require_api_key, require_owner
 
 router = APIRouter(prefix="/api", tags=["settings"])
 
@@ -43,7 +43,7 @@ def get_background() -> FileResponse:
     return FileResponse(path, media_type=media)
 
 
-@router.post("/background", dependencies=[Depends(require_api_key), Depends(get_current_user)])
+@router.post("/background", dependencies=[Depends(require_api_key), Depends(require_owner)])
 async def upload_background(file: UploadFile = File(...)) -> dict:
     ext = Path(file.filename or "bg.jpg").suffix.lower()
     if ext not in ALLOWED_EXTS:
@@ -58,14 +58,14 @@ async def upload_background(file: UploadFile = File(...)) -> dict:
     return {"background": True, "url": "/api/background"}
 
 
-@router.delete("/background", dependencies=[Depends(require_api_key), Depends(get_current_user)])
+@router.delete("/background", dependencies=[Depends(require_api_key), Depends(require_owner)])
 def reset_background() -> dict:
     for old in DATA_DIR.glob(f"{BG_STEM}.*"):
         old.unlink(missing_ok=True)
     return {"background": False}
 
 
-@router.get("/settings/hoyolab-cookie", dependencies=[Depends(require_api_key), Depends(get_current_user)])
+@router.get("/settings/hoyolab-cookie", dependencies=[Depends(require_api_key), Depends(require_owner)])
 def get_hoyolab_cookie(db: Session = Depends(get_db)) -> dict:
     row = db.query(SiteSetting).filter(SiteSetting.key == COOKIE_KEY).first()
     value = row.value if row else ""
@@ -73,7 +73,7 @@ def get_hoyolab_cookie(db: Session = Depends(get_db)) -> dict:
     return {"configured": bool(value), "tail": tail, "value": value}
 
 
-@router.put("/settings/hoyolab-cookie", dependencies=[Depends(require_api_key), Depends(get_current_user)])
+@router.put("/settings/hoyolab-cookie", dependencies=[Depends(require_api_key), Depends(require_owner)])
 def set_hoyolab_cookie(payload: CookieIn, db: Session = Depends(get_db)) -> dict:
     value = payload.cookie.strip()
     row = db.query(SiteSetting).filter(SiteSetting.key == COOKIE_KEY).first()

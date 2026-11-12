@@ -10,6 +10,7 @@ load_dotenv(BASE_DIR / ".env")
 
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{(BASE_DIR / 'data' / 'starwaves.db').as_posix()}")
 API_KEY = os.getenv("API_KEY", "").strip() or None
+OWNER_USERNAME = os.getenv("OWNER_USERNAME", "").strip()
 HOST = os.getenv("HOST", "127.0.0.1")
 PORT = int(os.getenv("PORT", "8000"))
 

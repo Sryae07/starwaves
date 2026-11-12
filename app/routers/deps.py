@@ -42,3 +42,13 @@ def get_current_user(
         db.commit()
         raise HTTPException(status_code=401, detail="登录已过期，请重新登录")
     return row.user
+
+
+def require_owner(user: User = Depends(get_current_user)) -> User:
+    """机主专属：本机控制类接口（启动游戏 / 背景图 / Cookie / 注册表）。"""
+    if not bool(getattr(user, "is_owner", False)):
+        raise HTTPException(
+            status_code=403,
+            detail="仅机主账号可执行此操作（服务运行在机主电脑上，为防止他人控制你的电脑已做限制）",
+        )
+    return user

@@ -28,7 +28,7 @@ from ..services.hoyolab_login import (
 )
 from ..services.profiles import apply_profile_update
 from ..services.serializers import share_payload
-from .deps import get_current_user, require_api_key
+from .deps import get_current_user, require_api_key, require_owner
 
 router = APIRouter(prefix="/api", tags=["sync"])
 
@@ -119,7 +119,7 @@ def unbind_game(
     return {"game": game, "unbound": True}
 
 
-@router.post("/hoyolab/auto-login", dependencies=[Depends(require_api_key)])
+@router.post("/hoyolab/auto-login", dependencies=[Depends(require_api_key), Depends(require_owner)])
 def hoyolab_auto_login(
     payload: dict = Body(...),
     user: User = Depends(get_current_user),

@@ -24,6 +24,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(32), unique=True, index=True)
     phone: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True)
     password_hash: Mapped[str] = mapped_column(String(128))
+    is_owner: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     player: Mapped[Player | None] = relationship(back_populates="user", uselist=False)

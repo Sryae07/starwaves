@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.responses import Response
 
 from . import models  # noqa: F401  确保模型注册到 Base.metadata
-from .config import DATA_DIR, DATABASE_URL, STATIC_DIR, UPLOAD_DIR
+from .config import DATA_DIR, DATABASE_URL, OWNER_USERNAME, STATIC_DIR, UPLOAD_DIR
 from .database import Base, SessionLocal, engine
 from .models import Player, User
 from .security import hash_password
@@ -34,6 +34,10 @@ def ensure_schema() -> None:
         pcols = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(profiles)")}
         if "challenges" not in pcols:
             conn.exec_driver_sql("ALTER TABLE profiles ADD COLUMN challenges TEXT DEFAULT '{}'")
+            conn.commit()
+        ucols = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(users)")}
+        if "is_owner" not in ucols:
+            conn.exec_driver_sql("ALTER TABLE users ADD COLUMN is_owner INTEGER DEFAULT 0")
             conn.commit()
 
 
@@ -65,12 +69,35 @@ def migrate_legacy_player() -> None:
         db.close()
 
 
+def ensure_owner() -> None:
+    """机主账号：服务运行在机主电脑上，启动游戏 / 改背景 / 换 Cookie 等
+    本机控制类操作只允许机主执行。优先采用 .env 的 OWNER_USERNAME，
+    未指定时默认最早注册的账号为机主。"""
+    db = SessionLocal()
+    try:
+        if db.query(User).filter(User.is_owner.is_(True)).first() is not None:
+            return
+        candidate = None
+        if OWNER_USERNAME:
+            candidate = db.query(User).filter(User.username == OWNER_USERNAME).first()
+        if candidate is None:
+            candidate = db.query(User).order_by(User.id.asc()).first()
+        if candidate is None:
+            return
+        candidate.is_owner = True
+        db.commit()
+        logger.info("机主账号已指定：%s（可在 .env 用 OWNER_USERNAME 覆盖）", candidate.username)
+    finally:
+        db.close()
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     ensure_schema()
     migrate_legacy_player()
+    ensure_owner()
     yield
 
 

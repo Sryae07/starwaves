@@ -116,3 +116,47 @@ def test_launch_without_path(client, auth_headers, monkeypatch):
     resp = client.post("/api/launch/hsr", headers=auth_headers)
     assert resp.status_code == 400
     assert "未找到" in resp.json()["detail"]
+
+def _register(client, phone):
+    resp = client.post("/api/auth/send-code", json={"phone": phone})
+    assert resp.status_code == 200
+    code = resp.json()["dev_code"]
+    resp = client.post(
+        "/api/auth/register",
+        json={"phone": phone, "code": code, "username": "玩家" + phone[-4:], "password": "pass123456"},
+    )
+    assert resp.status_code == 200, resp.text
+    return {"Authorization": f"Bearer {resp.json()['token']}"}
+
+
+def test_owner_flag_and_host_control(client):
+    """第一个注册账号自动成为机主；陌生人登录不能启动游戏或改动本机设置。"""
+    owner = _register(client, "13800138000")
+    stranger = _register(client, "13800138001")
+
+    me_owner = client.get("/api/me", headers=owner).json()
+    me_other = client.get("/api/me", headers=stranger).json()
+    assert me_owner["user"]["is_owner"] is True
+    assert me_other["user"]["is_owner"] is False
+
+    resp = client.post("/api/launch/hsr", headers=stranger)
+    assert resp.status_code == 403
+
+    files = {"file": ("bg.png", b"x", "image/png")}
+    resp = client.post("/api/background", files=files, headers=stranger)
+    assert resp.status_code == 403
+
+    resp = client.put("/api/settings/hoyolab-cookie", json={"cookie": "x"}, headers=stranger)
+    assert resp.status_code == 403
+
+    resp = client.post(
+        "/api/games",
+        json={"key": "zzz", "label": "测试游戏", "emoji": "🎮", "cap": 120, "minutes_per_point": 6,
+              "color_a": "#8b5cf6", "color_b": "#22d3ee"},
+        headers=stranger,
+    )
+    assert resp.status_code == 403
+
+    resp = client.post("/api/hoyolab/auto-login", json={}, headers=stranger)
+    assert resp.status_code == 403
+

@@ -38,5 +38,6 @@ def get_my_profile(user: User = Depends(get_current_user), db: Session = Depends
         "username": user.username,
         "phone": mask_phone(user.phone) if user.phone else None,
         "created_at": user.created_at.isoformat() if user.created_at else None,
+        "is_owner": bool(user.is_owner),
     }
     return payload

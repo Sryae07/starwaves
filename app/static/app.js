@@ -168,6 +168,7 @@ function setAuthTab(tab) {
 }
 
 function updateAuthUI(user) {
+  OWNER = !!(user && user.is_owner);
   if (!user || !authToken) {
     $('#btn-login').classList.remove('hidden');
     $('#auth-userbox').classList.add('hidden');
@@ -177,7 +178,7 @@ function updateAuthUI(user) {
   $('#btn-login').classList.add('hidden');
   $('#auth-userbox').classList.remove('hidden');
   $('#auth-userbox').classList.add('flex');
-  $('#auth-user').textContent = `👤 ${user.username}`;
+  $('#auth-user').textContent = `👤 ${user.username}${user.is_owner ? ' 👑' : ''}`;
 }
 
 function setLoggedOut(message, openModal = false) {
@@ -357,6 +358,7 @@ function fmtDuration(ms) {
 /* ---------- 渲染 ---------- */
 let timers = [];
 let CURRENT = null;
+let OWNER = false;
 
 function render(data) {
   CURRENT = data;
@@ -369,6 +371,10 @@ function render(data) {
     if (data.user) updateAuthUI(data.user);
     $('#admin-actions').classList.remove('hidden');
     $('#admin-actions').classList.add('flex');
+    ['btn-add-game', 'btn-bg'].forEach((id) => {
+      const el = $(id);
+      if (el) el.classList.toggle('hidden', !OWNER);
+    });
     $('#share-hint').classList.remove('hidden');
     $('#share-hint').textContent = `分享链接：${shareUrlOf(data.player.share_id)}`;
   }
@@ -491,8 +497,11 @@ function renderGame(spec, game) {
     const removeButton = spec.custom && !isShare
       ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2.5 py-1 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
       : '';
-    const launchButton = spec.launchable !== false && !isShare
+    const launchButton = spec.launchable !== false && !isShare && OWNER
       ? `<button class="launch-btn rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition" data-game="${key}">🚀 启动游戏</button>`
+      : '';
+    const launchHint = spec.launchable !== false && !isShare && !OWNER
+      ? `<span class="text-[11px] text-slate-600" title="为避免他人控制这台电脑，只有机主账号可以启动游戏">🔒 仅机主可启动</span>`
       : '';
     root.innerHTML = `
       <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-5 sm:p-6 flex flex-col items-center justify-center text-center min-h-[240px] sm:min-h-[280px]" style="${cardStyle}">
@@ -500,7 +509,7 @@ function renderGame(spec, game) {
         <p class="text-3xl">${esc(spec.emoji)}</p>
         <p class="mt-3 font-bold">${esc(spec.label)}</p>
         <p class="text-xs text-slate-500 mt-1">${esc(spec.tagline || '还没有数据')}${spec.custom ? ' · 自定义接入' : ''}</p>
-        ${isShare ? '' : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🔗 接入</button><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}${launchButton}</div>`}
+        ${isShare ? '' : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🔗 接入</button><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}${launchButton}${launchHint}</div>`}
       </div>`;
     return;
   }
@@ -536,8 +545,11 @@ function renderGame(spec, game) {
   const syncButton = spec.syncable && !isShare
     ? `<button class="sync-btn rounded-lg border px-2.5 py-1 text-[11px] transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
     : '';
-  const launchButton = spec.launchable !== false && !isShare
+  const launchButton = spec.launchable !== false && !isShare && OWNER
     ? `<button class="launch-btn rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-2.5 py-1 text-[11px] font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition" data-game="${key}">🚀 启动游戏</button>`
+    : '';
+  const launchHint = spec.launchable !== false && !isShare && !OWNER
+    ? `<span class="text-[11px] text-slate-600" title="为避免他人控制这台电脑，只有机主账号可以启动游戏">🔒 仅机主可启动</span>`
     : '';
   const removeButton = spec.custom && !isShare
     ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2 py-0.5 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
@@ -558,6 +570,7 @@ function renderGame(spec, game) {
         <div class="flex items-center gap-1.5 flex-wrap justify-end">
           ${isShare ? '' : `<button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🔗 重新绑定</button>`}
           ${launchButton}
+          ${launchHint}
           ${removeButton}
           ${syncButton}
           ${game.last_update ? `<span class="rounded-full border px-2 py-0.5 text-[11px]" style="color:${a};border-color:${a}55;background:${a}15">${sourceLabel}</span>` : ''}
