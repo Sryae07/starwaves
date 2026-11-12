@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StarWaves · 多游戏个人档案 + 官方资讯</title>
+  <meta name="description" content="把星穹铁道、鸣潮、绝区零的账号数据汇集到一个页面：等级、成就、体力倒计时、角色图鉴与官方资讯，一条链接即可分享。" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans SC"', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          keyframes: {
+            float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+          },
+          animation: { float: 'float 7s ease-in-out infinite' },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { background: #05070f; }
+    .stars::before, .stars::after {
+      content: ""; position: fixed; width: 2px; height: 2px; border-radius: 50%;
+      background: rgba(255,255,255,.7); z-index: -3;
+    }
+    .stars::before {
+      box-shadow: 120px 80px 0 rgba(255,255,255,.7), 320px 140px 0 rgba(255,255,255,.5), 540px 60px 0 rgba(255,255,255,.6), 760px 200px 0 rgba(255,255,255,.4), 980px 90px 0 rgba(255,255,255,.7), 1120px 320px 0 rgba(255,255,255,.5), 140px 420px 0 rgba(255,255,255,.5), 430px 520px 0 rgba(255,255,255,.6), 640px 400px 0 rgba(255,255,255,.4), 860px 560px 0 rgba(255,255,255,.5), 1060px 620px 0 rgba(255,255,255,.6), 80px 660px 0 rgba(255,255,255,.4), 300px 780px 0 rgba(255,255,255,.5), 520px 700px 0 rgba(255,255,255,.6), 700px 820px 0 rgba(255,255,255,.4), 920px 760px 0 rgba(255,255,255,.5), 1150px 840px 0 rgba(255,255,255,.4);
+    }
+    .stars::after {
+      box-shadow: 200px 240px 0 rgba(255,255,255,.45), 470px 340px 0 rgba(255,255,255,.5), 690px 180px 0 rgba(255,255,255,.45), 900px 420px 0 rgba(255,255,255,.5), 60px 180px 0 rgba(255,255,255,.5), 1010px 160px 0 rgba(255,255,255,.5), 260px 600px 0 rgba(255,255,255,.45), 580px 640px 0 rgba(255,255,255,.5), 800px 700px 0 rgba(255,255,255,.45), 1100px 480px 0 rgba(255,255,255,.5);
+    }
+    .orb { position: fixed; border-radius: 50%; filter: blur(130px); z-index: -2; pointer-events: none; }
+    .orb-hsr { width: 460px; height: 460px; top: -140px; left: -100px; background: #8b5cf6; opacity: .16; }
+    .orb-wuwa { width: 500px; height: 500px; bottom: -180px; right: -120px; background: #22d3ee; opacity: .13; }
+    .hero-gradient {
+      background: linear-gradient(120deg, #fcd34d 0%, #a78bfa 45%, #67e8f9 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(10px); transition: all .25s ease; }
+    .card:hover { transform: translateY(-4px); border-color: rgba(167,139,250,.45); box-shadow: 0 12px 40px -12px rgba(139,92,246,.35); }
+  </style>
+</head>
+<body class="min-h-screen text-slate-200 font-sans antialiased">
+  <div class="stars"></div>
+  <div class="orb orb-hsr"></div>
+  <div class="orb orb-wuwa"></div>
+
+  <header class="max-w-6xl mx-auto px-4 pt-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400 grid place-items-center text-lg font-black text-white shadow-lg shadow-violet-500/30">星</div>
+      <div>
+        <h1 class="font-bold tracking-wide">StarWaves <span class="text-slate-400 font-medium">· 游戏档案</span></h1>
+        <p class="text-xs text-slate-500">多游戏统一看板 · 官方资讯聚合</p>
+      </div>
+    </div>
+    <nav class="flex items-center gap-2">
+      <a data-news href="/news" class="rounded-lg border border-white/15 bg-white/5 px-3.5 py-1.5 text-sm hover:bg-white/10 transition">📡 资讯</a>
+      <a data-dashboard href="/dashboard" class="rounded-lg border border-white/15 bg-white/5 px-3.5 py-1.5 text-sm hover:bg-white/10 transition">进入看板</a>
+      <a href="https://github.com/Sryae07/starwaves" target="_blank" rel="noopener" class="rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">GitHub</a>
+    </nav>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4">
+    <section class="pt-20 pb-24 text-center">
+      <p class="inline-block rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1 text-xs text-violet-200 tracking-wide">非官方 · 个人数据看板</p>
+      <h2 class="mt-6 text-4xl md:text-6xl font-black tracking-wide leading-tight">一个页面，<br class="md:hidden"/>装下<span class="hero-gradient">所有游戏</span>的档案</h2>
+      <p class="mt-6 max-w-2xl mx-auto text-slate-400 leading-relaxed">
+        把《崩坏：星穹铁道》《鸣潮》《绝区零》的账号数据汇集到一起——等级、活跃天数、成就、
+        体力回满倒计时、角色图鉴与资源统计，生成一条链接即可分享你的游戏名片。
+        游戏列表由注册表驱动，后续新游戏接入无需改前端。
+      </p>
+      <div class="mt-10 flex items-center justify-center gap-3 flex-wrap">
+        <a data-dashboard href="/dashboard" class="rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 px-7 py-3 font-semibold text-white shadow-xl shadow-violet-500/30 hover:opacity-90 transition">🚀 进入看板</a>
+        <a href="#about" class="rounded-xl border border-white/15 bg-white/5 px-7 py-3 hover:bg-white/10 transition">了解更多</a>
+      </div>
+      <p id="local-hint" class="hidden mt-4 text-xs text-slate-500">提示：进入看板需要在本机已启动 StarWaves 服务（双击 start.bat）</p>
+
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+        <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">3+</p><p class="text-xs text-slate-500 mt-1">款游戏数据</p></div>
+        <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">4</p><p class="text-xs text-slate-500 mt-1">种更新方式</p></div>
+        <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">30</p><p class="text-xs text-slate-500 mt-1">条历史快照</p></div>
+        <div class="card rounded-2xl p-4"><p class="text-2xl font-black hero-gradient">1</p><p class="text-xs text-slate-500 mt-1">条分享链接</p></div>
+      </div>
+    </section>
+
+    <section id="features" class="py-16">
+      <p class="text-center text-xs tracking-widest text-slate-500">FEATURES</p>
+      <h3 class="text-center text-3xl font-black mt-2">它能做什么</h3>
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="card rounded-2xl p-6"><p class="text-2xl">🛰️</p><h4 class="mt-3 font-bold">多游戏合并看板</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">星铁、鸣潮、绝区零同屏展示：等级、活跃天数、成就、资源、角色图鉴一页尽览，看板内「➕ 接入游戏」可直接登记新游戏。</p></div>
+        <div class="card rounded-2xl p-6"><p class="text-2xl">👤</p><h4 class="mt-3 font-bold">账号与档案分离</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">手机验证码注册 / 密码登录，用户名即档案名（不填自动生成「用户＋随机编号」），多账号互不干扰，各自一条分享链接。</p></div>
+        <div class="card rounded-2xl p-6"><p class="text-2xl">📡</p><h4 class="mt-3 font-bold">官方资讯聚合</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">米游社公告、库洛官网新闻实时聚合到一个信息流，每 5 分钟自动刷新。</p></div>
+        <div class="card rounded-2xl p-6"><p class="text-2xl">⏳</p><h4 class="mt-3 font-bold">体力回满倒计时</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">开拓力 / 结晶波片 / 电量实时推算回满时间，开游戏前先瞄一眼。</p></div>
+        <div class="card rounded-2xl p-6"><p class="text-2xl">📸</p><h4 class="mt-3 font-bold">截图 OCR 识别</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">上传游戏截图自动识别数字，先核对再入库，误差可控。</p></div>
+        <div class="card rounded-2xl p-6"><p class="text-2xl">🔗</p><h4 class="mt-3 font-bold">UID 官方式接入</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">星铁输入 UID 即拉取米游社战绩：角色柜台（命座/命途）、忘却之庭·虚构叙事·末日幻影·模拟宇宙进度全同步；鸣潮用本地导出 JSON / OCR。</p></div>
+        <div class="card rounded-2xl p-6"><p class="text-2xl">📈</p><h4 class="mt-3 font-bold">体力历史曲线</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">最近 30 条快照自动成图，回看自己的清体力节奏。</p></div>
+        <div class="card rounded-2xl p-6"><p class="text-2xl">🚀</p><h4 class="mt-3 font-bold">一键启动游戏</h4><p class="mt-2 text-sm text-slate-400 leading-relaxed">服务跑在本机，看板上点一下直接拉起星铁 / 鸣潮。</p></div>
+      </div>
+    </section>
+
+    <section id="how" class="py-16">
+      <p class="text-center text-xs tracking-widest text-slate-500">HOW IT WORKS</p>
+      <h3 class="text-center text-3xl font-black mt-2">三步开始使用</h3>
+      <div class="mt-10 grid gap-4 md:grid-cols-3">
+        <div class="card rounded-2xl p-6 text-center"><p class="text-3xl">1</p><h4 class="mt-3 font-bold">更新数据</h4><p class="mt-2 text-sm text-slate-400">截图 OCR、手动录入、米游社同步或鸣潮 JSON 上传，任选其一。</p></div>
+        <div class="card rounded-2xl p-6 text-center"><p class="text-3xl">2</p><h4 class="mt-3 font-bold">核对入库</h4><p class="mt-2 text-sm text-slate-400">OCR 结果人工确认后保存，每次更新留存历史快照。</p></div>
+        <div class="card rounded-2xl p-6 text-center"><p class="text-3xl">3</p><h4 class="mt-3 font-bold">分享主页</h4><p class="mt-2 text-sm text-slate-400">生成公开链接，别人打开就能看到你的全部游戏档案。</p></div>
+      </div>
+    </section>
+
+    <section id="news-preview" class="py-16 hidden">
+      <div class="flex items-end justify-between flex-wrap gap-2">
+        <div>
+          <p class="text-xs tracking-widest text-slate-500">LIVE · OFFICIAL NEWS</p>
+          <h3 class="text-3xl font-black mt-2">最新官方动态</h3>
+        </div>
+        <a data-news href="/news" class="rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition">查看全部 →</a>
+      </div>
+      <div id="news-preview-grid" class="mt-8 grid gap-4 md:grid-cols-3"></div>
+    </section>
+
+    <section id="about" class="py-16">
+      <p class="text-center text-xs tracking-widest text-slate-500">ABOUT</p>
+      <h3 class="text-center text-3xl font-black mt-2">关于本项目</h3>
+      <div class="mt-10 grid gap-4 md:grid-cols-2">
+        <div class="card rounded-2xl p-6">
+          <h4 class="font-bold">为什么做这个</h4>
+          <p class="mt-3 text-sm text-slate-400 leading-relaxed">
+            几款游戏的数据分散在不同客户端里，每次想看体力、成就还得切游戏。
+             StarWaves 把它们汇总成一张"游戏名片"：自己看、发朋友看，都行。
+             所有数据归你本人所有，存于你自己的数据库；账号密码仅存散列摘要，手机号对外仅脱敏展示。
+          </p>
+        </div>
+        <div class="card rounded-2xl p-6">
+          <h4 class="font-bold">数据来源与风险（实话实说）</h4>
+          <ul class="mt-3 space-y-2 text-sm text-slate-400 leading-relaxed">
+            <li>· 鸣潮无官方开放接口：依赖本地工具导出 JSON 或截图 OCR，无法全自动实时同步</li>
+            <li>· 米游社接口为社区逆向协议：存在失效与风控风险，Cookie 仅保存在本机 .env</li>
+            <li>· OCR 存在识别误差：设计为"先识别、人工核对、再入库"两段式流程</li>
+          </ul>
+        </div>
+        <div class="card rounded-2xl p-6 md:col-span-2">
+          <h4 class="font-bold">技术栈</h4>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs">Python · FastAPI</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs">SQLite · SQLAlchemy</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs">PaddleOCR</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs">Tailwind CSS</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs">Docker</span>
+          </div>
+          <p class="mt-4 text-sm text-slate-400">
+            开源地址：<a href="https://github.com/Sryae07/starwaves" target="_blank" rel="noopener" class="text-cyan-300 hover:text-cyan-200 underline underline-offset-4">github.com/Sryae07/starwaves</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-16 text-center">
+      <h3 class="text-3xl font-black">准备好展示你的档案了吗</h3>
+      <p class="mt-3 text-sm text-slate-400">启动本地服务，上传第一张截图，生成你的分享链接。</p>
+      <a data-dashboard href="/dashboard" class="mt-8 inline-block rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 px-8 py-3 font-semibold text-white shadow-xl shadow-violet-500/30 hover:opacity-90 transition">🚀 进入看板</a>
+    </section>
+  </main>
+
+  <footer class="border-t border-white/5 py-8 text-center text-xs text-slate-600 leading-relaxed">
+    StarWaves · 与米哈游 / 库洛游戏无关 · 非官方工具，仅供个人学习使用<br/>
+    所有游戏数据归玩家本人所有
+  </footer>
+
+  <script>
+    (function () {
+      const isPages = location.hostname.endsWith('github.io');
+      const localBase = 'http://127.0.0.1:8000';
+      const dashUrl = isPages ? localBase + '/dashboard' : '/dashboard';
+      const newsUrl = isPages ? localBase + '/news' : '/news';
+      document.querySelectorAll('[data-dashboard]').forEach((a) => { a.href = dashUrl; });
+      document.querySelectorAll('[data-news]').forEach((a) => { a.href = newsUrl; });
+      if (isPages) document.getElementById('local-hint').classList.remove('hidden');
+      const img = new Image();
+      img.onload = function () {
+        document.body.style.backgroundImage =
+          'linear-gradient(rgba(5,7,15,.78), rgba(5,7,15,.78)), url("/api/background?t=' + Date.now() + '")';
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundAttachment = 'fixed';
+      };
+      img.src = '/api/background';
+
+      const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+      ));
+      const apiBase = isPages ? localBase : '';
+      fetch(apiBase + '/api/news?limit=3')
+        .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then((data) => {
+          const items = (data.items || []).slice(0, 3);
+          if (!items.length) return;
+          const box = document.getElementById('news-preview-grid');
+          const cats = { 公告: '#fbbf24', 活动: '#67e8f9', 官方: '#a78bfa', 新闻: '#a78bfa' };
+          box.innerHTML = items.map((it) => {
+            const color = cats[it.category] || '#a78bfa';
+            return `
+              <a href="${esc(it.url)}" target="_blank" rel="noopener" class="card rounded-2xl p-5">
+                <div class="flex items-center gap-2">
+                  <span class="rounded-full px-2 py-0.5 text-[11px] border" style="color:${color};border-color:${color}55;background:${color}15">${esc(it.category)}</span>
+                  <span class="text-[11px] text-slate-500">${esc(it.game)} · ${esc(it.source)}</span>
+                </div>
+                <h4 class="mt-3 font-bold leading-snug">${esc(it.title)}</h4>
+                ${it.summary ? `<p class="mt-2 text-sm text-slate-400" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(it.summary)}</p>` : ''}
+              </a>`;
+          }).join('');
+          document.getElementById('news-preview').classList.remove('hidden');
+        })
+        .catch(() => { /* 本机服务未启动时静默隐藏预览区 */ });
+    })();
+  </script>
+</body>
+</html>
