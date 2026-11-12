@@ -22,7 +22,7 @@ USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 )
-LOGIN_URL = "https://user.mihoyo.com/#/login/password"
+BBS_HOME = "https://bbs.mihoyo.com/"
 COOKIE_SCOPE_URL = "https://bbs.mihoyo.com/"
 
 
@@ -112,8 +112,21 @@ def save_cookie_to_db(cookie: str) -> None:
         db.close()
 
 
-def capture_cookie_from_browser(timeout_s: int = 300) -> str:
-    """拉起本机 Edge 打开米游社登录页，等用户登录后抓取 Cookie。"""
+def _cookie_token_by_stoken(stoken: str, uid: str) -> str:
+    """有 stoken 时直接向米游社接口换 cookie_token（兜底，避免等页面种 cookie）。"""
+    with httpx.Client(timeout=15, headers=_headers()) as client:
+        payload = client.get(
+            "https://api-takumi.mihoyo.com/auth/api/getCookieAccountInfoBySToken",
+            params={"stoken": stoken, "uid": uid},
+        ).json()
+        return (payload.get("data") or {}).get("cookie_token") or ""
+
+
+def capture_cookie_from_browser(timeout_s: int = 600) -> str:
+    """拉起本机 Edge 打开米游社社区，等用户登录后抓取 Cookie。
+
+    登录成功后自动补全 cookie_token（优先页面种下，其次用 stoken 换），
+    因此抓取成功与否不再依赖登录页是否回跳社区。"""
     from playwright.sync_api import sync_playwright
 
     deadline = time.time() + timeout_s
@@ -125,27 +138,81 @@ def capture_cookie_from_browser(timeout_s: int = 300) -> str:
         )
         try:
             page = context.new_page()
-            page.goto(LOGIN_URL, wait_until="domcontentloaded")
+            page.goto(BBS_HOME, wait_until="domcontentloaded")
+            last_token_try = 0.0
             while time.time() < deadline:
                 jar = {c["name"]: c["value"] for c in context.cookies(COOKIE_SCOPE_URL)}
-                if all(jar.get(key) for key in ("ltoken", "ltuid", "cookie_token")):
-                    return (
-                        f"ltoken={jar['ltoken']}; ltuid={jar['ltuid']}; "
-                        f"cookie_token={jar['cookie_token']}"
-                    )
+                if jar.get("ltoken") and jar.get("ltuid"):
+                    if jar.get("cookie_token"):
+                        return (
+                            f"ltoken={jar['ltoken']}; ltuid={jar['ltuid']}; "
+                            f"cookie_token={jar['cookie_token']}"
+                        )
+                    if jar.get("stoken") and time.time() - last_token_try > 15:
+                        last_token_try = time.time()
+                        try:
+                            token = _cookie_token_by_stoken(jar["stoken"], jar["ltuid"])
+                            if token:
+                                return (
+                                    f"ltoken={jar['ltoken']}; ltuid={jar['ltuid']}; "
+                                    f"cookie_token={token}"
+                                )
+                        except Exception:
+                            pass
+                    # 登录完成但 cookie_token 还没种下：回社区首页触发种 cookie
+                    try:
+                        page.goto(BBS_HOME, wait_until="domcontentloaded", timeout=15000)
+                    except Exception:
+                        pass
+                    time.sleep(3)
+                    continue
                 time.sleep(2)
-            raise TimeoutError("等待米游社登录超时（5 分钟）")
+            raise TimeoutError("等待米游社登录超时（10 分钟）")
         finally:
             context.close()
 
 
+_capture_state = {
+    "running": False,
+    "status": "idle",
+    "message": "",
+    "started_at": None,
+}
+_capture_lock = threading.Lock()
+
+
+def capture_state() -> dict:
+    with _capture_lock:
+        return dict(_capture_state)
+
+
 def start_browser_capture() -> None:
-    """后台线程：拉起 Edge → 用户登录 → 自动抓 Cookie 落库。"""
+    """后台线程：拉起 Edge → 用户登录 → 自动抓 Cookie 落库。
+    同一时间只允许一个抓取任务，重复点击直接复用进行中的任务。"""
 
     def worker() -> None:
         try:
-            save_cookie_to_db(capture_cookie_from_browser())
-        except Exception:
-            pass  # 用户取消/超时：不落库，前端轮询自然超时
+            cookie = capture_cookie_from_browser()
+            save_cookie_to_db(cookie)
+            with _capture_lock:
+                _capture_state.update(
+                    running=False, status="captured", message="Cookie 已自动保存"
+                )
+        except Exception as exc:  # 用户取消/超时：记录原因，前端可看到
+            with _capture_lock:
+                _capture_state.update(
+                    running=False,
+                    status="failed",
+                    message=str(exc) or "未知错误",
+                )
 
+    with _capture_lock:
+        if _capture_state["running"]:
+            return
+        _capture_state.update(
+            running=True,
+            status="waiting",
+            message="已打开 Edge，请在浏览器中完成米游社登录",
+            started_at=time.time(),
+        )
     threading.Thread(target=worker, daemon=True).start()

@@ -1172,8 +1172,10 @@ $('#btn-auto-login')?.addEventListener('click', async () => {
       autoLoginPoll = setInterval(async () => {
         tries += 1;
         try {
-          const st = await api('/api/settings/hoyolab-cookie');
-          if (st.configured) {
+          const st = await api('/api/hoyolab/auto-login/status');
+          if (st.status === 'running') {
+            setBindStatus(`🌐 请在弹出的 Edge 中完成米游社登录…（已等待 ${st.elapsed} 秒，最长 10 分钟，重复点击不会新开窗口）`);
+          } else if (st.status === 'captured' || st.cookie_configured) {
             clearInterval(autoLoginPoll);
             toast('✓ 米游社 Cookie 已自动保存');
             setBindStatus('✅ Cookie 已自动获取，正在同步 UID ' + uid + ' …');
@@ -1185,13 +1187,16 @@ $('#btn-auto-login')?.addEventListener('click', async () => {
             $('#bind-modal').classList.add('hidden');
             toast('✓ 已自动登录并同步 UID ' + uid);
             await load();
+          } else if (st.status === 'failed') {
+            clearInterval(autoLoginPoll);
+            setBindStatus(`❌ 自动抓取失败：${st.message}，请重试`, false);
           }
         } catch (e) { /* 轮询期间接口抖动忽略 */ }
-        if (tries >= 90) {
+        if (tries >= 300) {
           clearInterval(autoLoginPoll);
-          setBindStatus('⏱ 等待登录超时（6 分钟），请重新尝试', false);
+          setBindStatus('⏱ 等待登录超时（10 分钟），请重新尝试', false);
         }
-      }, 4000);
+      }, 2000);
     }
   } catch (err) {
     setBindStatus(`❌ ${err.message}`, false);

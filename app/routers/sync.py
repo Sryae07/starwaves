@@ -6,16 +6,20 @@
 
 from __future__ import annotations
 
+import time
+
 from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..games import merged_games
 from ..models import User
+from ..models import SiteSetting
 from ..schemas import CharacterIn, ProfileUpdate
 from ..services.hoyolab import SyncError, fetch_hsr_record
 from ..services.hoyolab_login import (
     NeedCaptcha,
+    capture_state,
     login_by_password,
     save_cookie_to_db,
     start_browser_capture,
@@ -144,10 +148,24 @@ def hoyolab_auto_login(
         "status": "browser",
         "uid": uid,
         "message": (
-            "已打开 Edge 米游社登录页，请完成登录（含人机验证）。"
+            "已打开 Edge 米游社社区，请完成登录（含人机验证）。"
             "登录成功后系统会自动抓取 Cookie 并同步该 UID，本窗口请勿关闭。"
         ),
     }
+
+
+@router.get("/hoyolab/auto-login/status", dependencies=[Depends(require_api_key)])
+def hoyolab_auto_login_status(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """抓取进度：waiting（等待登录）/ captured（已保存）/ failed（失败原因）。"""
+    state = capture_state()
+    row = db.query(SiteSetting).filter(SiteSetting.key == "hoyolab_cookie").first()
+    state["cookie_configured"] = bool(row and row.value.strip())
+    started = state.get("started_at")
+    state["elapsed"] = int(time.time() - started) if started else 0
+    return state
 
 
 @router.post("/import/{game}", dependencies=[Depends(require_api_key)])
