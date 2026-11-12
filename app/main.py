@@ -39,6 +39,10 @@ def ensure_schema() -> None:
         if "is_owner" not in ucols:
             conn.exec_driver_sql("ALTER TABLE users ADD COLUMN is_owner INTEGER DEFAULT 0")
             conn.commit()
+        gcols = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(custom_games)")}
+        if "steam_appid" not in gcols:
+            conn.exec_driver_sql("ALTER TABLE custom_games ADD COLUMN steam_appid TEXT DEFAULT ''")
+            conn.commit()
 
 
 def migrate_legacy_player() -> None:

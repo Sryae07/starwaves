@@ -144,6 +144,7 @@ class CustomGame(Base):
     label: Mapped[str] = mapped_column(String(64))
     tagline: Mapped[str] = mapped_column(String(128), default="")
     emoji: Mapped[str] = mapped_column(String(8), default="🎮")
+    steam_appid: Mapped[str] = mapped_column(String(16), default="")
     stamina_name: Mapped[str] = mapped_column(String(32), default="体力")
     minutes_per_point: Mapped[int] = mapped_column(Integer, default=6)
     cap: Mapped[int] = mapped_column(Integer, default=240)

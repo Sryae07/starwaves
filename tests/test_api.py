@@ -160,3 +160,42 @@ def test_owner_flag_and_host_control(client):
     resp = client.post("/api/hoyolab/auto-login", json={}, headers=stranger)
     assert resp.status_code == 403
 
+def test_steam_platform_card_and_appid_launch(client, auth_headers, monkeypatch):
+    """内置 Steam 卡片可协议启动；自定义游戏填 Steam AppID 后变成启动卡。"""
+    from app.routers import launch
+
+    meta = client.get("/api/games").json()["games"]
+    steam = next((g for g in meta if g["key"] == "steam"), None)
+    assert steam is not None
+    assert steam["platform"] is True and steam["launchable"] is True
+
+    calls = []
+    monkeypatch.setattr(launch, "_resolve_path", lambda game, spec=None: None)
+    monkeypatch.setattr(launch.os, "startfile", lambda url: calls.append(url))
+
+    resp = client.post("/api/launch/steam", headers=auth_headers)
+    assert resp.status_code == 200, resp.text
+    assert calls == ["steam://open/main"]
+
+    created = client.post(
+        "/api/games",
+        json={"key": "cs2", "label": "CS2", "emoji": "🔫", "cap": 240, "minutes_per_point": 6,
+              "color_a": "#66c0f4", "color_b": "#1b2838", "steam_appid": "730"},
+        headers=auth_headers,
+    )
+    assert created.status_code == 200, created.text
+    calls.clear()
+    resp = client.post("/api/launch/cs2", headers=auth_headers)
+    assert resp.status_code == 200, resp.text
+    assert calls == ["steam://rungameid/730"]
+
+
+def test_steam_appid_must_be_numeric(client, auth_headers):
+    resp = client.post(
+        "/api/games",
+        json={"key": "badsteam", "label": "bad", "cap": 240, "minutes_per_point": 6,
+              "color_a": "#66c0f4", "color_b": "#1b2838", "steam_appid": "abc"},
+        headers=auth_headers,
+    )
+    assert resp.status_code == 422
+

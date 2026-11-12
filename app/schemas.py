@@ -72,6 +72,15 @@ class GameCreate(BaseModel):
     color_a: str = "#a78bfa"
     color_b: str = "#67e8f9"
     resource_labels: dict[str, str] = Field(default_factory=dict)
+    steam_appid: str = Field(default="")
+
+    @field_validator("steam_appid")
+    @classmethod
+    def _check_appid(cls, value: str) -> str:
+        value = (value or "").strip()
+        if value and not value.isdigit():
+            raise ValueError("Steam AppID 必须是纯数字")
+        return value
 
     @field_validator("color_a", "color_b")
     @classmethod

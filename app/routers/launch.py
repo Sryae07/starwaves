@@ -78,6 +78,15 @@ def _launch_elevated(path: Path, extra_args: str = "") -> None:
         raise OSError(message)
 
 
+def _launch_protocol(url: str, game: str) -> dict:
+    """协议启动（如 steam://rungameid/xxx）：无需管理员权限、不依赖安装路径。"""
+    try:
+        os.startfile(url)
+    except OSError as exc:
+        raise HTTPException(status_code=500, detail=f"协议启动失败（Steam 等客户端可能未安装）: {exc}") from exc
+    return {"launched": True, "game": game, "protocol": url, "elevated": False}
+
+
 def _ensure_pre_launch(spec: GameSpec) -> None:
     """部分游戏（如鸣潮）需要启动器进程驻留，客户端通过管道向它索取加密密钥。
     启动器不存在时先拉起（普通权限即可），稍等其初始化后再启动游戏。"""
@@ -112,6 +121,9 @@ def launch_game(game: str, db: Session = Depends(get_db)) -> dict:
     if os.name != "nt":
         raise HTTPException(status_code=501, detail="启动游戏仅支持 Windows 本机部署")
     path = _resolve_path(game, spec)
+    protocol = spec.launch_protocol or (f"steam://rungameid/{spec.steam_appid}" if spec.steam_appid else "")
+    if path is None and protocol:
+        return _launch_protocol(protocol, game)
     if path is None:
         env_key = spec.launch_env_key
         if not env_key:
@@ -122,7 +134,7 @@ def launch_game(game: str, db: Session = Depends(get_db)) -> dict:
         )
     _ensure_pre_launch(spec)
     extra_args = getattr(spec, "launch_args", "") or ""
-    if _elevated_task_available():
+    if _elevated_task_available() and not spec.platform:
         try:
             _launch_elevated(path, extra_args)
         except OSError as exc:

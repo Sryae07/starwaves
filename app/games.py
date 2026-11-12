@@ -44,6 +44,9 @@ class GameSpec:
     launch_candidates: tuple[str, ...] = ()
     launch_args: str = ""
     launch_pre: tuple[str, str] | None = None
+    platform: bool = False
+    launch_protocol: str = ""
+    steam_appid: str = ""
     ocr_keywords: dict = field(default_factory=dict)
     resource_labels: dict = field(default_factory=dict)
     news: dict = field(default_factory=dict)
@@ -162,6 +165,24 @@ GAMES: dict[str, GameSpec] = {
             "article_base": "https://www.miyoushe.com/zzz/article/",
         },
     ),
+    "steam": GameSpec(
+        key="steam",
+        label="Steam",
+        tagline="启动 Steam 客户端，玩库里所有游戏",
+        emoji="🎮",
+        color_a="#66c0f4",
+        color_b="#1b2838",
+        stamina_name="活跃度",
+        minutes_per_point=6,
+        cap=240,
+        platform=True,
+        launch_protocol="steam://open/main",
+        launch_candidates=(
+            r"C:\Program Files (x86)\Steam\steam.exe",
+            r"C:\Program Files\Steam\steam.exe",
+            r"C:\Steam\steam.exe",
+        ),
+    ),
 }
 
 BUILTIN_KEYS = set(GAMES)
@@ -188,6 +209,7 @@ def custom_spec(row) -> GameSpec:
             "characters": ["角色数量", "角色数"],
         },
         resource_labels=row.resource_labels or {},
+        steam_appid=row.steam_appid or "",
     )
 
 
@@ -239,7 +261,9 @@ def game_meta(specs: dict[str, GameSpec] | None = None) -> list[dict]:
             "cap": spec.cap,
             "syncable": spec.syncable,
             "custom": spec.key not in BUILTIN_KEYS,
-            "launchable": bool(spec.launch_candidates or spec.launch_env_key),
+            "launchable": bool(spec.launch_candidates or spec.launch_env_key or spec.launch_protocol or spec.steam_appid),
+            "platform": spec.platform,
+            "steam_appid": spec.steam_appid,
             "news": bool(spec.news),
             "colors": {"a": spec.color_a, "b": spec.color_b},
             "resource_labels": spec.resource_labels,

@@ -503,13 +503,17 @@ function renderGame(spec, game) {
     const launchHint = spec.launchable !== false && !isShare && !OWNER
       ? `<span class="text-[11px] text-slate-600" title="为避免他人控制这台电脑，只有机主账号可以启动游戏">🔒 仅机主可启动</span>`
       : '';
+    const isPlatform = !!spec.platform;
+    const emptyActions = isShare ? '' : (isPlatform
+      ? `<div class="mt-4 flex gap-2 flex-wrap justify-center">${launchButton}${launchHint}</div>`
+      : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🔗 接入</button><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}${launchButton}${launchHint}</div>`);
     root.innerHTML = `
       <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-5 sm:p-6 flex flex-col items-center justify-center text-center min-h-[240px] sm:min-h-[280px]" style="${cardStyle}">
         <div class="self-end -mt-2 -mr-2">${removeButton}</div>
         <p class="text-3xl">${esc(spec.emoji)}</p>
         <p class="mt-3 font-bold">${esc(spec.label)}</p>
-        <p class="text-xs text-slate-500 mt-1">${esc(spec.tagline || '还没有数据')}${spec.custom ? ' · 自定义接入' : ''}</p>
-        ${isShare ? '' : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🔗 接入</button><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}${launchButton}${launchHint}</div>`}
+        <p class="text-xs text-slate-500 mt-1">${esc(spec.tagline || '还没有数据')}${spec.platform ? ' · 游戏平台' : ''}${spec.custom ? ' · 自定义接入' : ''}${spec.steam_appid ? ` · Steam AppID ${esc(spec.steam_appid)}` : ''}</p>
+        ${emptyActions}
       </div>`;
     return;
   }
@@ -898,6 +902,7 @@ $('#add-game-form')?.addEventListener('submit', async (e) => {
     color_a: $('#ag-color-a').value,
     color_b: $('#ag-color-b').value,
     resource_labels: resourceLabels,
+    steam_appid: $('#ag-steam-appid').value.trim(),
   };
   try {
     await api('/api/games', {

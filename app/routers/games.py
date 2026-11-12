@@ -36,6 +36,7 @@ def create_game(payload: GameCreate, db: Session = Depends(get_db)) -> dict:
             color_a=payload.color_a,
             color_b=payload.color_b,
             resource_labels=payload.resource_labels,
+            steam_appid=payload.steam_appid,
         )
     )
     db.commit()

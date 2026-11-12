@@ -211,6 +211,7 @@
             <label class="text-xs text-slate-400">每点恢复分钟<input id="ag-minutes" type="number" min="1" max="120" value="6" class="field mt-1" /></label>
             <label class="text-xs text-slate-400">体力上限<input id="ag-cap" type="number" min="1" value="240" class="field mt-1" /></label>
           </div>
+          <label class="text-xs text-slate-400">Steam AppID（选填，填了可一键启动）<input id="ag-steam-appid" class="field mt-1 font-mono" placeholder="如：730（CS2）/ 570（Dota2）" inputmode="numeric" /></label>
           <label class="text-xs text-slate-400">主题色 A<input id="ag-color-a" type="color" class="field mt-1 h-10 p-1" value="#a78bfa" /></label>
           <label class="text-xs text-slate-400">主题色 B<input id="ag-color-b" type="color" class="field mt-1 h-10 p-1" value="#67e8f9" /></label>
         </div>
@@ -218,7 +219,7 @@
           <label class="text-xs text-slate-400">资源标签（JSON，选填）</label>
           <textarea id="ag-resources" rows="2" class="field mt-1 font-mono text-xs" placeholder='{"primogems": "原石", "mora": "摩拉"}'></textarea>
         </div>
-        <p class="text-[11px] text-slate-500">· 标识只用小写字母/数字/下划线，保存后不可改（历史数据按它归档）<br/>· 自定义游戏没有自动同步与官方资讯源，数据请用手动录入或截图 OCR</p>
+        <p class="text-[11px] text-slate-500">· 标识只用小写字母/数字/下划线，保存后不可改（历史数据按它归档）<br/>· 自定义游戏没有自动同步与官方资讯源，数据请用手动录入或截图 OCR<br/>· 填了 Steam AppID 的卡片会变成 Steam 启动卡，点「🚀 启动游戏」即可拉起对应游戏（需本机已装 Steam）</p>
         <div class="flex gap-2 justify-end">
           <button type="button" data-add-game-close class="rounded-xl border border-white/15 px-5 py-2 text-sm hover:bg-white/10 transition">取消</button>
           <button type="submit" class="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:opacity-90 transition">接入游戏</button>
@@ -339,7 +340,7 @@
       var seg = location.pathname.split('/').filter(Boolean);
       var base = (seg.length >= 2 && seg[seg.length - 2] === 'share') ? '../' : './';
       var s = document.createElement('script');
-      s.src = base + 'app.js?v=12';
+      s.src = base + 'app.js?v=13';
       document.body.appendChild(s);
     })();
   </script>
