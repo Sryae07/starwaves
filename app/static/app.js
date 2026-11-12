@@ -14,6 +14,23 @@
     location.replace(toServerUrl(saved) + '/dashboard');
     throw new Error('__redirect_to_dashboard__');
   }
+  /* 固定入口：读取电脑开机时自动推送的当前隧道地址，手机无需每次手动换链接 */
+  let pointer = '';
+  try {
+    const base = location.pathname.replace(/[^/]*$/, '');
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', base + 'current-server.json?t=' + Date.now(), false);
+    xhr.timeout = 5000;
+    xhr.send(null);
+    if (xhr.status === 200) {
+      const data = JSON.parse(xhr.responseText);
+      pointer = (data && data.url) || '';
+    }
+  } catch (err) { /* 指针不可用时回落到手动网关页 */ }
+  if (pointer) {
+    location.replace(toServerUrl(pointer) + '/dashboard');
+    throw new Error('__redirect_to_dashboard__');
+  }
 })();
 
 /* 规范化服务器地址：带协议直接用；IP/localhost 默认 http；域名默认 https（云端部署） */
