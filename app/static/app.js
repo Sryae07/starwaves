@@ -934,11 +934,13 @@ function setBindGame(game) {
   if (spec.syncable) {
     $('#btn-bind-sync').classList.remove('hidden');
     $('#bind-cookie-box').classList.remove('hidden');
+    $('#bind-auto-box').classList.remove('hidden');
     $('#bind-uid-note').textContent = `${spec.label}：输入 UID 后自动拉取米游社战绩（等级 / 活跃天数 / 成就 / 角色 / 忘却之庭 / 虚构叙事 / 末日幻影 / 模拟宇宙），需先配置 Cookie。`;
     loadCookieStatus();
   } else {
     $('#btn-bind-sync').classList.add('hidden');
     $('#bind-cookie-box').classList.add('hidden');
+    $('#bind-auto-box').classList.add('hidden');
     $('#bind-uid-note').textContent = `${spec.label}没有公开的玩家数据接口，无法按 UID 自动同步。请用下方「本地导出 JSON」导入，或回到看板用截图 OCR / 手动录入。`;
   }
 }
@@ -1047,6 +1049,63 @@ $('#btn-bind-unbind')?.addEventListener('click', async () => {
     btn.disabled = false;
     btn.textContent = '解除绑定';
   }
+});
+
+let autoLoginPoll = null;
+$('#btn-auto-login')?.addEventListener('click', async () => {
+  const uid = $('#bind-uid').value.trim();
+  const account = $('#auto-account').value.trim();
+  const password = $('#auto-password').value;
+  if (!uid) {
+    setBindStatus('请先在上方填写游戏 UID', false);
+    return;
+  }
+  const btn = $('#btn-auto-login');
+  btn.disabled = true;
+  btn.textContent = '⏳ 接入中…';
+  setBindStatus('⏳ 正在尝试自动登录米游社…');
+  try {
+    const res = await api('/api/hoyolab/auto-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid, account, password }),
+    });
+    if (res.status === 'synced') {
+      $('#bind-modal').classList.add('hidden');
+      toast('✓ 已自动登录并同步 UID ' + uid);
+      await load();
+    } else if (res.status === 'browser') {
+      setBindStatus('🌐 ' + res.message);
+      let tries = 0;
+      clearInterval(autoLoginPoll);
+      autoLoginPoll = setInterval(async () => {
+        tries += 1;
+        try {
+          const st = await api('/api/settings/hoyolab-cookie');
+          if (st.configured) {
+            clearInterval(autoLoginPoll);
+            setBindStatus('✅ Cookie 已自动获取，正在同步 UID ' + uid + ' …');
+            await api(`/api/bind/${encodeURIComponent(bindGame)}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ uid }),
+            });
+            $('#bind-modal').classList.add('hidden');
+            toast('✓ 已自动登录并同步 UID ' + uid);
+            await load();
+          }
+        } catch (e) { /* 轮询期间接口抖动忽略 */ }
+        if (tries >= 90) {
+          clearInterval(autoLoginPoll);
+          setBindStatus('⏱ 等待登录超时（6 分钟），请重新尝试', false);
+        }
+      }, 4000);
+    }
+  } catch (err) {
+    setBindStatus(`❌ ${err.message}`, false);
+  }
+  btn.disabled = false;
+  btn.textContent = '🔑 自动登录并接入';
 });
 
 document.querySelectorAll('[data-bind-close]').forEach((el) =>

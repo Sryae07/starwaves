@@ -139,3 +139,75 @@ def test_unbind_clears_profile(client, auth_headers, monkeypatch):
 
     assert client.delete("/api/bind/hsr", headers=auth_headers).json()["unbound"] is False
     assert client.delete("/api/bind/nope", headers=auth_headers).status_code == 404
+
+
+def test_auto_login_by_password_syncs(client, auth_headers, monkeypatch):
+    calls = {}
+
+    def fake_login(account, password):
+        calls["account"] = account
+        return "ltoken=fake; ltuid=123; cookie_token=fake_cookie_token"
+
+    def fake_save(cookie):
+        calls["cookie"] = cookie
+
+    def fake_fetch(uid=None, cookie=None, db=None):
+        calls["uid"] = uid
+        return FAKE_RECORD
+
+    monkeypatch.setattr(sync_router, "login_by_password", fake_login)
+    monkeypatch.setattr(sync_router, "save_cookie_to_db", fake_save)
+    monkeypatch.setattr(sync_router, "fetch_hsr_record", fake_fetch)
+
+    resp = client.post(
+        "/api/hoyolab/auto-login",
+        json={"account": "a@b.c", "password": "secret", "uid": "100000001"},
+        headers=auth_headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "synced"
+    assert calls["account"] == "a@b.c"
+    assert "ltoken=fake" in calls["cookie"]
+    assert calls["uid"] == "100000001"
+    assert "hsr" in client.get("/api/me", headers=auth_headers).json()["games"]
+
+
+def test_auto_login_requires_uid(client, auth_headers):
+    resp = client.post("/api/hoyolab/auto-login", json={"account": "a", "password": "b"}, headers=auth_headers)
+    assert resp.status_code == 422
+
+
+def test_auto_login_falls_back_to_browser(client, auth_headers, monkeypatch):
+    called = {}
+
+    def fake_login(account, password):
+        raise sync_router.NeedCaptcha("captcha")
+
+    def fake_browser():
+        called["browser"] = True
+
+    monkeypatch.setattr(sync_router, "login_by_password", fake_login)
+    monkeypatch.setattr(sync_router, "start_browser_capture", fake_browser)
+
+    resp = client.post(
+        "/api/hoyolab/auto-login",
+        json={"account": "a", "password": "b", "uid": "100000001"},
+        headers=auth_headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "browser"
+    assert called["browser"] is True
+
+
+def test_auto_login_bad_credentials_400(client, auth_headers, monkeypatch):
+    def boom(account, password):
+        raise RuntimeError("账号或密码错误")
+
+    monkeypatch.setattr(sync_router, "login_by_password", boom)
+    resp = client.post(
+        "/api/hoyolab/auto-login",
+        json={"account": "a", "password": "b", "uid": "100000001"},
+        headers=auth_headers,
+    )
+    assert resp.status_code == 400
+    assert "账号或密码错误" in resp.json()["detail"]

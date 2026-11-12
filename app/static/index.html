@@ -286,6 +286,16 @@
         </div>
       </div>
 
+      <div id="bind-auto-box" class="hidden mt-4 rounded-xl border border-emerald-400/25 bg-emerald-400/10 p-4">
+        <p class="text-xs font-semibold text-emerald-200">🔑 账号密码自动接入（免手动抓 Cookie）</p>
+        <p class="text-[11px] text-emerald-100/70 leading-relaxed mt-1">填写上方 UID 后，先尝试用米游社账号密码直接登录；遇到人机验证会自动打开 Edge 登录页，登录成功后系统自动抓取 Cookie 并同步。密码仅用于本次登录，不会保存。</p>
+        <div class="mt-2 grid grid-cols-2 gap-2">
+          <input id="auto-account" class="field" placeholder="米游社账号（手机/邮箱）" />
+          <input id="auto-password" type="password" class="field" placeholder="米游社密码（可选）" />
+        </div>
+        <button id="btn-auto-login" class="mt-2 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:opacity-90 transition disabled:opacity-50">🔑 自动登录并接入</button>
+      </div>
+
       <div class="mt-4 rounded-xl border border-white/10 bg-white/[0.04] p-4">
         <p class="text-xs font-semibold text-slate-300">📦 本地导出 JSON 导入</p>
         <p class="text-[11px] text-slate-500 leading-relaxed mt-1">鸣潮等没有官方接口的游戏：用本地辅助工具导出 JSON（<code class="text-cyan-300">python tools/wuwa_export.py --example</code> 查看格式），粘贴到这里即可。角色、挑战进度都会展示。</p>

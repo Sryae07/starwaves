@@ -14,6 +14,12 @@ from ..games import merged_games
 from ..models import User
 from ..schemas import CharacterIn, ProfileUpdate
 from ..services.hoyolab import SyncError, fetch_hsr_record
+from ..services.hoyolab_login import (
+    NeedCaptcha,
+    login_by_password,
+    save_cookie_to_db,
+    start_browser_capture,
+)
 from ..services.profiles import apply_profile_update
 from ..services.serializers import share_payload
 from .deps import get_current_user, require_api_key
@@ -100,6 +106,48 @@ def unbind_game(
     db.delete(profile)
     db.commit()
     return {"game": game, "unbound": True}
+
+
+@router.post("/hoyolab/auto-login", dependencies=[Depends(require_api_key)])
+def hoyolab_auto_login(
+    payload: dict = Body(...),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """输入 UID + 米游社账号密码，自动接入 Cookie：
+    先尝试密码直登并直接同步；遇到人机验证时自动拉起本机 Edge，
+    用户登录后系统自动抓取 Cookie（前端轮询到已配置后自动同步 UID）。
+    密码仅在本机进程内使用，不落盘。"""
+    uid = str((payload or {}).get("uid") or "").strip()
+    if not uid:
+        raise HTTPException(status_code=422, detail="请填写游戏 UID")
+    account = str((payload or {}).get("account") or "").strip()
+    password = str((payload or {}).get("password") or "").strip()
+
+    if account and password:
+        try:
+            cookie = login_by_password(account, password)
+        except NeedCaptcha:
+            pass
+        except RuntimeError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail=f"自动登录失败：{exc}（可以清空账号密码，改用浏览器登录自动抓取）",
+            ) from exc
+        else:
+            save_cookie_to_db(cookie)
+            _sync_hsr(user, db, uid=uid)
+            return {"status": "synced", "uid": uid}
+
+    start_browser_capture()
+    return {
+        "status": "browser",
+        "uid": uid,
+        "message": (
+            "已打开 Edge 米游社登录页，请完成登录（含人机验证）。"
+            "登录成功后系统会自动抓取 Cookie 并同步该 UID，本窗口请勿关闭。"
+        ),
+    }
 
 
 @router.post("/import/{game}", dependencies=[Depends(require_api_key)])
