@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from ..config import DATA_DIR
+from ..config import GALLERY_DIR
 from ..database import get_db
 from ..games import merged_games
 from ..models import Screenshot, User
@@ -17,7 +17,6 @@ from .deps import get_current_user, require_api_key
 
 router = APIRouter(prefix="/api/gallery", tags=["gallery"])
 
-GALLERY_DIR = DATA_DIR / "gallery"
 THUMB_DIR = GALLERY_DIR / "thumbs"
 ALLOWED_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 MAX_SIZE = 20 * 1024 * 1024

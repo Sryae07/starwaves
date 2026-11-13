@@ -5,6 +5,7 @@ TEST_DB = os.path.join(tempfile.gettempdir(), "starwaves_test.db")
 if os.path.exists(TEST_DB):
     os.remove(TEST_DB)
 os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB}"
+os.environ["GALLERY_DIR"] = os.path.join(tempfile.gettempdir(), "starwaves_test_gallery")
 
 import pytest
 from fastapi.testclient import TestClient
