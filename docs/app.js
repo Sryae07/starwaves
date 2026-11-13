@@ -588,7 +588,7 @@ function renderGallery(key, data) {
   box.innerHTML = items.map((it) => `
     <div class="group relative rounded-lg overflow-hidden border border-white/10 bg-black/30 aspect-square">
       <img src="${esc(API_BASE + it.url)}" alt="游戏截图" loading="lazy" class="w-full h-full object-cover cursor-zoom-in transition duration-300 group-hover:scale-105" data-view="${esc(API_BASE + it.url)}" />
-      <button class="gallery-del-btn absolute top-1 right-1 h-6 w-6 rounded-lg bg-black/60 text-xs text-white/70 hover:bg-red-500/80 hover:text-white transition" data-game="${esc(key)}" data-id="${it.id}" title="删除这张截图">✕</button>
+      <button class="gallery-del-btn absolute top-1 right-1 h-7 w-7 rounded-lg bg-black/60 text-sm text-white/80 hover:bg-red-500/90 hover:text-white transition" data-game="${esc(key)}" data-id="${it.id}" title="删除这张截图">✕</button>
     </div>`).join('');
 }
 
@@ -605,22 +605,62 @@ async function loadGallery(key) {
   }
 }
 
+async function normalizeImageFile(file) {
+  const type = (file.type || '').toLowerCase();
+  const isHeic = type === 'image/heic' || type === 'image/heif' || /\.heic$/i.test(file.name || '') || /\.heif$/i.test(file.name || '');
+  const allowed = /^image\/(png|jpe?g|gif|webp)$/i.test(type);
+  if (!allowed && !isHeic) return null;
+  if (!isHeic) return file;
+  try {
+    const url = URL.createObjectURL(file);
+    const img = await new Promise((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error('decode-failed'));
+      el.src = url;
+    });
+    const MAX = 2000;
+    let w = img.naturalWidth || img.width || 1;
+    let h = img.naturalHeight || img.height || 1;
+    const scale = Math.min(1, MAX / Math.max(w, h));
+    w = Math.max(1, Math.round(w * scale));
+    h = Math.max(1, Math.round(h * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+    if (!blob) throw new Error('encode-failed');
+    return new File([blob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+  } catch (err) {
+    throw new Error('HEIC 转换失败，请改用 JPG/PNG 截图');
+  }
+}
+
 async function uploadGalleryFiles(key, files) {
+  const btn = document.querySelector(`.gallery-upload-btn[data-game="${key}"]`);
+  const original = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ 上传中…'; }
   let ok = 0;
   let skipped = 0;
+  let firstError = '';
   for (const file of Array.from(files)) {
-    if (!/^image\/(png|jpe?g|gif|webp)$/i.test(file.type || '')) { skipped += 1; continue; }
-    const fd = new FormData();
-    fd.append('file', file);
     try {
+      const normalized = await normalizeImageFile(file);
+      if (!normalized) { skipped += 1; continue; }
+      const fd = new FormData();
+      fd.append('file', normalized, normalized.name);
       await api(`/api/gallery/${key}`, { method: 'POST', body: fd, silent: true });
       ok += 1;
     } catch (err) {
-      toast(`上传失败：${err.message}`, false);
+      if (!firstError) firstError = err.message;
     }
   }
+  if (btn) { btn.disabled = false; btn.textContent = original; }
   if (ok) toast(`✓ 已上传 ${ok} 张截图到该卡片`);
-  else if (skipped) toast('仅支持 PNG / JPG / GIF / WebP 图片', false);
+  else if (firstError) toast(`上传失败：${firstError}`, false);
+  else if (skipped) toast('仅支持图片格式（PNG / JPG / GIF / WebP，HEIC 会自动转换）', false);
   await loadGallery(key);
 }
 
@@ -1023,8 +1063,10 @@ document.body.addEventListener('click', (e) => {
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
+    input.style.display = 'none';
+    document.body.appendChild(input);
     input.addEventListener('change', () => {
-      if (input.files.length) uploadGalleryFiles(key, input.files);
+      if (input.files.length) uploadGalleryFiles(key, Array.from(input.files));
       input.remove();
     });
     input.click();
