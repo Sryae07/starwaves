@@ -407,6 +407,10 @@ function render(data) {
   grid.innerHTML = keys.map((k) => `<div id="game-${esc(k)}"></div>`).join('');
   keys.forEach((k) => renderGame(specOf(k), games[k]));
   startTimers(data);
+  if (!isShare) {
+    startHeartbeat();
+    loadCardExtras(keys);
+  }
 }
 
 function statBox(label, value) {
@@ -495,139 +499,225 @@ function renderChallenges(challenges, theme) {
   return `<div class="mt-4"><p class="text-xs text-slate-500 mb-2">挑战进度</p>${sections}</div>`;
 }
 
+/* ---------- 卡片附加：截图相册 + 使用时长 ---------- */
+function todayLocal() {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+}
+
+function fmtSeconds(sec) {
+  const total = Math.max(0, Math.round(Number(sec) || 0));
+  if (total < 60) return `${total} 秒`;
+  const m = Math.floor(total / 60);
+  if (m < 60) return `${m} 分钟`;
+  const h = Math.floor(m / 60);
+  return `${h} 小时 ${m % 60} 分`;
+}
+
+function renderUsageBars(series, theme) {
+  const days = (series || []).slice(-7);
+  if (!days.length) return '';
+  const maxV = Math.max(...days.map((d) => d.seconds || 0), 1);
+  const today = todayLocal();
+  return days.map((d) => {
+    const h = Math.max(3, Math.round(((d.seconds || 0) / maxV) * 30));
+    const isToday = (d.day || '') === today;
+    return `<div class="flex-1 flex flex-col items-center gap-1" title="${esc((d.day || '').slice(5))} · ${fmtSeconds(d.seconds || 0)}">
+      <div class="w-full max-w-[16px] rounded-sm ${isToday ? '' : 'opacity-45'}" style="height:${h}px;background:linear-gradient(180deg,${theme.c1},${theme.c2})"></div>
+      <span class="text-[9px] text-slate-600">${esc((d.day || '').slice(8))}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderGallery(key, data) {
+  const box = $(`#gallery-${key}`);
+  if (!box) return;
+  const items = (data && data.items) || [];
+  const countEl = $(`#gallery-count-${key}`);
+  if (countEl) countEl.textContent = `📷 截图 ${items.length} 张`;
+  if (!items.length) {
+    box.innerHTML = `<div class="col-span-full rounded-xl border border-dashed border-white/15 py-6 text-center">
+      <p class="text-2xl opacity-50">🖼️</p>
+      <p class="mt-1.5 text-xs text-slate-500">还没有截图，点击「📷 上传截图」存放你的游戏瞬间</p>
+    </div>`;
+    return;
+  }
+  box.innerHTML = items.map((it) => `
+    <div class="group relative rounded-lg overflow-hidden border border-white/10 bg-black/30 aspect-square">
+      <img src="${esc(API_BASE + it.url)}" alt="游戏截图" loading="lazy" class="w-full h-full object-cover cursor-zoom-in transition duration-300 group-hover:scale-105" data-view="${esc(API_BASE + it.url)}" />
+      <button class="gallery-del-btn absolute top-1 right-1 h-6 w-6 rounded-lg bg-black/60 text-xs text-white/70 hover:bg-red-500/80 hover:text-white transition" data-game="${esc(key)}" data-id="${it.id}" title="删除这张截图">✕</button>
+    </div>`).join('');
+}
+
+async function loadGallery(key) {
+  const box = $(`#gallery-${key}`);
+  if (!box) return;
+  try {
+    const data = await api(`/api/gallery/${key}`, { silent: true });
+    renderGallery(key, data);
+  } catch (err) {
+    box.innerHTML = `<p class="col-span-full text-[11px] text-slate-600 py-3 text-center">截图加载失败：${esc(err.message)}</p>`;
+    const countEl = $(`#gallery-count-${key}`);
+    if (countEl) countEl.textContent = '📷 截图加载失败';
+  }
+}
+
+async function uploadGalleryFiles(key, files) {
+  let ok = 0;
+  let skipped = 0;
+  for (const file of Array.from(files)) {
+    if (!/^image\/(png|jpe?g|gif|webp)$/i.test(file.type || '')) { skipped += 1; continue; }
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      await api(`/api/gallery/${key}`, { method: 'POST', body: fd, silent: true });
+      ok += 1;
+    } catch (err) {
+      toast(`上传失败：${err.message}`, false);
+    }
+  }
+  if (ok) toast(`✓ 已上传 ${ok} 张截图到该卡片`);
+  else if (skipped) toast('仅支持 PNG / JPG / GIF / WebP 图片', false);
+  await loadGallery(key);
+}
+
+async function deleteGalleryItem(key, imageId) {
+  try {
+    await api(`/api/gallery/${key}/${imageId}`, { method: 'DELETE', silent: true });
+    toast('已删除截图');
+    await loadGallery(key);
+  } catch (err) {
+    toast(err.message, false);
+  }
+}
+
+async function loadCardExtras(keys) {
+  if (isShare) return;
+  try {
+    const data = await api('/api/usage', { silent: true });
+    const ownerGames = (data && data.games) || {};
+    const appWeek = (data && data.week) || [];
+    const appToday = (data && data.today_app) || 0;
+    for (const key of keys) {
+      const g = ownerGames[key];
+      const series = (g && g.week) || appWeek;
+      const today = (g ? g.today : appToday) || 0;
+      const weekTotal = (series || []).reduce((sum, d) => sum + (Number(d.seconds) || 0), 0);
+      const spec = specOf(key);
+      const todayEl = $(`#usage-today-${key}`);
+      if (todayEl) todayEl.textContent = fmtSeconds(today);
+      const weekEl = $(`#usage-week-${key}`);
+      if (weekEl) weekEl.textContent = fmtSeconds(weekTotal);
+      const barsEl = $(`#usage-bars-${key}`);
+      if (barsEl) barsEl.innerHTML = renderUsageBars(series, { c1: spec.colors.a, c2: spec.colors.b });
+    }
+  } catch (err) { /* 未登录或接口不可用时保持占位显示 */ }
+  for (const key of keys) await loadGallery(key);
+}
+
+let heartbeatTimer = null;
+function startHeartbeat() {
+  if (heartbeatTimer || isShare || !authToken) return;
+  const beat = async () => {
+    try {
+      await api('/api/usage/heartbeat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seconds: 60 }),
+        silent: true,
+      });
+    } catch (err) { /* 心跳失败不影响页面 */ }
+  };
+  beat();
+  heartbeatTimer = setInterval(beat, 60000);
+}
+
 function renderGame(spec, game) {
+  if (isShare) return renderGameLegacy(spec, game);
   const key = spec.key;
   const root = $(`#game-${key}`);
   if (!root) return;
   const a = spec.colors.a;
   const b = spec.colors.b;
-  const theme = { c1: a, c2: b };
   const cardStyle = `border-color:${a}45;box-shadow:0 18px 50px -18px ${b}66`;
 
-  if (!game) {
-    const syncButton = spec.syncable && !isShare
-      ? `<button class="sync-btn mt-2 rounded-lg border px-4 py-1.5 text-sm transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
-      : '';
-    const bindButton = !isShare
-      ? `<button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🔗 接入</button>`
-      : '';
-    const removeButton = spec.custom && !isShare
-      ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2.5 py-1 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
-      : '';
-    const launchButton = spec.launchable !== false && !isShare && OWNER
-      ? `<button class="launch-btn rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition" data-game="${key}">🚀 启动游戏</button>`
-      : '';
-    const launchHint = spec.launchable !== false && !isShare && !OWNER
-      ? `<span class="text-[11px] text-slate-600" title="为避免他人控制这台电脑，只有机主账号可以启动游戏">🔒 仅机主可启动</span>`
-      : '';
-    const isPlatform = !!spec.platform;
-    const emptyActions = isShare ? '' : (isPlatform
-      ? `<div class="mt-4 flex gap-2 flex-wrap justify-center">${launchButton}${launchHint}</div>`
-      : `<div class="mt-4 flex gap-2 flex-wrap justify-center"><button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">🔗 接入</button><button class="update-btn rounded-lg border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>${syncButton}${launchButton}${launchHint}</div>`);
-    root.innerHTML = `
-      <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-5 sm:p-6 flex flex-col items-center justify-center text-center min-h-[240px] sm:min-h-[280px]" style="${cardStyle}">
-        <div class="self-end -mt-2 -mr-2">${removeButton}</div>
-        <p class="text-3xl">${esc(spec.emoji)}</p>
-        <p class="mt-3 font-bold">${esc(spec.label)}</p>
-        <p class="text-xs text-slate-500 mt-1">${esc(spec.tagline || '还没有数据')}${spec.platform ? ' · 游戏平台' : ''}${spec.custom ? ' · 自定义接入' : ''}${spec.steam_appid ? ` · Steam AppID ${esc(spec.steam_appid)}` : ''}</p>
-        ${emptyActions}
-      </div>`;
-    return;
-  }
-  const p = game.profile;
-  const st = game.stamina;
-  const pct = st.max > 0 ? Math.min(100, Math.round((st.current / st.max) * 100)) : 0;
-  const sourceLabel = { manual: '手动录入', ocr: '截图 OCR', sync: '自动同步' }[game.last_update?.source] || '历史数据';
-  const chars = (game.characters || []).slice(0, 12);
-  const charHtml = chars.length
-    ? chars.map((c) => {
-        const el = ELEMENT_COLORS[c.element] || '#94a3b8';
-        const eidolon = Number(c.eidolon || 0);
-        const path = c.extra && c.extra.path ? c.extra.path : '';
-        return `
-        <div class="shrink-0 w-[92px] rounded-xl border bg-white/[0.03] p-2 text-center" style="border-color:${el}55">
-          <div class="text-amber-300 text-[13px] leading-none">${'★'.repeat(Math.max(1, Math.min(5, c.rarity)))}</div>
-          <div class="text-sm font-semibold truncate mt-1.5" style="color:${el}">${esc(c.name)}</div>
-          <div class="text-[11px] text-slate-500">Lv.${c.level}</div>
-          <div class="mt-1 flex items-center justify-center gap-1 flex-wrap">
-            ${c.element ? elementBadge(c.element) : ''}
-            ${path ? `<span class="text-[10px] px-1.5 py-0.5 rounded border" style="color:#e2e8f0;border-color:#ffffff30;background:#ffffff10">${esc(path)}</span>` : ''}
-          </div>
-          ${eidolon > 0 ? `<div class="mt-1 text-[10px] tracking-tighter" style="color:${el}">${'◆'.repeat(eidolon)}</div>` : ''}
-        </div>`;
-      }).join('')
-    : '<p class="text-xs text-slate-500 py-4">暂无角色数据（🔗 接入后可自动同步角色柜台）</p>';
-  const labels = Object.assign({}, RESOURCE_LABELS, spec.resource_labels || {});
-  const resources = Object.entries(game.resources || {});
-  const resourceHtml = resources.length
-    ? resources.map(([k, v]) => `<span class="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] text-slate-300">${esc(labels[k] || k)} <b class="text-slate-100">${Number(v || 0).toLocaleString()}</b></span>`).join('')
-    : '<span class="text-[11px] text-slate-600">暂无资源数据</span>';
-
-  const syncButton = spec.syncable && !isShare
-    ? `<button class="sync-btn rounded-lg border px-2.5 py-1 text-[11px] transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
+  const launchButton = spec.launchable !== false && OWNER
+    ? `<button class="launch-btn rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-3 py-1.5 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition" data-game="${key}">🚀 启动游戏</button>`
     : '';
-  const launchButton = spec.launchable !== false && !isShare && OWNER
-    ? `<button class="launch-btn rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-2.5 py-1 text-[11px] font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition" data-game="${key}">🚀 启动游戏</button>`
-    : '';
-  const launchHint = spec.launchable !== false && !isShare && !OWNER
+  const launchHint = spec.launchable !== false && !OWNER
     ? `<span class="text-[11px] text-slate-600" title="为避免他人控制这台电脑，只有机主账号可以启动游戏">🔒 仅机主可启动</span>`
     : '';
-  const removeButton = spec.custom && !isShare
-    ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2 py-0.5 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
+  const removeButton = spec.custom
+    ? `<button class="remove-btn rounded-lg border border-red-400/30 bg-red-400/10 px-2 py-1 text-[11px] text-red-300 hover:bg-red-400/20 transition" data-game="${key}" title="移除该游戏">✕</button>`
     : '';
-  const chartHtml = renderChart(key, game.history, theme);
-  const challengesHtml = renderChallenges(game.challenges, theme);
+  const bindButton = `<button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">${game ? '🔗 重新绑定' : '🔗 接入'}</button>`;
+  const updateButton = game
+    ? `<button class="update-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">⬆ 更新数据</button>`
+    : '';
+  const syncButton = spec.syncable
+    ? `<button class="sync-btn rounded-lg border px-2.5 py-1 text-[11px] transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">🔄 米游社同步</button>`
+    : '';
+
+  const profile = game && game.profile ? game.profile : null;
+  const uidLine = profile && profile.uid
+    ? `UID ${esc(profile.uid)}`
+    : esc(spec.tagline || '游戏卡片');
+  const sourceLabel = game && game.last_update
+    ? ({ manual: '手动录入', ocr: '截图 OCR', sync: '自动同步' }[game.last_update.source] || '历史数据')
+    : '';
 
   root.innerHTML = `
     <div class="rounded-2xl border bg-white/[0.04] backdrop-blur p-5" style="${cardStyle}">
       <div class="flex items-start justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">${esc(spec.emoji)}</span>
-          <div>
-            <h3 class="font-bold">${esc(spec.label)}${p.nickname ? ` · ${esc(p.nickname)}` : ''}${spec.custom ? ` <span class="rounded-full border px-1.5 py-0.5 text-[10px] font-normal" style="color:${a};border-color:${a}55;background:${a}15">自定义</span>` : ''}</h3>
-            <p class="text-xs text-slate-500">UID ${esc(p.uid) || '未绑定'}</p>
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="text-2xl">${esc(spec.emoji)}</span>
+          <div class="min-w-0">
+            <h3 class="font-bold truncate">${esc(spec.label)}${spec.custom ? ` <span class="rounded-full border px-1.5 py-0.5 text-[10px] font-normal" style="color:${a};border-color:${a}55;background:${a}15">自定义</span>` : ''}</h3>
+            <p class="text-[11px] text-slate-500 truncate">${uidLine}${spec.steam_appid ? ` · Steam ${esc(spec.steam_appid)}` : ''}</p>
           </div>
         </div>
-        <div class="flex items-center gap-1.5 flex-wrap justify-end">
-          ${isShare ? '' : `<button class="bind-btn rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}">🔗 重新绑定</button>`}
+        <div class="flex items-center gap-1.5 flex-wrap justify-end shrink-0">
+          ${removeButton}
+          ${bindButton}
+          ${updateButton}
+          ${syncButton}
           ${launchButton}
           ${launchHint}
-          ${removeButton}
-          ${syncButton}
-          ${game.last_update ? `<span class="rounded-full border px-2 py-0.5 text-[11px]" style="color:${a};border-color:${a}55;background:${a}15">${sourceLabel}</span>` : ''}
         </div>
       </div>
 
-      <div class="mt-4 rounded-xl border border-white/10 bg-black/25 p-4">
-        <div class="flex items-end justify-between">
-          <div>
-            <p class="text-xs text-slate-500">${esc(st.name || spec.stamina_name)}</p>
-            <p class="text-2xl font-black mt-0.5">${st.current}<span class="text-sm font-medium text-slate-500"> / ${st.max}</span></p>
-          </div>
-          <p id="cd-${key}" class="text-xs text-slate-400">${st.full ? '已回满 ✓' : '计算中…'}</p>
+      <div class="mt-4 grid grid-cols-2 gap-2 text-center">
+        <div class="rounded-xl border border-white/10 bg-white/[0.03] py-2.5 px-2">
+          <div class="text-base font-bold" id="usage-today-${key}">—</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">今日使用</div>
         </div>
-        <div class="mt-2 h-2 rounded-full bg-white/10 overflow-hidden">
-          <div class="h-full rounded-full transition-all duration-700" style="width:${pct}%;background:linear-gradient(90deg,${a},${b})"></div>
+        <div class="rounded-xl border border-white/10 bg-white/[0.03] py-2.5 px-2">
+          <div class="text-base font-bold" id="usage-week-${key}">—</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">近 7 天合计</div>
         </div>
       </div>
-
-      <div class="mt-3 grid grid-cols-3 gap-2 text-center">
-        ${statBox('等级', p.level)}${statBox('活跃天数', p.active_days)}${statBox('成就', p.achievements)}
+      <div class="mt-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 pt-3 pb-1">
+        <p class="text-[10px] text-slate-600 mb-1.5">近 7 天使用时长</p>
+        <div class="flex items-end gap-1" id="usage-bars-${key}"><p class="text-[11px] text-slate-700 pb-2">加载中…</p></div>
       </div>
 
-      <div class="mt-3 flex flex-wrap gap-1.5">${resourceHtml}</div>
-
-      <div class="mt-4">
-        <p class="text-xs text-slate-500 mb-2">角色图鉴 <span class="text-slate-600">(${(game.characters || []).length} 名)</span></p>
-        <div class="flex gap-2 overflow-x-auto pb-1">${charHtml}</div>
+      <div class="mt-4 flex items-center justify-between gap-2 flex-wrap">
+        <p class="text-xs text-slate-400"><span id="gallery-count-${key}">📷 截图 — 张</span></p>
+        <div class="flex items-center gap-1.5">
+          <button class="gallery-refresh-btn rounded-lg border border-white/15 bg-white/5 px-2 py-1 text-[11px] hover:bg-white/10 transition" data-game="${key}" title="重新载入截图列表">⟳</button>
+          <button class="gallery-upload-btn rounded-lg border px-2.5 py-1 text-[11px] transition" style="border-color:${a}55;color:${a};background:${a}14" data-game="${key}">📷 上传截图</button>
+        </div>
       </div>
+      <div id="gallery-${key}" class="mt-2 grid grid-cols-3 sm:grid-cols-4 gap-2">
+        <p class="col-span-full text-[11px] text-slate-600 py-3 text-center">截图加载中…</p>
+      </div>
+      <p class="mt-2 text-[10px] text-slate-600">每位用户独立相册 · 点击缩略图查看原图</p>
 
-      ${challengesHtml}
-
-      ${chartHtml}
-
-      ${game.last_update ? `<p class="mt-3 text-[11px] text-slate-600">最近更新：${fmtTime(game.last_update.at)} · 共 ${game.snapshot_count} 条记录</p>` : ''}
+      ${game && game.last_update ? `<p class="mt-3 text-[11px] text-slate-600">档案：${sourceLabel} · 最近更新 ${fmtTime(game.last_update.at)} · 共 ${game.snapshot_count} 条记录</p>` : ''}
     </div>`;
+}
+
+function renderGameLegacy(spec, game) {
 }
 
 function startTimers(data) {
@@ -881,6 +971,26 @@ document.body.addEventListener('click', (e) => {
   if (bindBtn) openBindModal(bindBtn.dataset.game);
   const launchBtn = e.target.closest('.launch-btn');
   if (launchBtn) launchGame(launchBtn);
+  const galleryDel = e.target.closest('.gallery-del-btn');
+  if (galleryDel) { deleteGalleryItem(galleryDel.dataset.game, galleryDel.dataset.id); return; }
+  const galleryUpload = e.target.closest('.gallery-upload-btn');
+  if (galleryUpload) {
+    const key = galleryUpload.dataset.game;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    input.addEventListener('change', () => {
+      if (input.files.length) uploadGalleryFiles(key, input.files);
+      input.remove();
+    });
+    input.click();
+    return;
+  }
+  const galleryRefresh = e.target.closest('.gallery-refresh-btn');
+  if (galleryRefresh) { loadGallery(galleryRefresh.dataset.game); return; }
+  const galleryView = e.target.closest('[data-view]');
+  if (galleryView) { window.open(galleryView.dataset.view, '_blank', 'noopener'); return; }
 });
 
 /* ---------- 接入游戏 ---------- */

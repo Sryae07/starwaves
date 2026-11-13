@@ -15,7 +15,7 @@ from .config import DATA_DIR, DATABASE_URL, OWNER_USERNAME, STATIC_DIR, UPLOAD_D
 from .database import Base, SessionLocal, engine
 from .models import Player, User
 from .security import hash_password
-from .routers import auth, games, launch, news, profiles, public, settings, sync, uploads
+from .routers import auth, checkin, gallery, games, launch, messages, news, profiles, public, settings, sync, uploads, usage
 
 logger = logging.getLogger("starwaves.bootstrap")
 
@@ -107,6 +107,7 @@ async def lifespan(_: FastAPI):
     ensure_schema()
     migrate_legacy_player()
     ensure_owner()
+    usage.start_usage_monitor()
     yield
 
 
@@ -132,11 +133,20 @@ app.include_router(settings.router)
 app.include_router(launch.router)
 app.include_router(news.router)
 app.include_router(games.router)
+app.include_router(gallery.router)
+app.include_router(usage.router)
+app.include_router(checkin.router)
+app.include_router(messages.router)
 
 
 @app.get("/", include_in_schema=False)
 def landing_page() -> FileResponse:
     return FileResponse(STATIC_DIR / "home.html", headers={"Cache-Control": "no-store, must-revalidate"})
+
+
+@app.get("/checkin", include_in_schema=False)
+def checkin_page() -> FileResponse:
+    return FileResponse(STATIC_DIR / "checkin.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 @app.get("/dashboard", include_in_schema=False)

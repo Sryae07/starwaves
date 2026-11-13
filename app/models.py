@@ -164,3 +164,52 @@ class SiteSetting(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
     )
+
+
+class Screenshot(Base):
+    """卡片截图存放：每个登录用户、每个游戏卡片各自一个相册。"""
+
+    __tablename__ = "screenshots"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    game: Mapped[str] = mapped_column(String(16), index=True)
+    filename: Mapped[str] = mapped_column(String(80), unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class UsageStat(Base):
+    """使用时长统计：user + game('app' 表示程序整体) + 天 -> 秒。"""
+
+    __tablename__ = "usage_stats"
+    __table_args__ = (UniqueConstraint("user_id", "game", "day", name="uq_usage_user_game_day"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    game: Mapped[str] = mapped_column(String(16), index=True)
+    day: Mapped[str] = mapped_column(String(10), index=True)  # YYYY-MM-DD
+    seconds: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class Checkin(Base):
+    """每日签到：记录使用软件的天数，每天一条。"""
+
+    __tablename__ = "checkins"
+    __table_args__ = (UniqueConstraint("user_id", "day", name="uq_checkin_user_day"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    day: Mapped[str] = mapped_column(String(10), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class Message(Base):
+    """留言板：资讯页与签到页可见的公开留言。"""
+
+    __tablename__ = "messages"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    username: Mapped[str] = mapped_column(String(64), default="")
+    content: Mapped[str] = mapped_column(String(500))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

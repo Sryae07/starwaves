@@ -47,6 +47,7 @@ class GameSpec:
     platform: bool = False
     launch_protocol: str = ""
     steam_appid: str = ""
+    proc_name: str = ""
     ocr_keywords: dict = field(default_factory=dict)
     resource_labels: dict = field(default_factory=dict)
     news: dict = field(default_factory=dict)
@@ -56,6 +57,7 @@ GAMES: dict[str, GameSpec] = {
     "hsr": GameSpec(
         key="hsr",
         label="星穹铁道",
+        proc_name="StarRail.exe",
         tagline="愿此行，终抵群星",
         emoji="🚂",
         color_a="#fcd34d",
@@ -95,6 +97,7 @@ GAMES: dict[str, GameSpec] = {
     "wuwa": GameSpec(
         key="wuwa",
         label="鸣潮",
+        proc_name="Client-Win64-Shipping.exe",
         tagline="浪潮退去，故人归乡",
         emoji="🌊",
         color_a="#67e8f9",
@@ -134,6 +137,7 @@ GAMES: dict[str, GameSpec] = {
     "zzz": GameSpec(
         key="zzz",
         label="绝区零",
+        proc_name="ZenlessZoneZero.exe",
         tagline="不惧喧嚣，加入绳匠",
         emoji="⚡",
         color_a="#fbbf24",
@@ -168,6 +172,7 @@ GAMES: dict[str, GameSpec] = {
     "steam": GameSpec(
         key="steam",
         label="Steam",
+        proc_name="steam.exe",
         tagline="启动 Steam 客户端，玩库里所有游戏",
         emoji="🎮",
         color_a="#66c0f4",

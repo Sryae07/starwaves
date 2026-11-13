@@ -219,3 +219,60 @@ def test_env_owner_override(client, monkeypatch):
     assert flags["玩家8000"] is False
     assert flags["玩家8001"] is True
 
+
+
+def test_gallery_upload_list_delete(client, auth_headers):
+    files = {"file": ("shot.png", b"fake-png-bytes", "image/png")}
+    up = client.post("/api/gallery/hsr", files=files, headers=auth_headers)
+    assert up.status_code == 200, up.text
+    body = up.json()
+    assert body["count"] == 1
+    assert len(body["items"]) == 1
+    img_id = body["items"][0]["id"]
+    url = body["items"][0]["url"]
+    assert client.get(url).status_code == 200
+    assert client.get("/api/gallery/hsr", headers=auth_headers).json()["count"] == 1
+    assert client.delete(f"/api/gallery/hsr/{img_id}", headers=auth_headers).status_code == 200
+    assert client.get("/api/gallery/hsr", headers=auth_headers).json()["count"] == 0
+
+
+def test_gallery_guards(client, auth_headers):
+    assert client.post("/api/gallery/nope", files={"file": ("a.png", b"x", "image/png")}, headers=auth_headers).status_code == 404
+    assert client.post("/api/gallery/hsr", files={"file": ("a.txt", b"x", "text/plain")}, headers=auth_headers).status_code == 415
+    assert client.post("/api/gallery/hsr", files={"file": ("a.png", b"x", "image/png")}).status_code == 401
+
+
+def test_usage_heartbeat_and_stats(client, auth_headers):
+    resp = client.post("/api/usage/heartbeat", json={"seconds": 120}, headers=auth_headers)
+    assert resp.status_code == 200
+    assert resp.json()["today_seconds"] == 120
+    stats = client.get("/api/usage", headers=auth_headers).json()
+    assert stats["today_app"] == 120
+    assert len(stats["week"]) == 7
+    assert stats["games"]["hsr"]["today"] == 0
+    assert stats["games"]["wuwa"]["today"] == 0
+
+
+def test_checkin_once_per_day(client, auth_headers):
+    r1 = client.post("/api/checkin", json={}, headers=auth_headers)
+    assert r1.status_code == 200
+    assert r1.json()["checked_today"] is True
+    assert r1.json()["total_days"] == 1
+    r2 = client.post("/api/checkin", json={}, headers=auth_headers)
+    assert r2.status_code == 200
+    assert r2.json()["total_days"] == 1
+    stats = client.get("/api/checkin", headers=auth_headers).json()
+    assert stats["streak"] == 1
+    assert stats["checked_today"] is True
+
+
+def test_messages_board(client, auth_headers):
+    assert client.get("/api/messages").json()["items"] == []
+    r = client.post("/api/messages", json={"content": "你好，Sryaestart"}, headers=auth_headers)
+    assert r.status_code == 200
+    items = client.get("/api/messages").json()["items"]
+    assert len(items) == 1
+    assert items[0]["content"] == "你好，Sryaestart"
+    assert items[0]["username"]
+    assert client.post("/api/messages", json={"content": ""}, headers=auth_headers).status_code == 422
+    assert client.post("/api/messages", json={"content": "x"}).status_code == 401
