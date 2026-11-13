@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-13T13:23:04.477621+00:00",
+ "generated_at": "2026-11-13T15:59:34.034996+00:00",
  "games": [
   {
    "key": "hsr",
@@ -91,6 +91,18 @@
    "official": true
   },
   {
+   "id": "hsr-79519029",
+   "game": "hsr",
+   "title": "听歌领80星琼！歌曲「无中生有」音乐活动正式上线",
+   "summary": "亲爱的开拓者： 二相乐园全新音乐专辑「神说要有笑（下篇）」——全新音乐H5现已正式上线。专辑包含与「贪欢的神颅」的战斗背景音乐《无中生有 Ex Nihilo》，欢迎各位开拓者前往QQ音乐、",
+   "url": "https://www.miyoushe.com/hsr/article/79519029",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/12/288909600/cf43271587e4e14e78f9ae8e4e06f087_9041291641978263618.jpg",
+   "published_at": "2026-11-12T05:00:05+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "zzz-79517921",
    "game": "zzz",
    "title": "「快、快还给我！伊埃斯是诺姆先抓到的！」",
@@ -103,6 +115,18 @@
    "official": true
   },
   {
+   "id": "hsr-79517918",
+   "game": "hsr",
+   "title": "《崩坏：星穹铁道》EP：「无中生有」",
+   "summary": "当第一声「阿哈」响起，「欢愉」将再度诞生。 在虚与实的边缘起舞吧，今夜，奇迹将由众生缔造！ 《无中生有》 作词 Lyricist：温菁 Jing.W (HOYO-MiX) / Ruby Qu 作曲",
+   "url": "https://www.miyoushe.com/hsr/article/79517918",
+   "cover": "",
+   "published_at": "2026-11-12T04:00:14+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "hsr-79517070",
    "game": "hsr",
    "title": "5.5版本 | 故事之外，有谁还在",
@@ -110,6 +134,18 @@
    "url": "https://www.miyoushe.com/hsr/article/79517070",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/11/288909600/75494a33adc79759e1fd719603f0c433_5050141903040822420.png",
    "published_at": "2026-11-12T03:12:14+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79498409",
+   "game": "hsr",
+   "title": "星旅一瞬：「皆大欢喜！」",
+   "summary": "全宇宙是一个舞台， 每个人不过都是演员， 他们有时下场，有时上场， 有时扮演多个角色， 直到演出结束，然后 像你期待的那样宣布—— 「欢愉」——永不谢幕！",
+   "url": "https://www.miyoushe.com/hsr/article/79498409",
+   "cover": "",
+   "published_at": "2026-11-11T10:00:15+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -163,13 +199,25 @@
    "official": true
   },
   {
-   "id": "hsr-79468685",
+   "id": "hsr-79487236",
    "game": "hsr",
-   "title": "您有一份「模糊二维马」的遗产请查收（备注：不动产）",
-   "summary": "让《苍天航路绒绒号》烂尾？抱歉，最富责任心的伟大漫画家「模糊二维马」非但做不到，还要画出个美食剧场版！ 她给你留下了一笔亟待继承的遗产，想要得到它，就得先完成这篇旷世奇作，不过，「画」漫画",
-   "url": "https://www.miyoushe.com/hsr/article/79468685",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/09/288909600/d9cf3dac85ec0528ee10fff21d506228_1717106008047241111.png",
-   "published_at": "2026-11-10T06:00:10+00:00",
+   "title": "列车信箱｜4.7版本意见反馈集中帖",
+   "summary": "亲爱的开拓者，欢迎来到4.7版本「此刻，将群星付之一笑」！ 为了更好地倾听开拓者对于游戏内容的建议与反馈，列车组开设了意见箱。开拓者有任何反馈意见，都可以发布到本集中帖内~ 【参与方式】",
+   "url": "https://www.miyoushe.com/hsr/article/79487236",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/10/288909601/f3967d7602b0149ca73cb65a5a64fe14_7208383910196037555.jpg",
+   "published_at": "2026-11-11T03:30:12+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79471231",
+   "game": "hsr",
+   "title": "歌曲《无中生有 Ex Nihilo》即将上线",
+   "summary": "嗨，开拓者： 《崩坏：星穹铁道》二相乐园主题OST《神说要有笑（下篇） Let There Be Laughter (Part 3)》将于11月12日00:00正式上线，收录了48首由HOY",
+   "url": "https://www.miyoushe.com/hsr/article/79471231",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/10/288909600/08012d9acb31d1d919fd05dabb433ea8_8484169466805201519.jpg",
+   "published_at": "2026-11-10T09:30:10+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -187,18 +235,6 @@
    "official": true
   },
   {
-   "id": "zzz-79450779",
-   "game": "zzz",
-   "title": "「跛脚乌鸦奇踪记」活动说明",
-   "summary": "【活动时间】 2026/11/11 10:00 ~ 2026/11/30 03:59 【活动奖励】 【参与条件】 绳网等级≥20级，完成主线第一章·幕间后即可参与。 【玩法说明",
-   "url": "https://www.miyoushe.com/zzz/article/79450779",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/09/152039148/cc804005b2931917b19402d610ebf644_5931475715400497642.png",
-   "published_at": "2026-11-09T06:15:09+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
    "id": "zzz-79449326",
    "game": "zzz",
    "title": "肃仪无犯丨「赛维里安」全新时装展示",
@@ -206,6 +242,18 @@
    "url": "https://www.miyoushe.com/zzz/article/79449326",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/09/152039148/deecd6516bd8a08dcd9c80faa613623d_6143838151031813396.png",
    "published_at": "2026-11-09T04:30:09+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "zzz-79448856",
+   "game": "zzz",
+   "title": "《绝区零》赛维里安EP | Gambit",
+   "summary": "对手还未落子 胜负已定在我方 我仍循自己的信念向前 制作人：周斌 作曲：周斌 编曲：周斌 作词：Mishon 演唱：Mishon 混音：周斌 母带：周斌",
+   "url": "https://www.miyoushe.com/zzz/article/79448856",
+   "cover": "",
+   "published_at": "2026-11-09T04:00:11+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -223,13 +271,13 @@
    "official": true
   },
   {
-   "id": "hsr-79409044",
+   "id": "hsr-79427010",
    "game": "hsr",
-   "title": "阿哈全明星 | 《逐光追影的新星》",
-   "summary": "钢琴王子 ✧星期日✧ 琴键优雅，耳羽温柔，舞台上他是安静的诉说者。 狼的诱惑 ✧不死途✧ Hook的秘密，当场转译！Flow的线索，当场勘破！ 他们的对决，将会碰撞出什么样的反转火花？",
-   "url": "https://www.miyoushe.com/hsr/article/79409044",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/06/288909600/ce042b8cdcd6ad5cb6c4870cba265ff2_5869811564010720227.png",
-   "published_at": "2026-11-07T10:00:12+00:00",
+   "title": "星神★阿哈角色PV：「让骰子飞」",
+   "summary": "「你这妙计叫什么名字？」 「打BOSS，直接用BOSS打——此计名为BOSS直拼。」 中文CV： 星神★阿哈——子音 男开拓者——秦且歌 来古士——赵君毅 银狼——Hanser 黄泉——菊花花",
+   "url": "https://www.miyoushe.com/hsr/article/79427010",
+   "cover": "",
+   "published_at": "2026-11-08T04:00:20+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -283,6 +331,30 @@
    "official": true
   },
   {
+   "id": "hsr-79361922",
+   "game": "hsr",
+   "title": "《狸了个大谱》虚一直照 | 阿哈：魔术巡演",
+   "summary": "虚照女士首登狸狸八卦封面，报社推出「虚一直照」限定刊，阿哈真有面子哩~ 贪饕神战一手消息、星神谒者最新动向，尽在本期狸了个大谱！ 独家正版，请认准狸猫头水印，仿冒必究。 本期记者：普狸",
+   "url": "https://www.miyoushe.com/hsr/article/79361922",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/04/288909600/622caf4a2c37b84c7803c08f34a59514_6512243839684168302.png",
+   "published_at": "2026-11-05T10:00:15+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "zzz-79357293",
+   "game": "zzz",
+   "title": "《绝区零》对iPhone Duo机型的适配说明",
+   "summary": "亲爱的绳匠： 《绝区零》现已支持对iPhone Duo机型的适配，有需要的绳匠请前往App Store搜索《绝区零》，手动选择更新至3.3.1版本后即可体验相关适配功能。 若您已开启App自",
+   "url": "https://www.miyoushe.com/zzz/article/79357293",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/05/152039148/4bc363823e0723d4c18369bbb9682af2_712518011372738142.png",
+   "published_at": "2026-11-05T06:00:15+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "zzz-79355055",
    "game": "zzz",
    "title": "代理人机制介绍丨赛维里安篇",
@@ -319,6 +391,18 @@
    "official": true
   },
   {
+   "id": "hsr-79327798",
+   "game": "hsr",
+   "title": "即兴巡演PV：「当阿哈来敲门」",
+   "summary": "假如生活欺骗了你，不要悲伤，不要心急—— 在每一个沮丧的时刻，阿哈都在注视着你。 中文CV： 星神★阿哈——子音",
+   "url": "https://www.miyoushe.com/hsr/article/79327798",
+   "cover": "",
+   "published_at": "2026-11-04T04:00:13+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "zzz-79233566",
    "game": "zzz",
    "title": "养成指南上新丨赛维里安养成材料预告",
@@ -331,37 +415,13 @@
    "official": true
   },
   {
-   "id": "hsr-79195869",
-   "game": "hsr",
-   "title": "谷帕谷帕 | 流萤 粘土人DOLL 春日手信Ver.实物展示",
-   "summary": "《崩坏：星穹铁道》「流萤 粘土人DOLL 春日手信Ver.」实物展示登场！本品现已开启预定，预定即可获取专属特典打卡棒；首轮预定还能额外获得初回特典——流萤小不点猫猫挂件，欢迎感兴趣的开拓者前往预定~",
-   "url": "https://www.miyoushe.com/hsr/article/79195869",
-   "cover": "",
-   "published_at": "2026-10-29T10:01:12+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79174868",
-   "game": "hsr",
-   "title": "天外卫星通信 | 耀嘉音",
-   "summary": "「我是耀嘉音，一名来自新艾利都的歌手。如果你喜欢我的音乐，那我们之间一定很合拍；如果你还不是我的歌迷，那…请给我一首歌的时间吧！」 繁星为她落座，灯光为她熄灭，新艾利都最闪耀的歌声划破",
-   "url": "https://www.miyoushe.com/hsr/article/79174868",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/27/288909600/1f14c72f0c64210d9754dee34794d583_4567480316673207017.png",
-   "published_at": "2026-10-28T04:00:18+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-79121531",
-   "game": "hsr",
-   "title": "诚邀您参加「货币战争」年度颁奖典礼 | 趣味数据回顾",
-   "summary": "「货币战争」第一赛季「零和博弈」即将收官，翡翠女士特邀开拓者出席年度颁奖典礼。现在，请各位入席，晚会即将开始——",
-   "url": "https://www.miyoushe.com/hsr/article/79121531",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/23/288909600/d221c7bfef744a9d42e741a0cf85129f_8257191444714521008.png",
-   "published_at": "2026-10-25T04:00:13+00:00",
+   "id": "zzz-79232625",
+   "game": "zzz",
+   "title": "生日快乐菲欧妮丨否极泰来",
+   "summary": "「桌椅包边，棱角覆盖，警戒带就位。菲欧妮前辈，生日快乐！请在指定区域内活动噢~(*╹▽╹*)」 「诶…？需要这样吗，琉音，上次我只是不小心磕到桌角而已…」 「我和小照前辈都已准备妥当，现在你",
+   "url": "https://www.miyoushe.com/zzz/article/79232625",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/30/152039148/a68cc31b278f2f02cfe711b9aa75bc3d_8460377426932343230.png",
+   "published_at": "2026-10-31T04:15:10+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -391,97 +451,37 @@
    "official": true
   },
   {
-   "id": "zzz-79077741",
+   "id": "zzz-79040622",
    "game": "zzz",
-   "title": "代理人档案丨挽昼",
-   "summary": "「『挽昼』——这个名字是世界的期许，也是我们三人并肩的承诺。」 挽昼 「哪怕天空注定沉寂，罗斯凯利法也绝不俯首。」 「所以，抬头吧。让人类看见我们仍立于此处。」 「若黎明不至，我们便踏碎",
-   "url": "https://www.miyoushe.com/zzz/article/79077741",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/23/152039148/cbb73bf27b36c71f4858d8da27a14f9e_2629836493639743733.png",
-   "published_at": "2026-10-23T04:00:13+00:00",
+   "title": "生日快乐派派丨落日飞车",
+   "summary": "「礼物？这个人已经过了那个年纪啦~」 「不急，让太阳先下山，这个人也再眯一会儿。」 「毕竟，年轻人待会儿肯定要闹着庆祝呀~」",
+   "url": "https://www.miyoushe.com/zzz/article/79040622",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/21/152039148/90ac5149eb9636ec3411f44d617f58bd_2675823128687960315.png",
+   "published_at": "2026-10-21T04:15:14+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
   },
   {
-   "id": "zzz-78938448",
+   "id": "zzz-78918184",
    "game": "zzz",
-   "title": "新品展示丨「Tidal Noise噪点狂潮」键盘",
-   "summary": "三Z STUDIO「Tidal Noise噪点狂潮」客制化三模机械键盘展示视频登场！ 键盘包含噪点轴（段落轴）/调频轴（线性轴）2款，键盘定制鼠标垫、定制硅胶手托、定制装饰替换片套组也将于10月20日",
-   "url": "https://www.miyoushe.com/zzz/article/78938448",
-   "cover": "",
-   "published_at": "2026-10-16T04:47:38+00:00",
+   "title": "【已开奖】Random Play会员册丨菲欧妮",
+   "summary": "（外部数据读取——Random Play会员册加载完成...请查看！) 菲欧妮·蕾法爱菈，黑枝的裁决官与隐藏王牌。 与其他裁决官不同，菲欧妮几乎不受理前序的审查与评估环节，只会偶尔负责处理",
+   "url": "https://www.miyoushe.com/zzz/article/78918184",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/15/152039149/433140b998ef4315f0eb9ff19ed92fa0_1365463025091446357.png",
+   "published_at": "2026-10-15T04:00:15+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
   },
   {
-   "id": "zzz-78817399",
+   "id": "zzz-65026162",
    "game": "zzz",
-   "title": "《绝区零》☆Zenless LIVE 2026——FES专场",
-   "summary": "绝区零 2026 ZLIVE FES专场将于11月27日-11月29日在杭州大会展中心举办，更多活动细节将会陆续公布，敬请期待~ —— 欢迎来到新艾利都！——",
-   "url": "https://www.miyoushe.com/zzz/article/78817399",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/10/152039148/85477268dfbf0788bc28dea6f6b0b77a_5842264385385692964.jpg",
-   "published_at": "2026-10-10T04:05:12+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "zzz-78817340",
-   "game": "zzz",
-   "title": "《绝区零》2026 FES | 布梦嘉年华PV",
-   "summary": "待星光与美梦交织，嘉年华即将启幕。 绳匠，欢迎来到布梦嘉年华，这场属于您的盛会！ 绝区零 2026 FES将于11月27日-11月29日在杭州大会展中心举办，更多活动细节将会陆续公布，敬请期待~",
-   "url": "https://www.miyoushe.com/zzz/article/78817340",
-   "cover": "",
-   "published_at": "2026-10-10T04:00:15+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "zzz-78804028",
-   "game": "zzz",
-   "title": "【已开奖】3.3版本「重返天空的旅程」前瞻讨论活动开启",
-   "summary": "绳匠们好呀~《绝区零》3.3 版本「重返天空的旅程」将于2026年10月21日正式上线！ >>点击观看《绝区零》3.3 版本「重返天空的旅程」<< 米仔还为绳匠们准备了礼物哦，快来参与",
-   "url": "https://www.miyoushe.com/zzz/article/78804028",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/09/152039149/6d1b9b3eaf728f0e278f69d593aaf523_6945611143427842820.png",
-   "published_at": "2026-10-09T11:30:10+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-76688381",
-   "game": "hsr",
-   "title": "「重返群星之旅」回归网页活动上线，最高可得480星琼等好礼！",
-   "summary": "亲爱的开拓者，列车的伙伴们都等着你哦，一同踏上旅途，重新出发银河大冒险吧！最高可获480星琼！ >>点击前往<< ▌活动时间 4.4版本期间 ▌活动介绍 1. 活动期间开拓者可通过邀请",
-   "url": "https://www.miyoushe.com/hsr/article/76688381",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/07/14/288909600/5a2dde8fd9c0b59d5fbfea802bed2645_5994558004997071860.jpg",
-   "published_at": "2026-07-15T04:30:12+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-67374551",
-   "game": "hsr",
-   "title": "《云•星穹铁道》排队权益说明",
-   "summary": "亲爱的开拓者： 由于服务器承载能力有限，为了保证开拓者使用官方云游戏的体验，部分情景下会出现需要排队等待情况，请您谅解。 拥有专属优先通道或加速排队权益的开拓者可优先进入游戏。当出现服务器",
-   "url": "https://www.miyoushe.com/hsr/article/67374551",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2025/08/11/378227966/eddbb2811974c7d1ca2ce9beb86f4633_3770692346032405613.jpg",
-   "published_at": "2025-08-11T07:00:17+00:00",
-   "source": "米游社",
-   "category": "官方",
-   "official": true
-  },
-  {
-   "id": "hsr-65715826",
-   "game": "hsr",
-   "title": "银河智库 | 「毁灭」与绝灭大君",
-   "summary": "囚徒即将拾起星火，洞穴之外传来星空的寓言。 翁法罗斯的命运，正曝露在纳努克及其座下一众绝灭大君的目光之下。 绝灭大君，「毁灭」意志的执行人，他们所造成的流离失所并非是远方的恸哭，它与银",
-   "url": "https://www.miyoushe.com/hsr/article/65715826",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2025/06/24/288909600/294daf8f045218eea432237d2dea7bc4_6684143459084657340.png",
-   "published_at": "2025-06-24T06:00:18+00:00",
+   "title": "【已开奖】周年快乐！动态头像与评论装扮等你来拿~",
+   "summary": "（数据接口公开，周年庆典载入完成...请查收~) 绳匠们周年快乐~不知不觉间，一年就要过去了嗯呢！无论是街头巷尾的小发现，空洞中的惊魂一刻，傍晚的光映余晖，都已成为大家独一无二的痕迹。相信",
+   "url": "https://www.miyoushe.com/zzz/article/65026162",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2025/06/06/152039149/0706d2e8aa81cd4aa7b4f48842e92bc0_3985859298048565302.jpeg",
+   "published_at": "2025-06-06T02:32:25+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
