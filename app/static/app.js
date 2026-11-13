@@ -9,12 +9,7 @@
     localStorage.removeItem('sw_server');
     return;
   }
-  const saved = localStorage.getItem('sw_server');
-  if (saved) {
-    location.replace(toServerUrl(saved) + '/dashboard');
-    throw new Error('__redirect_to_dashboard__');
-  }
-  /* 固定入口：读取电脑开机时自动推送的当前隧道地址，手机无需每次手动换链接 */
+  /* 固定入口：优先读取电脑自动推送的最新隧道地址（手机存的旧地址失效时也能进） */
   let pointer = '';
   try {
     const base = location.pathname.replace(/[^/]*$/, '');
@@ -26,9 +21,14 @@
       const data = JSON.parse(xhr.responseText);
       pointer = (data && data.url) || '';
     }
-  } catch (err) { /* 指针不可用时回落到手动网关页 */ }
+  } catch (err) { /* 指针不可用时回落到已保存地址或手动网关页 */ }
   if (pointer) {
     location.replace(toServerUrl(pointer) + '/dashboard');
+    throw new Error('__redirect_to_dashboard__');
+  }
+  const saved = localStorage.getItem('sw_server');
+  if (saved) {
+    location.replace(toServerUrl(saved) + '/dashboard');
     throw new Error('__redirect_to_dashboard__');
   }
 })();
