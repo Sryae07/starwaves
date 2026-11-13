@@ -329,9 +329,10 @@
     <div class="w-full max-w-md rounded-2xl border border-white/10 bg-[#0b0f1d] p-6 shadow-2xl">
       <p class="text-3xl text-center">📡</p>
       <h3 class="mt-3 text-lg font-bold text-center">连接你的看板服务器</h3>
-      <p class="mt-2 text-xs text-slate-400 leading-relaxed">看板数据保存在你电脑上运行的本机服务里。<b class="text-slate-200">手机访问请填电脑的局域网地址</b>（两台设备连同一 Wi-Fi），电脑访问保持默认即可。</p>
+      <p class="mt-2 text-xs text-slate-400 leading-relaxed">看板数据保存在你电脑上运行的本机服务里。<b class="text-slate-200">手机打开固定入口会自动连接</b>；若显示此页面说明电脑服务暂时离线（约 2 分钟内自动恢复），可点下方重试，或手动填写地址。</p>
       <input id="gw-host" class="field mt-4 font-mono" placeholder="127.0.0.1:8000 或 192.168.1.5:8000" />
       <button id="gw-go" class="mt-3 w-full rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">🚀 进入看板</button>
+      <button id="gw-retry" class="mt-2 w-full rounded-xl border border-white/15 bg-white/5 py-2 text-sm text-slate-300 hover:bg-white/10 transition">🔁 重试自动连接</button>
       <p class="mt-3 text-[11px] text-slate-500 text-center">电脑端需已启动 Sryaestart 服务（双击 start.bat）· <a href="?reset=1" class="text-cyan-300 underline underline-offset-2">清除已保存的服务器</a></p>
     </div>
   </div>

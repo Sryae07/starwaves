@@ -36,10 +36,22 @@
       localStorage.removeItem('sw_server');
       window.__srvProbeDone = true;
       const gw = document.getElementById('server-gateway');
-      if (gw) {
-        gw.classList.remove('hidden');
-        const input = document.getElementById('gw-host');
-        if (input) input.focus();
+      if (gw) gw.classList.remove('hidden');
+      const input = document.getElementById('gw-host');
+      if (input) input.focus();
+      const retryBtn = document.getElementById('gw-retry');
+      if (retryBtn) retryBtn.addEventListener('click', () => location.reload());
+      const goBtn = document.getElementById('gw-go');
+      if (goBtn && !goBtn.dataset.bound) {
+        goBtn.dataset.bound = '1';
+        goBtn.addEventListener('click', () => {
+          const raw = input.value.trim();
+          const url = toServerUrl(raw);
+          if (!url) { input.focus(); return; }
+          localStorage.setItem('sw_server', url);
+          location.href = url + '/dashboard';
+        });
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') goBtn.click(); });
       }
       return;
     }
@@ -1542,6 +1554,7 @@ function showGateway() {
     location.href = url + '/dashboard';
   };
   $('#gw-go').addEventListener('click', go);
+  $('#gw-retry')?.addEventListener('click', () => location.reload());
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
   input.focus();
 }
