@@ -127,7 +127,7 @@ def serve_thumb(filename: str) -> FileResponse:
         raise HTTPException(status_code=404, detail="无效图片")
     thumb = THUMB_DIR / f"{Path(filename).stem}.jpg"
     if not thumb.exists():
-        matches = list(GALLERY_DIR.rglob(filename))
+        matches = list(GALLERY_DIR.glob(f"*/*/{filename}"))
         if not matches:
             raise HTTPException(status_code=404, detail="图片不存在")
         return FileResponse(matches[0], media_type="image/jpeg")
@@ -140,7 +140,7 @@ def serve_image(filename: str) -> FileResponse:
 
     if not re.fullmatch(IMG_RE, filename):
         raise HTTPException(status_code=404, detail="无效图片")
-    matches = list(GALLERY_DIR.rglob(filename))
+    matches = list(GALLERY_DIR.glob(f"*/*/{filename}"))
     if not matches:
         raise HTTPException(status_code=404, detail="图片不存在")
     ext = matches[0].suffix.lower()
