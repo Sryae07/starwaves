@@ -22,15 +22,46 @@
       pointer = (data && data.url) || '';
     }
   } catch (err) { /* 指针不可用时回落到已保存地址或手动网关页 */ }
-  if (pointer) {
-    location.replace(toServerUrl(pointer) + '/dashboard');
-    throw new Error('__redirect_to_dashboard__');
-  }
+  const candidates = [];
+  if (pointer) candidates.push(toServerUrl(pointer));
   const saved = localStorage.getItem('sw_server');
   if (saved) {
-    location.replace(toServerUrl(saved) + '/dashboard');
-    throw new Error('__redirect_to_dashboard__');
+    const savedUrl = toServerUrl(saved);
+    if (candidates.indexOf(savedUrl) === -1) candidates.push(savedUrl);
   }
+  if (!candidates.length) { window.__srvProbeDone = true; return; }
+  window.__srvProbing = true;
+  const tryNext = (idx) => {
+    if (idx >= candidates.length) {
+      localStorage.removeItem('sw_server');
+      window.__srvProbeDone = true;
+      const gw = document.getElementById('server-gateway');
+      if (gw) {
+        gw.classList.remove('hidden');
+        const input = document.getElementById('gw-host');
+        if (input) input.focus();
+      }
+      return;
+    }
+    const url = candidates[idx];
+    const img = new Image();
+    let done = false;
+    const finish = (ok) => {
+      if (done) return;
+      done = true;
+      if (ok) {
+        localStorage.setItem('sw_server', url);
+        location.replace(url + '/dashboard');
+      } else {
+        tryNext(idx + 1);
+      }
+    };
+    img.onload = () => finish(true);
+    img.onerror = () => finish(false);
+    setTimeout(() => finish(false), 8000);
+    img.src = url + '/assets/icon-192.png?probe=' + Date.now();
+  };
+  tryNext(0);
 })();
 
 /* 规范化服务器地址：带协议直接用；IP/localhost 默认 http；域名默认 https（云端部署） */
@@ -1516,7 +1547,8 @@ function showGateway() {
 }
 
 if (GATEWAY_MODE) {
-  showGateway();
+  if (!window.__srvProbing || window.__srvProbeDone) showGateway();
+  /* 探测进行中：成功会自动跳转到最新服务器，失败会自动显示网关页 */
 } else {
   applyBackground();
   load();

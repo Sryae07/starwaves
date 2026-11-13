@@ -1,5 +1,9 @@
-﻿# Sryaestart keeper: ensure backend + tunnel alive, publish tunnel URL to GitHub.
+# Sryaestart keeper v2: backend + tunnel health management, publish tunnel URL to GitHub.
 # Runs forever hidden; GitHub Pages reads docs\current-server.json for auto-redirect.
+$createdNew = $false
+$mutex = New-Object System.Threading.Mutex($true, 'Global\SryaestartKeeper', [ref]$createdNew)
+if (-not $createdNew) { exit }
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $root = Split-Path -Parent $PSScriptRoot
 $py = Join-Path $root '.venv\Scripts\python.exe'
 $data = Join-Path $root 'data'
@@ -8,31 +12,78 @@ $cf = 'C:\Program Files (x86)\cloudflared\cloudflared.exe'
 if (-not (Test-Path -LiteralPath $cf)) { $cf = (Get-Command cloudflared -ErrorAction SilentlyContinue).Source }
 $pointer = Join-Path $root 'docs\current-server.json'
 $stampLog = Join-Path $data 'autostart.log'
+$tunnelUrlFile = Join-Path $data 'tunnel_url.txt'
+
+function Log($msg) {
+    Add-Content -LiteralPath $stampLog -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + ' ' + $msg) -Encoding UTF8
+}
+
+function Test-Http($url, $timeoutMs = 8000) {
+    try {
+        $req = [System.Net.HttpWebRequest]::Create($url)
+        $req.Timeout = $timeoutMs
+        $req.UserAgent = 'sryaestart-keeper'
+        $resp = $req.GetResponse()
+        $ok = ($resp.StatusCode -eq 200)
+        $resp.Close()
+        return $ok
+    } catch { return $false }
+}
+
+function Get-KnownTunnelUrl {
+    if (Test-Path -LiteralPath $tunnelUrlFile) {
+        $u = (Get-Content -LiteralPath $tunnelUrlFile -Raw -Encoding UTF8).Trim()
+        if ($u -match '^https://[a-z0-9-]+\.trycloudflare\.com$') { return $u }
+    }
+    return $null
+}
+
+function Stop-Tunnels {
+    $procs = Get-Process cloudflared -ErrorAction SilentlyContinue
+    if ($procs) {
+        $procs | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+    }
+}
 
 function Start-Backend {
     $used = netstat -ano | Select-String ':8000' | Select-String 'LISTENING'
     if (-not $used) {
         Start-Process -WindowStyle Hidden -FilePath $py -ArgumentList '-m','uvicorn','app.main:app','--host','0.0.0.0','--port','8000' -WorkingDirectory $root
-        Add-Content -LiteralPath $stampLog -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + ' backend started') -Encoding UTF8
+        Log 'backend started'
     }
 }
 
 function Start-Tunnel {
-    if (-not $cf) { return }
-    if (Get-Process cloudflared -ErrorAction SilentlyContinue) { return }
+    if (-not $cf) { Log 'cloudflared not found'; return }
+    $known = Get-KnownTunnelUrl
+    if ($known) {
+        if (Test-Http ($known + '/api/games')) { return }
+        Log ('tunnel dead, restarting: ' + $known)
+        Stop-Tunnels
+    } else {
+        Stop-Tunnels
+    }
     $log = Join-Path $data 'tunnel.log'
     $err = Join-Path $data 'tunnel.err.log'
-    Start-Process -WindowStyle Hidden -FilePath $cf -ArgumentList 'tunnel','--url','http://127.0.0.1:8000','--no-autoupdate' -RedirectStandardOutput $log -RedirectStandardError $err
+    Remove-Item $log, $err -ErrorAction SilentlyContinue
+    Start-Process -WindowStyle Hidden -FilePath $cf -ArgumentList 'tunnel','--url','http://127.0.0.1:8000','--no-autoupdate' -WorkingDirectory $root -RedirectStandardOutput $log -RedirectStandardError $err
     $url = $null
-    for ($i = 0; $i -lt 20 -and -not $url; $i++) {
+    for ($i = 0; $i -lt 25 -and -not $url; $i++) {
         Start-Sleep -Seconds 2
         $url = Select-String -Path $log, $err -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' -ErrorAction SilentlyContinue | Select-Object -First 1 | ForEach-Object { $_.Matches[0].Value }
     }
     if ($url) {
-        Set-Content -LiteralPath (Join-Path $data 'tunnel_url.txt') -Value $url -Encoding UTF8
+        Set-Content -LiteralPath $tunnelUrlFile -Value $url -Encoding UTF8
+        for ($i = 0; $i -lt 10; $i++) {
+            if (Test-Http ($url + '/api/games')) { break }
+            Start-Sleep -Seconds 3
+        }
         Publish-Pointer $url
+        Log ('tunnel started ' + $url)
+    } else {
+        Log 'tunnel start failed: no url in logs'
     }
-    Add-Content -LiteralPath $stampLog -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + ' tunnel started') -Encoding UTF8
 }
 
 function Publish-Pointer($url) {
@@ -45,15 +96,20 @@ function Publish-Pointer($url) {
         git -C $root -c user.name=Sryaestart -c user.email=sryaestart@localhost commit -m 'auto: update tunnel url' --only docs/current-server.json 2>$null
         git -C $root push origin main 2>$null
         if ($LASTEXITCODE -eq 0) {
-            Add-Content -LiteralPath $stampLog -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + ' pointer published ' + $url) -Encoding UTF8
+            Log ('pointer published ' + $url)
             return
         }
         Start-Sleep -Seconds 20
     }
+    Log 'pointer publish failed'
 }
 
 while ($true) {
-    Start-Backend
-    Start-Tunnel
-    Start-Sleep -Seconds 300
+    try {
+        Start-Backend
+        Start-Tunnel
+    } catch {
+        Log ('keeper error: ' + $_.Exception.Message)
+    }
+    Start-Sleep -Seconds 120
 }

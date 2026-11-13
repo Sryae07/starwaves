@@ -159,7 +159,20 @@
   <script>
     const isPages = location.hostname.endsWith('github.io');
     const savedServer = (localStorage.getItem('sw_server') || '').replace(/^https?:\/\//, '').replace(/\/+$/, '');
-    const apiBase = isPages ? 'http://' + (savedServer || '127.0.0.1:8000') : '';
+    let apiBase = '';
+    if (isPages) {
+      let pointer = '';
+      try {
+        const base = location.pathname.replace(/[^/]*$/, '');
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', base + 'current-server.json?t=' + Date.now(), false);
+        xhr.timeout = 5000;
+        xhr.send(null);
+        if (xhr.status === 200) pointer = ((JSON.parse(xhr.responseText)) || {}).url || '';
+      } catch (err) {}
+      const raw = pointer || savedServer;
+      apiBase = raw ? (raw.indexOf('://') !== -1 ? raw.replace(/\/+$/, '') : 'http://' + raw.replace(/\/+$/, '')) : 'http://127.0.0.1:8000';
+    }
     const REFRESH_MS = 5 * 60 * 1000;
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
       { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
