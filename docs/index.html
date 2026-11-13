@@ -179,11 +179,20 @@
       const isPages = location.hostname.endsWith('github.io');
       const localBase = 'http://127.0.0.1:8000';
       const savedServer = (localStorage.getItem('sw_server') || '').replace(/^https?:\/\//, '').replace(/\/+$/, '');
+      let pointer = '';
+      try {
+        const base = location.pathname.replace(/[^/]*$/, '');
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', base + 'current-server.json?t=' + Date.now(), false);
+        xhr.timeout = 5000;
+        xhr.send(null);
+        if (xhr.status === 200) pointer = ((JSON.parse(xhr.responseText)) || {}).url || '';
+      } catch (err) {}
       const dashUrl = isPages
-        ? (savedServer ? 'http://' + savedServer + '/dashboard' : 'dashboard.html')
+        ? (pointer ? pointer + '/dashboard' : (savedServer ? 'http://' + savedServer + '/dashboard' : 'dashboard.html'))
         : '/dashboard';
-      const newsUrl = isPages ? 'news.html' : '/news';
-      const checkinUrl = isPages ? 'checkin.html' : '/checkin';
+      const newsUrl = isPages ? (pointer ? pointer + '/news' : 'news.html') : '/news';
+      const checkinUrl = isPages ? (pointer ? pointer + '/checkin' : 'checkin.html') : '/checkin';
       document.querySelectorAll('[data-dashboard]').forEach((a) => { a.href = dashUrl; });
       document.querySelectorAll('[data-news]').forEach((a) => { a.href = newsUrl; });
       document.querySelectorAll('[data-checkin]').forEach((a) => { a.href = checkinUrl; });
