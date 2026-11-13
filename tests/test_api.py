@@ -230,7 +230,10 @@ def test_gallery_upload_list_delete(client, auth_headers):
     assert len(body["items"]) == 1
     img_id = body["items"][0]["id"]
     url = body["items"][0]["url"]
+    thumb = body["items"][0]["thumb"]
+    assert thumb.startswith("/api/gallery/thumb/")
     assert client.get(url).status_code == 200
+    assert client.get(thumb).status_code == 200
     assert client.get("/api/gallery/hsr", headers=auth_headers).json()["count"] == 1
     assert client.delete(f"/api/gallery/hsr/{img_id}", headers=auth_headers).status_code == 200
     assert client.get("/api/gallery/hsr", headers=auth_headers).json()["count"] == 0

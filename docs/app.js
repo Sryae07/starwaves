@@ -587,7 +587,7 @@ function renderGallery(key, data) {
   }
   box.innerHTML = items.map((it) => `
     <div class="group relative rounded-lg overflow-hidden border border-white/10 bg-black/30 aspect-square">
-      <img src="${esc(API_BASE + it.url)}" alt="游戏截图" loading="lazy" class="w-full h-full object-cover cursor-zoom-in transition duration-300 group-hover:scale-105" data-view="${esc(API_BASE + it.url)}" />
+      <img src="${esc(API_BASE + (it.thumb || it.url))}" alt="游戏截图" loading="lazy" class="w-full h-full object-cover cursor-zoom-in transition duration-300 group-hover:scale-105" data-view="${esc(API_BASE + it.url)}" />
       <button class="gallery-del-btn absolute top-1 right-1 h-7 w-7 rounded-lg bg-black/60 text-sm text-white/80 hover:bg-red-500/90 hover:text-white transition" data-game="${esc(key)}" data-id="${it.id}" title="删除这张截图">✕</button>
     </div>`).join('');
 }
@@ -605,12 +605,14 @@ async function loadGallery(key) {
   }
 }
 
-async function normalizeImageFile(file) {
+async function compressImageFile(file) {
   const type = (file.type || '').toLowerCase();
+  if (type === 'image/gif') return file; // 动图保持原样
   const isHeic = type === 'image/heic' || type === 'image/heif' || /\.heic$/i.test(file.name || '') || /\.heif$/i.test(file.name || '');
-  const allowed = /^image\/(png|jpe?g|gif|webp)$/i.test(type);
+  const allowed = /^image\/(png|jpe?g|webp)$/i.test(type);
   if (!allowed && !isHeic) return null;
-  if (!isHeic) return file;
+  // 小图直接传，不再解码（速度最快）
+  if (!isHeic && file.size <= 400 * 1024) return file;
   try {
     const url = URL.createObjectURL(file);
     const img = await new Promise((resolve, reject) => {
@@ -619,7 +621,7 @@ async function normalizeImageFile(file) {
       el.onerror = () => reject(new Error('decode-failed'));
       el.src = url;
     });
-    const MAX = 2000;
+    const MAX = 1920;
     let w = img.naturalWidth || img.width || 1;
     let h = img.naturalHeight || img.height || 1;
     const scale = Math.min(1, MAX / Math.max(w, h));
@@ -630,12 +632,36 @@ async function normalizeImageFile(file) {
     canvas.height = h;
     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
     URL.revokeObjectURL(url);
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.85));
     if (!blob) throw new Error('encode-failed');
-    return new File([blob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+    if (!isHeic && blob.size >= file.size) return file; // 压不动的原样传
+    return new File([blob], file.name.replace(/\.(png|webp|heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
   } catch (err) {
-    throw new Error('HEIC 转换失败，请改用 JPG/PNG 截图');
+    if (isHeic) throw new Error('HEIC 转换失败，请改用 JPG/PNG 截图');
+    return file; // 压缩失败就传原图
   }
+}
+
+function apiUpload(path, formData, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', API_BASE + path);
+    if (apiKey) xhr.setRequestHeader('X-API-Key', apiKey);
+    if (authToken) xhr.setRequestHeader('Authorization', 'Bearer ' + authToken);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) onProgress(Math.min(99, Math.round((e.loaded / e.total) * 100)));
+    };
+    xhr.onload = () => {
+      let data = {};
+      try { data = JSON.parse(xhr.responseText || '{}'); } catch (e) {}
+      if (xhr.status >= 200 && xhr.status < 300) resolve(data);
+      else reject(new Error((data && data.detail) || ('HTTP ' + xhr.status)));
+    };
+    xhr.onerror = () => reject(new Error('网络错误，上传失败'));
+    xhr.ontimeout = () => reject(new Error('上传超时，请重试'));
+    xhr.timeout = 120000;
+    xhr.send(formData);
+  });
 }
 
 async function uploadGalleryFiles(key, files) {
@@ -647,11 +673,14 @@ async function uploadGalleryFiles(key, files) {
   let firstError = '';
   for (const file of Array.from(files)) {
     try {
-      const normalized = await normalizeImageFile(file);
-      if (!normalized) { skipped += 1; continue; }
+      if (btn) btn.textContent = '🖼 处理图片…';
+      const compressed = await compressImageFile(file);
+      if (!compressed) { skipped += 1; continue; }
       const fd = new FormData();
-      fd.append('file', normalized, normalized.name);
-      await api(`/api/gallery/${key}`, { method: 'POST', body: fd, silent: true });
+      fd.append('file', compressed, compressed.name);
+      await apiUpload(`/api/gallery/${key}`, fd, (pct) => {
+        if (btn) btn.textContent = `⏳ 上传中 ${pct}%`;
+      });
       ok += 1;
     } catch (err) {
       if (!firstError) firstError = err.message;

@@ -18,9 +18,27 @@ from .deps import get_current_user, require_api_key
 router = APIRouter(prefix="/api/gallery", tags=["gallery"])
 
 GALLERY_DIR = DATA_DIR / "gallery"
+THUMB_DIR = GALLERY_DIR / "thumbs"
 ALLOWED_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 MAX_SIZE = 20 * 1024 * 1024
 IMG_RE = r"^[a-f0-9]{32}\.(png|jpg|jpeg|webp|gif)$"
+
+
+def _make_thumb(src_path: Path, filename: str) -> str:
+    """生成 480px 缩略图（JPEG），失败时返回空串（列表回退用原图）。"""
+    try:
+        from PIL import Image
+
+        THUMB_DIR.mkdir(parents=True, exist_ok=True)
+        thumb_path = THUMB_DIR / f"{Path(filename).stem}.jpg"
+        with Image.open(src_path) as im:
+            im.thumbnail((480, 480))
+            if im.mode not in ("RGB", "L"):
+                im = im.convert("RGB")
+            im.save(thumb_path, "JPEG", quality=80)
+        return thumb_path.name
+    except Exception:
+        return ""
 
 
 def _items(db: Session, user: User, game: str) -> list[dict]:
@@ -34,6 +52,7 @@ def _items(db: Session, user: User, game: str) -> list[dict]:
         {
             "id": row.id,
             "url": f"/api/gallery/img/{row.filename}",
+            "thumb": f"/api/gallery/thumb/{row.filename}",
             "created_at": row.created_at.isoformat() if row.created_at else None,
         }
         for row in rows
@@ -59,7 +78,9 @@ async def upload_screenshot(
     folder = GALLERY_DIR / str(user.id) / game
     folder.mkdir(parents=True, exist_ok=True)
     filename = f"{uuid.uuid4().hex}{ext}"
-    (folder / filename).write_bytes(content)
+    src_path = folder / filename
+    src_path.write_bytes(content)
+    _make_thumb(src_path, filename)
     db.add(Screenshot(user_id=user.id, game=game, filename=filename))
     db.commit()
     return {"uploaded": True, "count": len(_items(db, user, game)), "items": _items(db, user, game)}
@@ -93,9 +114,25 @@ def delete_screenshot(
     if row is None:
         raise HTTPException(status_code=404, detail="截图不存在或无权删除")
     (GALLERY_DIR / str(user.id) / game / row.filename).unlink(missing_ok=True)
+    (THUMB_DIR / f"{Path(row.filename).stem}.jpg").unlink(missing_ok=True)
     db.delete(row)
     db.commit()
     return {"deleted": True, "count": len(_items(db, user, game))}
+
+
+@router.get("/thumb/{filename}")
+def serve_thumb(filename: str) -> FileResponse:
+    import re
+
+    if not re.fullmatch(IMG_RE, filename):
+        raise HTTPException(status_code=404, detail="无效图片")
+    thumb = THUMB_DIR / f"{Path(filename).stem}.jpg"
+    if not thumb.exists():
+        matches = list(GALLERY_DIR.rglob(filename))
+        if not matches:
+            raise HTTPException(status_code=404, detail="图片不存在")
+        return FileResponse(matches[0], media_type="image/jpeg")
+    return FileResponse(thumb, media_type="image/jpeg")
 
 
 @router.get("/img/{filename}")
