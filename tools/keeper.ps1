@@ -5,6 +5,7 @@ $mutex = New-Object System.Threading.Mutex($true, 'Global\SryaestartKeeper', [re
 if (-not $createdNew) { exit }
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $root = Split-Path -Parent $PSScriptRoot
+$dashRepo = Join-Path (Split-Path -Parent $root) 'sryaestart'
 $py = Join-Path $root '.venv\Scripts\python.exe'
 $data = Join-Path $root 'data'
 New-Item -ItemType Directory -Force -Path $data | Out-Null
@@ -58,7 +59,10 @@ function Start-Tunnel {
     if (-not $cf) { Log 'cloudflared not found'; return }
     $known = Get-KnownTunnelUrl
     if ($known) {
-        if (Test-Http ($known + '/api/games')) { return }
+        if (Test-Http ($known + '/api/games')) {
+            Publish-Pointer $known
+            return
+        }
         Log ('tunnel dead, restarting: ' + $known)
         Stop-Tunnels
     } else {
@@ -87,21 +91,29 @@ function Start-Tunnel {
 }
 
 function Publish-Pointer($url) {
-    $current = if (Test-Path -LiteralPath $pointer) { (Get-Content -LiteralPath $pointer -Raw).Trim() } else { '' }
     $json = '{"url":"' + $url + '"}'
-    if ($current -eq $json) { return }
-    Set-Content -LiteralPath $pointer -Value $json -Encoding UTF8
-    for ($i = 0; $i -lt 6; $i++) {
-        git -C $root add docs/current-server.json 2>$null
-        git -C $root -c user.name=Sryaestart -c user.email=sryaestart@localhost commit -m 'auto: update tunnel url' --only docs/current-server.json 2>$null
-        git -C $root push origin main 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            Log ('pointer published ' + $url)
-            return
+    $targets = @(
+        @{ repo = $root; file = 'docs/current-server.json' },
+        @{ repo = $dashRepo; file = 'current-server.json' }
+    )
+    foreach ($t in $targets) {
+        $pf = Join-Path $t.repo $t.file
+        if (-not (Test-Path -LiteralPath $pf)) { continue }
+        $current = (Get-Content -LiteralPath $pf -Raw).Trim()
+        if ($current -eq $json) { continue }
+        Set-Content -LiteralPath $pf -Value $json -Encoding UTF8
+        for ($i = 0; $i -lt 6; $i++) {
+            git -C $t.repo pull --rebase origin main 2>$null
+            git -C $t.repo add $t.file 2>$null
+            git -C $t.repo -c user.name=Sryaestart -c user.email=sryaestart@localhost commit -m 'auto: update tunnel url' --only $t.file 2>$null
+            git -C $t.repo push origin main 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                Log ('pointer published ' + $url + ' -> ' + $t.file)
+                break
+            }
+            Start-Sleep -Seconds 20
         }
-        Start-Sleep -Seconds 20
     }
-    Log 'pointer publish failed'
 }
 
 while ($true) {
