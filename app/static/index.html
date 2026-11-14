@@ -243,10 +243,10 @@
       </div>
 
       <form id="login-form" class="space-y-3">
-        <label class="text-xs text-slate-400">用户名 / 手机号<input id="li-account" class="field mt-1" placeholder="用户名或注册手机号" required /></label>
-        <label class="text-xs text-slate-400">密码<input id="li-password" type="password" class="field mt-1" placeholder="登录密码" required /></label>
+        <label class="text-xs text-slate-400">用户名 / 手机号<input id="li-account" class="field mt-1" placeholder="用户名或注册手机号" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required /></label>
+        <label class="text-xs text-slate-400">密码<input id="li-password" type="password" class="field mt-1" placeholder="登录密码" autocomplete="current-password" autocapitalize="off" spellcheck="false" required /></label>
         <p id="login-error" class="hidden rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs text-red-200"></p>
-        <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">登 录</button>
+        <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed">登 录</button>
       </form>
 
       <form id="register-form" class="hidden space-y-3">
@@ -254,7 +254,7 @@
         <div>
           <label class="text-xs text-slate-400">短信验证码</label>
           <div class="mt-1 flex gap-2">
-            <input id="re-code" class="field" inputmode="numeric" placeholder="6 位验证码" maxlength="6" required />
+            <input id="re-code" class="field" inputmode="numeric" autocomplete="one-time-code" placeholder="6 位验证码" maxlength="6" required />
             <button type="button" id="btn-send-code" class="shrink-0 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 text-sm text-cyan-200 hover:bg-cyan-400/20 transition disabled:opacity-50">发送验证码</button>
           </div>
         </div>
@@ -262,7 +262,7 @@
         <label class="text-xs text-slate-400">用户名<input id="re-username" class="field mt-1" placeholder="选填，默认自动生成「用户＋随机编号」" maxlength="24" /></label>
         <label class="text-xs text-slate-400">密码<input id="re-password" type="password" class="field mt-1" placeholder="至少 6 位" minlength="6" required /></label>
         <p id="register-error" class="hidden rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs text-red-200"></p>
-        <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:opacity-90 transition">注册并登录</button>
+        <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed">注册并登录</button>
       </form>
 
       <p class="mt-4 text-[11px] text-slate-600 leading-relaxed">· 注册即生成你的专属分享链接，用户名即档案名<br/>· 开发模式短信：验证码会直接显示在下方提示里（部署公网请接入真实短信服务）</p>
@@ -342,7 +342,7 @@
       var seg = location.pathname.split('/').filter(Boolean);
       var base = (seg.length >= 2 && seg[seg.length - 2] === 'share') ? '../' : './';
       var s = document.createElement('script');
-      s.src = base + 'app.js?v=18';
+      s.src = base + 'app.js?v=19';
       document.body.appendChild(s);
     })();
   </script>

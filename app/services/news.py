@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import re
+import hashlib
 import threading
 import time
 from datetime import datetime, timedelta, timezone
@@ -96,8 +97,11 @@ class MiyousheProvider:
             if isinstance(item, dict)
         ]
         official = [p for p in posts if (p.get("post_status") or {}).get("is_official")]
-        chosen = official if len(official) >= 3 else posts
-        chosen.sort(key=lambda p: p.get("created_at") or 0, reverse=True)
+        community = [p for p in posts if not (p.get("post_status") or {}).get("is_official")]
+        official.sort(key=lambda p: p.get("created_at") or 0, reverse=True)
+        community.sort(key=lambda p: p.get("created_at") or 0, reverse=True)
+        chosen = official + community
+
         items = []
         for post in chosen:
             post_id = post.get("post_id")
@@ -132,7 +136,19 @@ class KuroNewsProvider:
     TYPE_LABELS = {"52": "公告", "51": "新闻", "53": "活动"}
 
     def fetch(self, spec: GameSpec) -> list[dict]:
-        payload = _get_json(spec.news["json_url"])
+        urls = spec.news["json_url"]
+        if isinstance(urls, str):
+            urls = [urls]
+        payload = None
+        last_error = None
+        for url in urls:
+            try:
+                payload = _get_json(url)
+                break
+            except Exception as exc:  # noqa: BLE001
+                last_error = exc
+        if payload is None:
+            raise NewsSourceError(f"库洛官网资讯接口不可达: {last_error}")
         if not isinstance(payload, list):
             raise NewsSourceError("鸣潮官网资讯返回结构异常")
         articles = sorted(
@@ -169,9 +185,124 @@ class KuroNewsProvider:
         return items
 
 
+
+
+def _get_xml(url: str) -> str:
+    """独立的 RSS/Atom 网络入口，便于测试注入假响应。"""
+    with httpx.Client(timeout=TIMEOUT, headers={"User-Agent": USER_AGENT, "Accept": "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8"}) as client:
+        resp = client.get(url)
+        resp.raise_for_status()
+        return resp.text
+
+
+class RssProvider:
+    """通用 RSS / Atom 资讯聚合（游研社、机核等游戏媒体）。"""
+
+    name = "rss"
+    ATOM_NS = "{http://www.w3.org/2005/Atom}"
+
+    def fetch(self, spec: GameSpec) -> list[dict]:
+        import xml.etree.ElementTree as ET  # noqa: F401
+
+        urls = spec.news["rss_url"]
+        if isinstance(urls, str):
+            urls = [urls]
+        entries: list[dict] = []
+        last_error = None
+        for url in urls:
+            try:
+                entries = self._parse(_get_xml(url))
+                if entries:
+                    break
+            except Exception as exc:  # noqa: BLE001
+                last_error = exc
+        if not entries:
+            raise NewsSourceError(f"RSS 数据源不可用: {last_error}")
+
+        items = []
+        for entry in entries[:20]:
+            published = None
+            raw = (entry.get("pub") or "").strip()
+            if raw:
+                for fmt in ("%a, %d %b %Y %H:%M:%S %z", "%a, %d %b %Y %H:%M:%S %Z", "%Y-%m-%dT%H:%M:%S%z"):
+                    try:
+                        published = datetime.strptime(raw, fmt)
+                        break
+                    except ValueError:
+                        continue
+                if published is None and raw.endswith("Z"):
+                    try:
+                        published = datetime.strptime(raw, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                    except ValueError:
+                        published = None
+            link = entry.get("link") or ""
+            digest = hashlib.md5(link.encode("utf-8")).hexdigest()[:16] if link else re.sub(r"\\W+", "", (entry.get("title") or "")[:24])
+            items.append(
+                {
+                    "id": f"{spec.key}-{digest}",
+                    "game": spec.key,
+                    "title": (entry.get("title") or "").strip() or "无标题",
+                    "summary": _strip_html(entry.get("desc") or ""),
+                    "url": link,
+                    "cover": "",
+                    "published_at": _iso(published),
+                    "source": spec.news.get("source_label", "RSS"),
+                    "category": "资讯",
+                    "official": False,
+                }
+            )
+        return items
+
+    @staticmethod
+    def _parse(text: str) -> list[dict]:
+        import xml.etree.ElementTree as ET
+
+        root = ET.fromstring(text)
+        out: list[dict] = []
+
+        def find_text(node, *paths):
+            for path in paths:
+                el = node.find(path)
+                if el is not None and el.text and el.text.strip():
+                    return el.text.strip()
+            return ""
+
+        tag = root.tag.lower()
+        if "rss" in tag:
+            for item in root.iter("item"):
+                out.append(
+                    {
+                        "title": find_text(item, "title"),
+                        "link": find_text(item, "link", "guid"),
+                        "desc": find_text(item, "description", "{http://purl.org/rss/1.0/modules/content/}encoded"),
+                        "pub": find_text(item, "pubDate", "{http://purl.org/dc/elements/1.1/}date"),
+                    }
+                )
+        elif "feed" in tag:
+            for entry in root.iter(RssProvider.ATOM_NS + "entry"):
+                links = entry.findall(RssProvider.ATOM_NS + "link")
+                link = ""
+                for link_el in links:
+                    if link_el.get("rel") == "alternate" and link_el.get("href"):
+                        link = link_el.get("href")
+                        break
+                if not link and links:
+                    link = links[0].get("href") or ""
+                out.append(
+                    {
+                        "title": find_text(entry, RssProvider.ATOM_NS + "title"),
+                        "link": link,
+                        "desc": find_text(entry, RssProvider.ATOM_NS + "summary", RssProvider.ATOM_NS + "content"),
+                        "pub": find_text(entry, RssProvider.ATOM_NS + "published", RssProvider.ATOM_NS + "updated"),
+                    }
+                )
+        return out
+
+
 PROVIDERS: dict[str, object] = {
     "miyoushe": MiyousheProvider(),
     "kuro_site": KuroNewsProvider(),
+    "rss": RssProvider(),
 }
 
 

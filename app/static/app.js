@@ -150,11 +150,45 @@ const RESOURCE_LABELS = {
 };
 
 /* ---------- 基础工具 ---------- */
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const NETWORK_ERROR_TEXT =
+  '连不上看板服务：网络或隧道不稳定，已自动重试仍未成功。请再试一次；同一 WiFi 下用入口页的「⚡ 同一 WiFi 秒开」最快。';
+
+/* 国内连 Cloudflare 隧道实测约一半请求 TCP 直接超时，重试能把偶发失败挡在用户看不见的地方。 */
+async function fetchRetry(url, init, { attempts = 2, timeout = 0, onRetry } = {}) {
+  let lastError = null;
+  for (let i = 0; i < attempts; i += 1) {
+    const ctl = timeout ? new AbortController() : null;
+    const timer = ctl ? setTimeout(() => ctl.abort(), timeout) : null;
+    try {
+      return await fetch(url, ctl ? Object.assign({}, init, { signal: ctl.signal }) : init);
+    } catch (err) {
+      lastError = err;
+      if (i < attempts - 1) {
+        if (onRetry) onRetry(i + 2, attempts);
+        await sleep(400 * (i + 1));
+      }
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+  const err = new Error(NETWORK_ERROR_TEXT);
+  err.cause = lastError;
+  err.isNetwork = true;
+  throw err;
+}
+
 async function api(path, options = {}) {
   const headers = Object.assign({}, options.headers || {});
   if (apiKey) headers['X-API-Key'] = apiKey;
   if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-  const resp = await fetch(API_BASE + path, Object.assign({}, options, { headers }));
+  const isAuth = path.indexOf('/api/auth/') === 0;
+  const resp = await fetchRetry(API_BASE + path, Object.assign({}, options, { headers }), {
+    attempts: isAuth ? 3 : 2,
+    timeout: isAuth ? 8000 : 0,
+    onRetry: options.onRetry,
+  });
   if (resp.status === 401 && !options.retried) {
     let detail = '';
     try { detail = (await resp.json()).detail || ''; } catch (e) { /* ignore */ }
@@ -191,7 +225,7 @@ async function loadRegistry() {
 function buildGameTabs() {
   const box = $('#game-tabs');
   if (!box) return;
-  box.innerHTML = REGISTRY.map(
+  box.innerHTML = REGISTRY.filter((g) => !g.news_only).map(
     (g) => `<button type="button" data-game="${esc(g.key)}" class="game-tab rounded-xl border py-2.5 text-sm font-semibold transition ${g.key === editorGame ? 'border-violet-400/60 bg-gradient-to-r from-violet-500/30 to-cyan-500/30' : 'border-white/10 bg-white/5'}">${esc(g.emoji)} ${esc(g.label)}</button>`
   ).join('');
   box.querySelectorAll('.game-tab').forEach((btn) =>
@@ -325,17 +359,28 @@ document.querySelectorAll('[data-auth-close]').forEach((el) =>
 
 $('#login-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  const label = btn ? btn.textContent : '';
+  const errBox = $('#login-error');
+  errBox.classList.add('hidden');
+  if (btn) { btn.disabled = true; btn.textContent = '登录中…'; }
   try {
     const data = await api('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ account: $('#li-account').value.trim(), password: $('#li-password').value }),
       silent: true,
+      onRetry: (i, total) => {
+        errBox.textContent = `网络不稳定，正在重试（${i}/${total}）…`;
+        errBox.classList.remove('hidden');
+      },
     });
     enterSession(data);
   } catch (err) {
-    $('#login-error').textContent = err.message;
-    $('#login-error').classList.remove('hidden');
+    errBox.textContent = err.message;
+    errBox.classList.remove('hidden');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = label; }
   }
 });
 
@@ -359,17 +404,28 @@ $('#register-form')?.addEventListener('submit', async (e) => {
     $('#register-error').classList.remove('hidden');
     return;
   }
+  const btn = e.target.querySelector('button[type="submit"]');
+  const label = btn ? btn.textContent : '';
+  const errBox = $('#register-error');
+  errBox.classList.add('hidden');
+  if (btn) { btn.disabled = true; btn.textContent = '注册中…'; }
   try {
     const data = await api('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone, code, username: $('#re-username').value.trim(), password }),
       silent: true,
+      onRetry: (i, total) => {
+        errBox.textContent = `网络不稳定，正在重试（${i}/${total}）…`;
+        errBox.classList.remove('hidden');
+      },
     });
     enterSession(data);
   } catch (err) {
-    $('#register-error').textContent = err.message;
-    $('#register-error').classList.remove('hidden');
+    errBox.textContent = err.message;
+    errBox.classList.remove('hidden');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = label; }
   }
 });
 
@@ -441,7 +497,7 @@ function render(data) {
   $('#updated-at').textContent = data.updated_at ? `最后更新：${fmtTime(data.updated_at)}` : '';
 
   const games = data.games || {};
-  const keys = REGISTRY.map((g) => g.key);
+  const keys = REGISTRY.filter((g) => !g.news_only).map((g) => g.key);
   Object.keys(games).forEach((k) => { if (!keys.includes(k)) keys.push(k); });
   if (!keys.length) keys.push('hsr', 'wuwa');
 
@@ -1193,7 +1249,7 @@ function setBindStatus(message, ok = null) {
 function buildBindTabs() {
   const box = $('#bind-game-tabs');
   if (!box) return;
-  box.innerHTML = REGISTRY.map(
+  box.innerHTML = REGISTRY.filter((g) => !g.news_only).map(
     (g) => `<button type="button" data-bind-game="${esc(g.key)}" class="bind-tab rounded-xl border py-2 text-sm font-semibold transition">${esc(g.emoji)} ${esc(g.label)}</button>`
   ).join('');
   box.querySelectorAll('.bind-tab').forEach((btn) =>
