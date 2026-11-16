@@ -15,7 +15,7 @@ from .config import DATA_DIR, DATABASE_URL, OWNER_USERNAME, STATIC_DIR, UPLOAD_D
 from .database import Base, SessionLocal, engine
 from .models import Player, User
 from .security import hash_password
-from .routers import auth, checkin, gallery, games, launch, messages, news, profiles, public, settings, sync, uploads, usage
+from .routers import auth, checkin, gallery, games, launch, messages, news, profiles, public, settings, sync, system, uploads, usage
 
 logger = logging.getLogger("starwaves.bootstrap")
 
@@ -137,6 +137,7 @@ app.include_router(gallery.router)
 app.include_router(usage.router)
 app.include_router(checkin.router)
 app.include_router(messages.router)
+app.include_router(system.router)
 
 
 @app.get("/", include_in_schema=False)

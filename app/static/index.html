@@ -67,6 +67,7 @@
         <button id="btn-force-refresh" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition" title="绕过浏览器缓存强制重载页面">🧹 强制刷新</button>
         <button id="btn-add-game" class="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm text-emerald-200 hover:bg-emerald-400/20 transition">➕ 接入游戏</button>
         <button id="btn-bg" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition">🖼 背景</button>
+        <button id="btn-shutdown" class="hidden rounded-lg border border-red-400/30 bg-red-400/10 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm text-red-200 hover:bg-red-400/20 transition" title="远程关闭这台电脑">⏻ 远程关机</button>
         <button id="btn-share" class="rounded-lg border border-white/15 bg-white/5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm hover:bg-white/10 transition">🔗 分享主页</button>
         <button id="btn-update" class="rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:opacity-90 transition">⬆ 更新数据</button>
       </div>
@@ -193,6 +194,33 @@
     </div>
   </div>
 
+
+  <div id="shutdown-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-shutdown-close></div>
+    <div class="relative max-w-md mx-3 sm:mx-auto mt-[8vh] sm:mt-[20vh] rounded-2xl border border-white/10 bg-[#0b0f1d] p-4 sm:p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold">⏻ 远程关机</h3>
+        <button data-shutdown-close class="h-8 w-8 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition">✕</button>
+      </div>
+      <p class="text-xs text-slate-400 leading-relaxed mb-4">关机后这台电脑会下线，网站将暂时无法访问，需在电脑前重新开机。倒计时期间可随时取消。</p>
+      <label class="text-xs text-slate-400">关机倒计时
+        <select id="shutdown-delay" class="field mt-1">
+          <option value="30">30 秒</option>
+          <option value="60" selected>1 分钟</option>
+          <option value="300">5 分钟</option>
+          <option value="600">10 分钟</option>
+          <option value="1800">30 分钟</option>
+          <option value="3600">1 小时</option>
+        </select>
+      </label>
+      <p id="shutdown-status" class="hidden mt-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm"></p>
+      <div class="mt-4 flex gap-2 justify-end">
+        <button id="btn-shutdown-cancel" class="hidden rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-sm text-amber-200 hover:bg-amber-400/20 transition">中止关机</button>
+        <button data-shutdown-close class="rounded-xl border border-white/15 px-5 py-2 text-sm hover:bg-white/10 transition">关闭</button>
+        <button id="btn-shutdown-confirm" class="rounded-xl bg-gradient-to-r from-red-500 to-rose-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-red-500/25 hover:opacity-90 transition">开始关机</button>
+      </div>
+    </div>
+  </div>
   <div id="add-game-modal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-add-game-close></div>
     <div class="relative max-w-lg mx-3 sm:mx-auto mt-[2vh] sm:mt-[6vh] max-h-[92vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#0b0f1d] p-4 sm:p-6 shadow-2xl">
@@ -342,9 +370,10 @@
       var seg = location.pathname.split('/').filter(Boolean);
       var base = (seg.length >= 2 && seg[seg.length - 2] === 'share') ? '../' : './';
       var s = document.createElement('script');
-      s.src = base + 'app.js?v=19';
+      s.src = base + 'app.js?v=20';
       document.body.appendChild(s);
     })();
   </script>
 </body>
 </html>
+

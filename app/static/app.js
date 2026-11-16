@@ -487,7 +487,7 @@ function render(data) {
     if (data.user) updateAuthUI(data.user);
     $('#admin-actions').classList.remove('hidden');
     $('#admin-actions').classList.add('flex');
-    ['btn-add-game', 'btn-bg'].forEach((id) => {
+    ['btn-add-game', 'btn-bg', 'btn-shutdown'].forEach((id) => {
       const el = $(id);
       if (el) el.classList.toggle('hidden', !OWNER);
     });
@@ -1599,6 +1599,96 @@ async function launchGame(btn) {
   }
 }
 
+/* ---------- 远程关机 ---------- */
+let shutdownTimer = null;
+
+$('#btn-shutdown')?.addEventListener('click', () => {
+  $('#shutdown-modal').classList.remove('hidden');
+  syncShutdownUI();
+});
+
+document.querySelectorAll('[data-shutdown-close]').forEach((el) =>
+  el.addEventListener('click', () => $('#shutdown-modal').classList.add('hidden'))
+);
+
+function syncShutdownUI() {
+  const pending = Number(localStorage.getItem('sw_shutdown_deadline') || 0);
+  const confirmBtn = $('#btn-shutdown-confirm');
+  const cancelBtn = $('#btn-shutdown-cancel');
+  const status = $('#shutdown-status');
+  if (pending > Date.now()) {
+    if (confirmBtn) confirmBtn.classList.add('hidden');
+    if (cancelBtn) cancelBtn.classList.remove('hidden');
+    startShutdownCountdown(pending);
+  } else {
+    if (confirmBtn) confirmBtn.classList.remove('hidden');
+    if (cancelBtn) cancelBtn.classList.add('hidden');
+    if (status) status.classList.add('hidden');
+    if (shutdownTimer) { clearInterval(shutdownTimer); shutdownTimer = null; }
+  }
+}
+
+$('#btn-shutdown-confirm')?.addEventListener('click', async () => {
+  const btn = $('#btn-shutdown-confirm');
+  const delay = Number($('#shutdown-delay').value) || 60;
+  btn.disabled = true;
+  btn.textContent = '发送中…';
+  try {
+    const data = await api('/api/system/shutdown', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ delay_seconds: delay }),
+    });
+    localStorage.setItem('sw_shutdown_deadline', String(Date.now() + (data.delay_seconds || delay) * 1000));
+    toast('⏻ 关机已安排，倒计时期间可中止');
+    syncShutdownUI();
+    setTimeout(() => { btn.disabled = false; btn.textContent = '开始关机'; }, 2000);
+  } catch (err) {
+    toast(err.message, false);
+    btn.disabled = false;
+    btn.textContent = '开始关机';
+  }
+});
+
+$('#btn-shutdown-cancel')?.addEventListener('click', async () => {
+  const btn = $('#btn-shutdown-cancel');
+  btn.disabled = true;
+  btn.textContent = '中止中…';
+  try {
+    await api('/api/system/cancel-shutdown', { method: 'POST' });
+    localStorage.removeItem('sw_shutdown_deadline');
+    toast('关机已中止');
+    syncShutdownUI();
+    btn.disabled = false;
+    btn.textContent = '中止关机';
+  } catch (err) {
+    toast(err.message, false);
+    btn.disabled = false;
+    btn.textContent = '中止关机';
+  }
+});
+
+function startShutdownCountdown(deadline) {
+  if (shutdownTimer) clearInterval(shutdownTimer);
+  const status = $('#shutdown-status');
+  const tick = () => {
+    const left = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+    if (status) {
+      status.textContent = `⏻ 电脑将在 ${fmtSeconds(left)} 后关机，期间可中止。`;
+      status.className = 'mt-3 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200';
+      status.classList.remove('hidden');
+    }
+    if (left <= 0) {
+      clearInterval(shutdownTimer);
+      shutdownTimer = null;
+      localStorage.removeItem('sw_shutdown_deadline');
+      syncShutdownUI();
+    }
+  };
+  tick();
+  shutdownTimer = setInterval(tick, 1000);
+}
+
 /* ---------- 背景设置 ---------- */
 $('#btn-bg')?.addEventListener('click', () => {
   $('#bg-modal').classList.remove('hidden');
@@ -1693,3 +1783,4 @@ if (GATEWAY_MODE) {
   applyBackground();
   load();
 }
+
