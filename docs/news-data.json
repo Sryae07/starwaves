@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-19T19:14:35.011639+00:00",
+ "generated_at": "2026-11-19T22:00:19.295471+00:00",
  "games": [
   {
    "key": "hsr",
@@ -54,6 +54,234 @@
  ],
  "items": [
   {
+   "id": "genshin-79670609",
+   "game": "genshin",
+   "title": "原神公告对于角色的标注可能是：角色称号·角色姓名（角色属性）",
+   "summary": "如：博闻异旅·莉奈娅（岩）",
+   "url": "https://www.miyoushe.com/ys/article/79670609",
+   "cover": "",
+   "published_at": "2026-11-19T22:00:04+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "genshin-79670605",
+   "game": "genshin",
+   "title": "ꉂ(ˊᗜˋ*).｡oO",
+   "summary": "(＾▽＾)b ↻(＾_＾) ☆⌒(≧▽​° )⌒☆",
+   "url": "https://www.miyoushe.com/ys/article/79670605",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/296272742/b245ccfd3438889cc3f437607abfe4a3_7064461378113832460.jpg",
+   "published_at": "2026-11-19T21:57:16+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "genshin-79670602",
+   "game": "genshin",
+   "title": "为木偶攒原石的第二十七天",
+   "summary": "",
+   "url": "https://www.miyoushe.com/ys/article/79670602",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/338209389/7f96c507ae685a4a9d73307cec9b44e4_412551322249253749.jpg",
+   "published_at": "2026-11-19T21:56:51+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "genshin-79670596",
+   "game": "genshin",
+   "title": "看到朋友有对象",
+   "summary": "真的好羡慕 我也想要对象 为啥我母胎单身到现在 不是建模问题 也不是经济问题 呜呜呜",
+   "url": "https://www.miyoushe.com/ys/article/79670596",
+   "cover": "",
+   "published_at": "2026-11-19T21:54:25+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79670578",
+   "game": "hi3",
+   "title": "致以无瑕之人 爱莉希雅 芽衣",
+   "summary": "爱莉希雅 芽衣 致以无瑕之人 往昔的记忆",
+   "url": "https://www.miyoushe.com/bh3/article/79670578",
+   "cover": "",
+   "published_at": "2026-11-19T21:48:30+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79670554",
+   "game": "hi3",
+   "title": "枣 赏 豪",
+   "summary": "",
+   "url": "https://www.miyoushe.com/bh3/article/79670554",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/323751079/7192bfb6117232692c9004ed283f3771_5333305579707878147.png",
+   "published_at": "2026-11-19T21:43:15+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79670516",
+   "game": "hi3",
+   "title": "爱符华的第八百六十天",
+   "summary": "",
+   "url": "https://www.miyoushe.com/bh3/article/79670516",
+   "cover": "",
+   "published_at": "2026-11-19T21:28:45+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "genshin-79670469",
+   "game": "genshin",
+   "title": "怎么不多搞点应用",
+   "summary": "",
+   "url": "https://www.miyoushe.com/ys/article/79670469",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/6785618/3b366dab9566df08c4cc86d719ae564d_2417498068675381505.jpg",
+   "published_at": "2026-11-19T21:14:40+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79670433",
+   "game": "hi3",
+   "title": "琪亚娜",
+   "summary": "画师：lana cavendish",
+   "url": "https://www.miyoushe.com/bh3/article/79670433",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/10/447561020/c203272c480de913cdbf717d485d1a5c_1212951183683468382.jpg",
+   "published_at": "2026-11-19T20:58:28+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "genshin-79670397",
+   "game": "genshin",
+   "title": "宝宝们",
+   "summary": "好想要你们的抱抱啊",
+   "url": "https://www.miyoushe.com/ys/article/79670397",
+   "cover": "",
+   "published_at": "2026-11-19T20:47:09+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "bh2-79670326",
+   "game": "bh2",
+   "title": "上下俩池子值得抽吗？",
+   "summary": "",
+   "url": "https://www.miyoushe.com/bh2/article/79670326",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/284760684/9d7dcd68fffae273e39b9d96d450035b_9206908198828332033.jpg",
+   "published_at": "2026-11-19T20:24:11+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "bh2-79670314",
+   "game": "bh2",
+   "title": "全人物GET★DAZE",
+   "summary": "全星灵满练还差亿点点",
+   "url": "https://www.miyoushe.com/bh2/article/79670314",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/320263366/07a1ca56ae40e69638a6ec0a64710fdf_699538479425564704.jpg",
+   "published_at": "2026-11-19T20:19:40+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79670231",
+   "game": "hi3",
+   "title": "早上好",
+   "summary": "",
+   "url": "https://www.miyoushe.com/bh3/article/79670231",
+   "cover": "",
+   "published_at": "2026-11-19T19:56:19+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79670165",
+   "game": "hi3",
+   "title": "无标题",
+   "summary": "瑟莉姆老婆太美了",
+   "url": "https://www.miyoushe.com/bh3/article/79670165",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/402499213/770b8347579dcbb4f06ee0c550913b94_7462682177359498122.jpg",
+   "published_at": "2026-11-19T19:33:51+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79670143",
+   "game": "hi3",
+   "title": "让我看看这么晚还有多少小朋友没睡觉哇",
+   "summary": "我捉！嘿嘿，被我逮到了吧∽( ˘ ³˘)❤ 已经很晚了，快去睡觉吧:D 明天要有个好新奇喔ᕦ(ò_óˇ)ᕤ",
+   "url": "https://www.miyoushe.com/bh3/article/79670143",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/398564031/9ead99c824138c6d5ca6fb1914a59496_8004851099154931916.gif",
+   "published_at": "2026-11-19T19:30:00+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "genshin-79670141",
+   "game": "genshin",
+   "title": "我感到无力",
+   "summary": "一直打不出伤害，以为有别的路能出去，找了一圈发现没有... 为啥空隙那么大的围栏能把人困住... 感觉再来两个旅行者也能同时钻出去（）",
+   "url": "https://www.miyoushe.com/ys/article/79670141",
+   "cover": "",
+   "published_at": "2026-11-19T19:28:32+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79670134",
+   "game": "hi3",
+   "title": "牛逼牛逼",
+   "summary": "米哈游卖的充电宝会不会太高级了？",
+   "url": "https://www.miyoushe.com/bh3/article/79670134",
+   "cover": "",
+   "published_at": "2026-11-19T19:27:52+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "bh2-79670118",
+   "game": "bh2",
+   "title": "这是魔女的爆率？",
+   "summary": "那么代价是？（）",
+   "url": "https://www.miyoushe.com/bh2/article/79670118",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/383147511/cda15d039cdec5539d8f7676b894d80e_4813803516537187055.jpg",
+   "published_at": "2026-11-19T19:24:34+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79670110",
+   "game": "hi3",
+   "title": "挂机到100级了",
+   "summary": "无聊，把小游戏挂机到100级了。居然100级就是上限。也没个怪给我打看看输出。觉得自己闲到没边了，每次上线到后面把这个活动翻出来。",
+   "url": "https://www.miyoushe.com/bh3/article/79670110",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/324080432/0b2d93aece0be426dc13fc6210650138_2786898887701458520.jpg",
+   "published_at": "2026-11-19T19:21:39+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
    "id": "hi3-79670077",
    "game": "hi3",
    "title": "不是我NPC呢？",
@@ -61,66 +289,6 @@
    "url": "https://www.miyoushe.com/bh3/article/79670077",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/302484603/d38c7226239d302ca31af847376cb983_2971608076369397742.png",
    "published_at": "2026-11-19T19:14:18+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "genshin-79670074",
-   "game": "genshin",
-   "title": "她，要钓沃吗？",
-   "summary": "",
-   "url": "https://www.miyoushe.com/ys/article/79670074",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/353451868/1cd4b1e6b54619cd33d7eabdd0dd55ff_6151531806844943346.png",
-   "published_at": "2026-11-19T19:13:08+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "genshin-79670073",
-   "game": "genshin",
-   "title": "有什么刷地图好用的配队吗？",
-   "summary": "目前是烟绯八重神子提纳里和芭芭拉",
-   "url": "https://www.miyoushe.com/ys/article/79670073",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/367257623/45e4466841ac2674b6f2b65229856bf5_4044701234036439087.jpg",
-   "published_at": "2026-11-19T19:12:34+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "genshin-79670067",
-   "game": "genshin",
-   "title": "没想到嘞",
-   "summary": "用岩主凹了这么久始终差一点，结果换成叶洛亚就过了，失策了失策了",
-   "url": "https://www.miyoushe.com/ys/article/79670067",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/284697834/0484b28f006d47149a097bcf34ef625b_6787272862448707914.jpg",
-   "published_at": "2026-11-19T19:10:42+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "genshin-79670064",
-   "game": "genshin",
-   "title": "讨厌七圣月绽放的第114514天",
-   "summary": "",
-   "url": "https://www.miyoushe.com/ys/article/79670064",
-   "cover": "",
-   "published_at": "2026-11-19T19:10:13+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "genshin-79670035",
-   "game": "genshin",
-   "title": "不会做枪战游戏可以不用做",
-   "summary": "原神这个枪战配上剧情强制转视角，给我晕3D干出来了。真的太难绷了，不玩还过不了剧情探索不了",
-   "url": "https://www.miyoushe.com/ys/article/79670035",
-   "cover": "",
-   "published_at": "2026-11-19T19:00:41+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -174,18 +342,6 @@
    "official": false
   },
   {
-   "id": "hi3-79669747",
-   "game": "hi3",
-   "title": "每日一遍",
-   "summary": "我永远喜欢梅比乌斯",
-   "url": "https://www.miyoushe.com/bh3/article/79669747",
-   "cover": "",
-   "published_at": "2026-11-19T18:04:34+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
    "id": "bh2-79669653",
    "game": "bh2",
    "title": "半夜抽这么概率吗",
@@ -205,18 +361,6 @@
    "url": "https://www.miyoushe.com/bh2/article/79669572",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/192898644/07ca31bfd93c00d1b40c5d3580ca8df2_6199974264728435565.png",
    "published_at": "2026-11-19T17:40:07+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "genshin-79669253",
-   "game": "genshin",
-   "title": "好不容易打完第三间，第二间数值不够啊。",
-   "summary": "",
-   "url": "https://www.miyoushe.com/ys/article/79669253",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/437930108/760705c7f620f474a624155ce03f14d6_1088997490999612465.jpg",
-   "published_at": "2026-11-19T17:09:20+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -270,6 +414,18 @@
    "official": false
   },
   {
+   "id": "genshin-79668680",
+   "game": "genshin",
+   "title": "我是个很专一的入",
+   "summary": "比如只钟爱崩崩那样的熟男…",
+   "url": "https://www.miyoushe.com/ys/article/79668680",
+   "cover": "",
+   "published_at": "2026-11-19T16:29:57+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
    "id": "bh2-79668548",
    "game": "bh2",
    "title": "我打不过了我就只能拿个伤害最高的硬打",
@@ -294,42 +450,6 @@
    "official": false
   },
   {
-   "id": "bh2-79668258",
-   "game": "bh2",
-   "title": "装备迭代第一步",
-   "summary": "百连三只，还行，我们来看看音乐会什么时候up",
-   "url": "https://www.miyoushe.com/bh2/article/79668258",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/73766872/02f89967075b6dab7d5bca6dc1aae1d8_8348871037883440345.jpg",
-   "published_at": "2026-11-19T16:11:13+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "hi3-79668042",
-   "game": "hi3",
-   "title": "我培养了一个神！",
-   "summary": "Ok啊各位舰长们，我也是闲到不行，天天领取小活动的挂机经验，终于，也是在今晚，成功培养了一个神！ 希儿，一百级，海神！！！（量子之海(≖֊≖)）",
-   "url": "https://www.miyoushe.com/bh3/article/79668042",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/81601489/21e0c3438d51f460cb553be3ada8990d_2827709213474587595.jpg",
-   "published_at": "2026-11-19T16:04:55+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "hi3-79667997",
-   "game": "hi3",
-   "title": "晚安💤",
-   "summary": "早上好",
-   "url": "https://www.miyoushe.com/bh3/article/79667997",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/20/411905435/7d9a3762e18697cb53cc480d7f177c73_7619371809054134904.png",
-   "published_at": "2026-11-19T16:03:56+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
    "id": "hi3-79667800",
    "game": "hi3",
    "title": "晚安💤956",
@@ -337,6 +457,18 @@
    "url": "https://www.miyoushe.com/bh3/article/79667800",
    "cover": "",
    "published_at": "2026-11-19T16:00:27+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "genshin-79667688",
+   "game": "genshin",
+   "title": "洛！",
+   "summary": "给洛儿攒原石的第五十九天",
+   "url": "https://www.miyoushe.com/ys/article/79667688",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/281421480/c3191de31c76d31fc6121a2b6a099c4b_2585079542117041979.jpg",
+   "published_at": "2026-11-19T15:56:32+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -378,30 +510,6 @@
    "official": false
   },
   {
-   "id": "genshin-79665152",
-   "game": "genshin",
-   "title": "今天联机打周本，打完其它人都退了",
-   "summary": "只有我去领奖励",
-   "url": "https://www.miyoushe.com/ys/article/79665152",
-   "cover": "",
-   "published_at": "2026-11-19T13:38:07+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "genshin-79664786",
-   "game": "genshin",
-   "title": "奥黛塔",
-   "summary": "",
-   "url": "https://www.miyoushe.com/ys/article/79664786",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/272867065/5687709456ac014f02dde965ea2bb64f_465889962206336033.jpg",
-   "published_at": "2026-11-19T13:14:21+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
    "id": "tot-79664783",
    "game": "tot",
    "title": "无标题",
@@ -409,18 +517,6 @@
    "url": "https://www.miyoushe.com/wd/article/79664783",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/165317485/7b5a80d0872fb27709f459897476f5fc_900019538646094854.jpg",
    "published_at": "2026-11-19T13:14:09+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "bh2-79664730",
-   "game": "bh2",
-   "title": "琪亚娜手偶到了",
-   "summary": "可爱捏",
-   "url": "https://www.miyoushe.com/bh2/article/79664730",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/282647181/8be9a42cf4a54b48a423b5e784d6572e_3499383508621833978.jpg",
-   "published_at": "2026-11-19T13:10:49+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -438,13 +534,13 @@
    "official": false
   },
   {
-   "id": "genshin-79663696",
+   "id": "genshin-79663119",
    "game": "genshin",
-   "title": "还有2年就要出去了",
-   "summary": "还是自己学点别的吧 土木已经不行了，我也不想去工地 考研应该是不用考虑，英语太差了",
-   "url": "https://www.miyoushe.com/ys/article/79663696",
-   "cover": "",
-   "published_at": "2026-11-19T11:59:15+00:00",
+   "title": "无标题",
+   "summary": "",
+   "url": "https://www.miyoushe.com/ys/article/79663119",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/393002801/300f0a02d2d4b905a478aede24ef777e_7017204335621488284.jpg",
+   "published_at": "2026-11-19T11:15:22+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -462,25 +558,25 @@
    "official": false
   },
   {
-   "id": "bh2-79663069",
-   "game": "bh2",
-   "title": "魔女特别祈愿丨燃星秘匣",
-   "summary": "✨ 本期魔女特别祈愿装备： 燃星秘匣 冥夜士气章·凯恩战术 *燃星秘匣为角色蒂亚拉专属的特化武装，尚未拥有蒂亚拉时，首次抽取可以直接获得蒂亚拉。已获得蒂亚拉后，获取燃星秘匣时可以同",
-   "url": "https://www.miyoushe.com/bh2/article/79663069",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/281637557/e227a3e9ed4204ecbd44f164ab0ebe0e_9168019071310381573.png",
-   "published_at": "2026-11-19T11:11:05+00:00",
+   "id": "genshin-79662396",
+   "game": "genshin",
+   "title": "五万整的原石",
+   "summary": "为了卡刚刚好五万就差八块原石我去满探须弥找了半个小时 今天还是我生日祝我生日快乐",
+   "url": "https://www.miyoushe.com/ys/article/79662396",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/317469709/fdeb062b6ad7ef99188275adc8bdddc2_227866826846156539.png",
+   "published_at": "2026-11-19T10:21:36+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
   },
   {
-   "id": "genshin-79662354",
+   "id": "genshin-79662072",
    "game": "genshin",
-   "title": "椰羊成就今天终于更新了",
+   "title": "助窝破鼎——",
    "summary": "",
-   "url": "https://www.miyoushe.com/ys/article/79662354",
-   "cover": "",
-   "published_at": "2026-11-19T10:18:16+00:00",
+   "url": "https://www.miyoushe.com/ys/article/79662072",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/343336725/85852a624b446a78e9752f608295033c_5151810501063878510.jpg",
+   "published_at": "2026-11-19T09:55:04+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -582,13 +678,13 @@
    "official": false
   },
   {
-   "id": "hi3-79660615",
-   "game": "hi3",
-   "title": "求求了，下次能不能弹窗提示啊",
-   "summary": "已经不是第一次，甚至应该不是第二次了",
-   "url": "https://www.miyoushe.com/bh3/article/79660615",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/7628439/048d0494760eec21d0b630825aac7410_3761369993540774350.png",
-   "published_at": "2026-11-19T07:35:45+00:00",
+   "id": "genshin-79661324",
+   "game": "genshin",
+   "title": "˶ᗜ ֊ ᗜ˶ಣ",
+   "summary": "(＾▽＾)b ↻(＾_＾) ☆⌒(≧▽​° )⌒☆",
+   "url": "https://www.miyoushe.com/ys/article/79661324",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/296272742/89d6b2ae3a04c8705621c3369e409048_6488261635191631364.jpg",
+   "published_at": "2026-11-19T08:48:11+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -618,13 +714,13 @@
    "official": false
   },
   {
-   "id": "hi3-79658160",
-   "game": "hi3",
-   "title": "无标题",
-   "summary": "10周年代币没换咋办，我记得这玩意不都是版本末期才过期吗，800给我换成8w星石了",
-   "url": "https://www.miyoushe.com/bh3/article/79658160",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/15583393/fd0044d570c2ac4dd7dd0395f9c87b63_3197601458211662865.jpg",
-   "published_at": "2026-11-19T03:52:30+00:00",
+   "id": "genshin-79658923",
+   "game": "genshin",
+   "title": "˶ᗜ ֊ ᗜ˶ಣ",
+   "summary": "(＾▽＾)b ↻(＾_＾) ☆⌒(≧▽​° )⌒☆",
+   "url": "https://www.miyoushe.com/ys/article/79658923",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/296272742/55b06911b2b1ea131bc3efd04d436f70_150063841958291471.jpg",
+   "published_at": "2026-11-19T04:54:01+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -651,18 +747,6 @@
    "published_at": "2026-11-19T02:10:00+00:00",
    "source": "机核",
    "category": "资讯",
-   "official": false
-  },
-  {
-   "id": "hi3-79656460",
-   "game": "hi3",
-   "title": "上古老登问一下",
-   "summary": "这个后来复刻过吗",
-   "url": "https://www.miyoushe.com/bh3/article/79656460",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/19/10965482/b53e3233f66d9bf56d084de34f89c233_4735980782248707616.jpg",
-   "published_at": "2026-11-19T01:30:38+00:00",
-   "source": "米游社",
-   "category": "社区",
    "official": false
   },
   {
@@ -699,6 +783,18 @@
    "published_at": "2026-11-19T00:30:00+00:00",
    "source": "机核",
    "category": "资讯",
+   "official": false
+  },
+  {
+   "id": "genshin-79655418",
+   "game": "genshin",
+   "title": "关于法器重击",
+   "summary": "",
+   "url": "https://www.miyoushe.com/ys/article/79655418",
+   "cover": "",
+   "published_at": "2026-11-18T23:43:40+00:00",
+   "source": "米游社",
+   "category": "社区",
    "official": false
   },
   {
@@ -822,18 +918,6 @@
    "official": false
   },
   {
-   "id": "hi3-79649826",
-   "game": "hi3",
-   "title": "难道爱莉和小薇是新的官配？",
-   "summary": "昨天拿到新的活动圣痕，今天翻了翻圣痕发现之前的活动圣痕都是官配的一对，而爱莉和薇塔是新的双人上位圣痕内容，马上薇塔要出dlc，爱莉和薇塔有没有可能是新的官配",
-   "url": "https://www.miyoushe.com/bh3/article/79649826",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/18/307570762/fb001c742d02cf47f797a3e3b67e80eb_5738863901129399916.jpg",
-   "published_at": "2026-11-18T14:28:01+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
    "id": "gcores-23484f2fed9b8404",
    "game": "gcores",
    "title": "上海谍战风云录 第九期丨信仰无声",
@@ -843,18 +927,6 @@
    "published_at": "2026-11-18T13:00:00+00:00",
    "source": "机核",
    "category": "资讯",
-   "official": false
-  },
-  {
-   "id": "hi3-79648059",
-   "game": "hi3",
-   "title": "哥们，别凹了",
-   "summary": "超过我了，打成第一了还在凹，提那3分不容易吧",
-   "url": "https://www.miyoushe.com/bh3/article/79648059",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/18/180445364/76c52ed8cada809d1bc46c6da4512176_7680701543598000960.jpg",
-   "published_at": "2026-11-18T12:48:06+00:00",
-   "source": "米游社",
-   "category": "社区",
    "official": false
   },
   {
@@ -1014,18 +1086,6 @@
    "official": true
   },
   {
-   "id": "hi3-79639442",
-   "game": "hi3",
-   "title": "协同者不是本来就不能操控吗？",
-   "summary": "为什么测试服还要单独说明呢",
-   "url": "https://www.miyoushe.com/bh3/article/79639442",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/18/341478495/3d1de43c3fc941ace509c0b50e66e711_3265671955135951267.jpg",
-   "published_at": "2026-11-18T02:37:21+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
    "id": "tot-79639298",
    "game": "tot",
    "title": "🐝",
@@ -1038,13 +1098,13 @@
    "official": false
   },
   {
-   "id": "genshin-79635098",
-   "game": "genshin",
-   "title": "这是毫茂吗",
-   "summary": "",
-   "url": "https://www.miyoushe.com/ys/article/79635098",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/18/316454006/9a8815522eb858d9c79b09285ba6d323_1638068108099979499.jpg",
-   "published_at": "2026-11-17T16:38:53+00:00",
+   "id": "bh2-79638153",
+   "game": "bh2",
+   "title": "满级哩，满级记录",
+   "summary": "24年8月1号入坑，26年11月18号满级，耗时不到一坤年 氪了200 没冲过阵营战，用小号冲过一次 就水瓶跟娃娃能秒15血10-",
+   "url": "https://www.miyoushe.com/bh2/article/79638153",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/18/186456291/4b38a13b241c2f009ae5e7e430082d1c_3218896680232234067.jpg",
+   "published_at": "2026-11-18T00:33:27+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -1086,6 +1146,30 @@
    "official": true
   },
   {
+   "id": "hsr-79627699",
+   "game": "hsr",
+   "title": "恢复色彩的魔术 | 星穹铁道公益第三卷画作展示",
+   "summary": "这场魔术没有标准答案，每一片彩色的天空下都绽放出了温暖的颜色。 谢谢每一位落笔的你。 如果你很难过，没关系，我们在这里陪着你~ 「群星沉默不语，但我说，要有笑声。」 [图",
+   "url": "https://www.miyoushe.com/hsr/article/79627699",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/17/288909600/e8e69904ec310f4da37b6e7ac3d8339b_8202873911268170733.png",
+   "published_at": "2026-11-17T10:00:13+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79627697",
+   "game": "hsr",
+   "title": "【工具更新】「末日幻影•领航冥茫」阵容推荐现已更新",
+   "summary": "开拓者好呜，「末日幻影•领航冥茫」已经开启，「阵容推荐」工具也迎来了相应的更新。 开拓者可以前往「阵容推荐」查找合适的阵容配队攻略或上传自己的独家阵容，快来使用吧~ >>点击使用【阵容推荐】",
+   "url": "https://www.miyoushe.com/hsr/article/79627697",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/17/288909601/3e443799ed68b2e7ab9e9f6971c45f50_6939017469388389249.png",
+   "published_at": "2026-11-17T10:00:11+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "yystv-76ff52ac806ea22f",
    "game": "yystv",
    "title": "【观赛预约】和QUQU线下看CS高校决赛：是黑马奇迹，还是宿命对决？",
@@ -1095,18 +1179,6 @@
    "published_at": "2026-11-17T09:00:00+00:00",
    "source": "游研社",
    "category": "资讯",
-   "official": false
-  },
-  {
-   "id": "genshin-79625199",
-   "game": "genshin",
-   "title": "做完任务以后冰龙翅膀就不发光了喵！",
-   "summary": "还没有做旧基捷城任务的猫猫， 要记得先来这里美美拍照呀",
-   "url": "https://www.miyoushe.com/ys/article/79625199",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/17/308858624/0cfc41b66105b4f201f989e1ab2084c3_3693792619364307695.png",
-   "published_at": "2026-11-17T06:25:24+00:00",
-   "source": "米游社",
-   "category": "社区",
    "official": false
   },
   {
@@ -1122,42 +1194,6 @@
    "official": false
   },
   {
-   "id": "genshin-79621322",
-   "game": "genshin",
-   "title": "拖尾全收集",
-   "summary": "这拖尾关卡也设计得太难了吧！特别有些0+0，没给皇冠的角色，真的是要凹好久呀",
-   "url": "https://www.miyoushe.com/ys/article/79621322",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/17/198480674/de6cc8caf5bc8ca5eac5b0781ede3685_2447623119407361691.png",
-   "published_at": "2026-11-17T01:18:01+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "bh2-79621116",
-   "game": "bh2",
-   "title": "萌新马上满级了，要注意什么",
-   "summary": "",
-   "url": "https://www.miyoushe.com/bh2/article/79621116",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/17/186456291/a6aaca99c51ec3c7896b2628beed6ec6_6224358381615111904.jpg",
-   "published_at": "2026-11-17T00:59:58+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "hi3-79616713",
-   "game": "hi3",
-   "title": "氵",
-   "summary": "",
-   "url": "https://www.miyoushe.com/bh3/article/79616713",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/13/296141053/3db5ebd1b032c175774868f4e7b555a8_1588256051714464617.jpg",
-   "published_at": "2026-11-16T16:04:44+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
    "id": "yystv-b9c5be127b54c3b8",
    "game": "yystv",
    "title": "网易《哈利波特：魔法觉醒》宣布停运，月流水曾超11亿元",
@@ -1170,6 +1206,18 @@
    "official": false
   },
   {
+   "id": "genshin-79616133",
+   "game": "genshin",
+   "title": "满星梦破碎了",
+   "summary": "彩虹史莱姆怎么这么阴间啊，我的满星梦破碎了（兹白队金不够）",
+   "url": "https://www.miyoushe.com/ys/article/79616133",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/16/330132808/0e6361d09800982befb44ff702270704_7584146667713898465.png",
+   "published_at": "2026-11-16T15:50:45+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
    "id": "tot-79612427",
    "game": "tot",
    "title": "🤗小陆神图有了!",
@@ -1177,18 +1225,6 @@
    "url": "https://www.miyoushe.com/wd/article/79612427",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/16/288211875/5705190ed9752f8e47c777ec0cca3b16_3491285967891231341.jpg",
    "published_at": "2026-11-16T13:06:13+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "genshin-79605684",
-   "game": "genshin",
-   "title": "世界树？那是老黄历了",
-   "summary": "我们现在都用的阿如",
-   "url": "https://www.miyoushe.com/ys/article/79605684",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/16/370916673/133cd7db4783cf5d374720838f85fa4d_882358995589083483.jpg",
-   "published_at": "2026-11-16T06:08:04+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -1206,13 +1242,25 @@
    "official": true
   },
   {
-   "id": "genshin-79603328",
-   "game": "genshin",
-   "title": "7.2深渊留档",
-   "summary": "这史莱姆到底是谁的专怪啊……我寻思这用月结晶也不怎么好打啊……试了几个队伍，最后还是用娜维娅肘过去……以及攒了260抽抽叶洛亚满命，跳了米提亚，结果幽境v5就打不过了……",
-   "url": "https://www.miyoushe.com/ys/article/79603328",
-   "cover": "",
-   "published_at": "2026-11-16T03:47:35+00:00",
+   "id": "hi3-79596055",
+   "game": "hi3",
+   "title": "氵",
+   "summary": "",
+   "url": "https://www.miyoushe.com/bh3/article/79596055",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/15/296141053/ebd51befc741cb742683aea215d21975_1171220888130105426.jpg",
+   "published_at": "2026-11-15T16:06:53+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hi3-79596041",
+   "game": "hi3",
+   "title": "氵",
+   "summary": "",
+   "url": "https://www.miyoushe.com/bh3/article/79596041",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/15/296141053/6975bc3353271001fbdd711ebd418cbd_5486906578076133482.png",
+   "published_at": "2026-11-15T16:06:37+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -1242,13 +1290,49 @@
    "official": false
   },
   {
-   "id": "genshin-79577481",
+   "id": "genshin-79587940",
    "game": "genshin",
-   "title": "臭杯子",
+   "title": "至冬生物图鉴",
+   "summary": "至冬新的生物在哪里？",
+   "url": "https://www.miyoushe.com/ys/article/79587940",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/15/164186686/cff9bbd1aecd2ca10b1f6ffc07d24a67_8620599107527391731.jpg",
+   "published_at": "2026-11-15T09:06:53+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "genshin-79586688",
+   "game": "genshin",
+   "title": "我很好奇，这个东西，你们是怎么刮死的，有点废角色",
    "summary": "",
-   "url": "https://www.miyoushe.com/ys/article/79577481",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/15/442289532/b34411c1afef35f4c11b091ec06f824a_2535117931543366368.jpg",
-   "published_at": "2026-11-14T19:48:58+00:00",
+   "url": "https://www.miyoushe.com/ys/article/79586688",
+   "cover": "",
+   "published_at": "2026-11-15T07:53:47+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hsr-79582592",
+   "game": "hsr",
+   "title": "绒绒号番外剧场最终回：模糊二维马真面目",
+   "summary": "《苍天航路绒绒号》最终回——「模糊二维马真面目…」 「真是被看扁了呢~」",
+   "url": "https://www.miyoushe.com/hsr/article/79582592",
+   "cover": "",
+   "published_at": "2026-11-15T04:00:13+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "genshin-79579603",
+   "game": "genshin",
+   "title": "幽境危战N5凹了三天，终于过了！",
+   "summary": "练米提亚主C手法练了几天也过不去，干脆老老实实给轮椅🦽木偶当副C居然一下子过了 手残党还是别玩花式操作了，有轮椅就别耍杂技了",
+   "url": "https://www.miyoushe.com/ys/article/79579603",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/15/294548351/f8a275d3200c548c00ef8177c64fea65_8392890469241299327.jpg",
+   "published_at": "2026-11-15T00:58:16+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -1290,6 +1374,30 @@
    "official": false
   },
   {
+   "id": "hsr-79560385",
+   "game": "hsr",
+   "title": "谷帕谷帕 | 不死途可动人偶实物展示",
+   "summary": "《崩坏：星穹铁道》「不死途可动人偶」实物展示登场！除本体外，服饰、配件、手型、底座一应俱全，更附3张可替换表情脸任意搭配。全身上下拥有多达17个可动关节，随心换装即可打造丰富造型。产品已在官方周边店铺",
+   "url": "https://www.miyoushe.com/hsr/article/79560385",
+   "cover": "",
+   "published_at": "2026-11-14T04:00:16+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79560380",
+   "game": "hsr",
+   "title": "欢迎来到乐园 | 来自点星船的邀请函",
+   "summary": "社长大人！黑心社长寄来了请柬，说是要邀请全报社的狸猫都去参观点星船呶~ 狸猫们已经洗得香喷喷，就等社长大人发话呶！",
+   "url": "https://www.miyoushe.com/hsr/article/79560380",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/13/288909600/125cfdc66f7c19563d01e73d5a5c24c2_2215274060453359755.jpg",
+   "published_at": "2026-11-14T04:00:13+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "tot-79559074",
    "game": "tot",
    "title": "初代小狼！登场！",
@@ -1297,18 +1405,6 @@
    "url": "https://www.miyoushe.com/wd/article/79559074",
    "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/13/277922464/c6df359f886ef8a32ac17fcbf885f64d_147940442863855293.png",
    "published_at": "2026-11-14T02:44:22+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
-  },
-  {
-   "id": "genshin-79554989",
-   "game": "genshin",
-   "title": "米提亚到底怎么输出",
-   "summary": "这个dps怎么这么低呀？而且他手感并不是很流畅会有点罚站，还有他za之后离怪那么远，强迫症如我总想跑近点有没有… 配置21米提亚1命瓦列里（太可怜了我四星又又又比五星难抽了），21奥黛塔",
-   "url": "https://www.miyoushe.com/ys/article/79554989",
-   "cover": "",
-   "published_at": "2026-11-13T18:43:48+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
@@ -1326,16 +1422,64 @@
    "official": false
   },
   {
-   "id": "genshin-79542458",
-   "game": "genshin",
-   "title": "175",
-   "summary": "",
-   "url": "https://www.miyoushe.com/ys/article/79542458",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/13/330513582/560622ab68f35786c78066fade816348_3968556926730319005.jpg",
-   "published_at": "2026-11-13T07:51:09+00:00",
+   "id": "hsr-79539576",
+   "game": "hsr",
+   "title": "【有奖活动】重生之我在货币战争当主角",
+   "summary": "重来一世，开拓者誓要拿回属于自己的一切！「货币战争」第二赛季「入画奇航」已然开张，开拓者快带着前世的记忆再战一回~开局就有「奇遇伙伴」赶来帮忙，还能钦点员工赋予「主角光环」……这哪里是投资模",
+   "url": "https://www.miyoushe.com/hsr/article/79539576",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/13/288909601/34fa9cab0462ff1c912e2cb5f26b1aa9_1890181466770176811.png",
+   "published_at": "2026-11-13T04:30:16+00:00",
    "source": "米游社",
-   "category": "社区",
-   "official": false
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "wuwa-5794",
+   "game": "wuwa",
+   "title": "《鸣潮》3.8版本「旧梦凋零的百合」全平台活动开启！",
+   "summary": "参与活",
+   "url": "https://mc.kurogames.com/main/news/detail/5794",
+   "cover": "",
+   "published_at": "2026-11-12T07:42:39+00:00",
+   "source": "鸣潮官网",
+   "category": "活动",
+   "official": true
+  },
+  {
+   "id": "hsr-79519029",
+   "game": "hsr",
+   "title": "听歌领80星琼！歌曲「无中生有」音乐活动正式上线",
+   "summary": "亲爱的开拓者： 二相乐园全新音乐专辑「神说要有笑（下篇）」——全新音乐H5现已正式上线。专辑包含与「贪欢的神颅」的战斗背景音乐《无中生有 Ex Nihilo》，欢迎各位开拓者前往QQ音乐、",
+   "url": "https://www.miyoushe.com/hsr/article/79519029",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/12/288909600/cf43271587e4e14e78f9ae8e4e06f087_9041291641978263618.jpg",
+   "published_at": "2026-11-12T05:00:05+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "wuwa-5779",
+   "game": "wuwa",
+   "title": "「旧梦凋零的百合」3.8版本内容说明",
+   "summary": "<img style=\"dis",
+   "url": "https://mc.kurogames.com/main/news/detail/5779",
+   "cover": "",
+   "published_at": "2026-11-11T09:47:44+00:00",
+   "source": "鸣潮官网",
+   "category": "公告",
+   "official": true
+  },
+  {
+   "id": "hsr-79489221",
+   "game": "hsr",
+   "title": "此刻，将群星付之一笑丨4.7版本攻略征集活动",
+   "summary": "亲爱的开拓者： 4.7版本「此刻，将群星付之一笑」上线啦！「货币战争•入画奇航」、「剧场版绒绒号：欢闹厨房」等活动玩法等待开拓者前往体验~ 4.7版本攻略征集活动也于今日正式开启！ [图",
+   "url": "https://www.miyoushe.com/hsr/article/79489221",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/11/288909601/b376037606e947136a6e7746e726142a_4997229060994008495.png",
+   "published_at": "2026-11-11T04:30:13+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
   },
   {
    "id": "zzz-79488227",
@@ -1347,6 +1491,78 @@
    "published_at": "2026-11-11T04:00:16+00:00",
    "source": "米游社",
    "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79488214",
+   "game": "hsr",
+   "title": "动画短片：「月下的欢快葬礼」",
+   "summary": "遥遥致意，远道而来的客人， 「何不尝试，再次开始一场游戏，再次品味其中痛苦，再次为其无情而颤动，再次在内心的地狱徘徊，往返多次，然后你终将会将这游戏玩得更好，也终将学会笑。」 不欢迎你的，阿哈",
+   "url": "https://www.miyoushe.com/hsr/article/79488214",
+   "cover": "",
+   "published_at": "2026-11-11T04:00:12+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79468685",
+   "game": "hsr",
+   "title": "您有一份「模糊二维马」的遗产请查收（备注：不动产）",
+   "summary": "让《苍天航路绒绒号》烂尾？抱歉，最富责任心的伟大漫画家「模糊二维马」非但做不到，还要画出个美食剧场版！ 她给你留下了一笔亟待继承的遗产，想要得到它，就得先完成这篇旷世奇作，不过，「画」漫画",
+   "url": "https://www.miyoushe.com/hsr/article/79468685",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/09/288909600/d9cf3dac85ec0528ee10fff21d506228_1717106008047241111.png",
+   "published_at": "2026-11-10T06:00:10+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "zzz-79467092",
+   "game": "zzz",
+   "title": "3.3版本「商城」上新说明",
+   "summary": "亲爱的绳匠： 3.3版本下期更新后，「商城」好物上新！ 「今日穿搭」代理人时装上新 【时装[赛维里安·肃仪无犯]】 • 在售时间：永久 • 折扣时间：2026/11/11 12:00 ~",
+   "url": "https://www.miyoushe.com/zzz/article/79467092",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/10/152039148/f1ee4e1f036ca9abb36e07543533d9ff_4867412314085219592.png",
+   "published_at": "2026-11-10T04:00:16+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79466344",
+   "game": "hsr",
+   "title": "4.7版本活动跃迁（其一）",
+   "summary": "亲爱的开拓者： 限定5星角色「星神★阿哈（欢愉•量子）」与限定5星光锥「当第一声『阿哈』响起（欢愉）」跃迁成功概率限时提升，4星角色「艾丝妲（同谐•火）」「玲可（丰饶•量子）」「驭空（同谐•虚数）」与",
+   "url": "https://www.miyoushe.com/hsr/article/79466344",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/09/288909600/252c9a39132d51e473280abe9613e500_8166715106670397818.png",
+   "published_at": "2026-11-10T03:00:12+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "wuwa-5755",
+   "game": "wuwa",
+   "title": "《鸣潮》共鸣者「莉莉」PV |  忘记恐惧",
+   "summary": "<div class=\"vi",
+   "url": "https://mc.kurogames.com/main/news/detail/5755",
+   "cover": "",
+   "published_at": "2026-11-09T11:43:28+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
+   "official": true
+  },
+  {
+   "id": "wuwa-5748",
+   "game": "wuwa",
+   "title": "《鸣潮》版本资讯 | 3.8版本「旧梦凋零的百合」11月12日即将更新",
+   "summary": "<div dat",
+   "url": "https://mc.kurogames.com/main/news/detail/5748",
+   "cover": "",
+   "published_at": "2026-11-09T07:24:23+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
    "official": true
   },
   {
@@ -1374,6 +1590,18 @@
    "official": true
   },
   {
+   "id": "hsr-79427010",
+   "game": "hsr",
+   "title": "星神★阿哈角色PV：「让骰子飞」",
+   "summary": "「你这妙计叫什么名字？」 「打BOSS，直接用BOSS打——此计名为BOSS直拼。」 中文CV： 星神★阿哈——子音 男开拓者——秦且歌 来古士——赵君毅 银狼——Hanser 黄泉——菊花花",
+   "url": "https://www.miyoushe.com/hsr/article/79427010",
+   "cover": "",
+   "published_at": "2026-11-08T04:00:20+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "tot-79413873",
    "game": "tot",
    "title": "发发左然大公～",
@@ -1386,27 +1614,27 @@
    "official": false
   },
   {
-   "id": "zzz-79408483",
+   "id": "zzz-79408361",
    "game": "zzz",
-   "title": "《绝区零》☆Zenless LIVE 2026——FES专场",
-   "summary": "《绝区零》☆Zenless LIVE 2026——FES专场 情报公开 ▼ 活动时间 2026年11月27日-11月29日 ▼ 开票时间 FES+ZLIVE套票：11月12日18:0",
-   "url": "https://www.miyoushe.com/zzz/article/79408483",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/07/152039148/85477268dfbf0788bc28dea6f6b0b77a_4558917653510478530.jpg",
-   "published_at": "2026-11-07T09:35:09+00:00",
+   "title": "《绝区零》2026 FES | 布梦嘉年华 情报公开",
+   "summary": "《绝区零》2026 FES | 布梦嘉年华 情报公开 绳匠，现在为您奉上《绝区零》2026 FES 最新情报！ 一起来见证这场盛会的惊喜吧！ ▼ 活动时间 2026年11月27日-1",
+   "url": "https://www.miyoushe.com/zzz/article/79408361",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/07/152039148/bb267a9b98f73cf8e295be54442692ea_8229631932265242995.png",
+   "published_at": "2026-11-07T09:30:10+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
   },
   {
-   "id": "zzz-79403314",
-   "game": "zzz",
-   "title": "「禁罪囚笼」音擎展示视频",
-   "summary": "「禁罪囚笼」调频活动即将开启， 2026/11/11 12:00 ~ 2026/12/01 14:59，限定S级音擎[禁罪囚笼(强攻)]调频获取概率up！ *开发中版本，具体效果请以正式上线内容为准。",
-   "url": "https://www.miyoushe.com/zzz/article/79403314",
+   "id": "wuwa-5733",
+   "game": "wuwa",
+   "title": "《鸣潮》共鸣者战斗演示 | 莉莉",
+   "summary": "<div class=\"vi",
+   "url": "https://mc.kurogames.com/main/news/detail/5733",
    "cover": "",
-   "published_at": "2026-11-07T05:00:11+00:00",
-   "source": "米游社",
-   "category": "官方",
+   "published_at": "2026-11-07T09:16:57+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
    "official": true
   },
   {
@@ -1422,6 +1650,42 @@
    "official": true
   },
   {
+   "id": "wuwa-5723",
+   "game": "wuwa",
+   "title": "《鸣潮》3.8版本更新维护预告",
+   "summary": "<img style=\"dis",
+   "url": "https://mc.kurogames.com/main/news/detail/5723",
+   "cover": "",
+   "published_at": "2026-11-06T14:17:42+00:00",
+   "source": "鸣潮官网",
+   "category": "公告",
+   "official": true
+  },
+  {
+   "id": "wuwa-5715",
+   "game": "wuwa",
+   "title": "《鸣潮》3.8版本PV | 旧梦凋零的百合",
+   "summary": "<div class=\"vi",
+   "url": "https://mc.kurogames.com/main/news/detail/5715",
+   "cover": "",
+   "published_at": "2026-11-06T09:57:24+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
+   "official": true
+  },
+  {
+   "id": "hsr-79379485",
+   "game": "hsr",
+   "title": "恢复色彩的魔术 | 星穹铁道公益第三卷",
+   "summary": "马老师发现了一幅失去色彩、用普通颜料难以上色的画。 她用恢复魔术，找到了灰白世界的其中一种可能性…… 「有些时候，颜色会暂时躲起来。没关系，它们不是消失了；慢一点、再慢一点，总会有重新被",
+   "url": "https://www.miyoushe.com/hsr/article/79379485",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/06/288909600/d3961f338c0963a2053abbc9683a8755_7592702489600579087.png",
+   "published_at": "2026-11-06T05:00:13+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "zzz-79378420",
    "game": "zzz",
    "title": "《绝区零》赛维里安角色展示 | 督察是怎样练成的",
@@ -1429,6 +1693,54 @@
    "url": "https://www.miyoushe.com/zzz/article/79378420",
    "cover": "",
    "published_at": "2026-11-06T04:00:15+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "wuwa-5699",
+   "game": "wuwa",
+   "title": "《鸣潮》服饰PV | 月沉霜",
+   "summary": "<div class=\"vi",
+   "url": "https://mc.kurogames.com/main/news/detail/5699",
+   "cover": "",
+   "published_at": "2026-11-06T03:34:26+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
+   "official": true
+  },
+  {
+   "id": "hsr-79355049",
+   "game": "hsr",
+   "title": "阿哈的抓马小曲",
+   "summary": "阿哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈。",
+   "url": "https://www.miyoushe.com/hsr/article/79355049",
+   "cover": "",
+   "published_at": "2026-11-05T04:00:13+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79336086",
+   "game": "hsr",
+   "title": "星神★阿哈特别展览活动即将开启！",
+   "summary": "亲爱的开拓者，星神★阿哈特别展览活动将于11月11日正式开启！欢迎开拓者前往打卡，共赴阿哈时刻！ ▌听着，是「miHAYo」 「米哈游的哈，其实是阿哈的哈。」 ▌看好，是「阿哈镜」",
+   "url": "https://www.miyoushe.com/hsr/article/79336086",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/03/288909600/84d63f1d8d125509a8015f5f43a11f01_5058862481831740241.png",
+   "published_at": "2026-11-04T10:00:13+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79329511",
+   "game": "hsr",
+   "title": "光锥前瞻 | 4.7版本「此刻，将群星付之一笑」",
+   "summary": "开拓者好呀，一起来看看4.7版本「此刻，将群星付之一笑」新增的光锥「在世界尽头相会吧！（欢愉）」~",
+   "url": "https://www.miyoushe.com/hsr/article/79329511",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/03/288909600/6af0996fb34f70ec458ada05416c181f_6248270572314371450.jpg",
+   "published_at": "2026-11-04T05:00:10+00:00",
    "source": "米游社",
    "category": "官方",
    "official": true
@@ -1458,6 +1770,66 @@
    "official": true
   },
   {
+   "id": "hsr-79328659",
+   "game": "hsr",
+   "title": "【有奖活动】星神会客厅 | 星神★阿哈：V我愿力，封你令使！",
+   "summary": "开拓者好呜！随着幻月游戏重新开幕，与贪饕决战马上就要来临了呜。不过在此危急时刻，小呜呜突然收到了一封神秘的来信—— 小浣熊！是我，星神★阿哈 (｡•̀ᴗ-)✧ 先声明：归寂在奥博洛斯肚子",
+   "url": "https://www.miyoushe.com/hsr/article/79328659",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/03/288909601/8a6d1fea26b9979edb441bf4adc9dfc5_4910584871115683672.png",
+   "published_at": "2026-11-04T04:30:09+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79327798",
+   "game": "hsr",
+   "title": "即兴巡演PV：「当阿哈来敲门」",
+   "summary": "假如生活欺骗了你，不要悲伤，不要心急—— 在每一个沮丧的时刻，阿哈都在注视着你。 中文CV： 星神★阿哈——子音",
+   "url": "https://www.miyoushe.com/hsr/article/79327798",
+   "cover": "",
+   "published_at": "2026-11-04T04:00:13+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "hsr-79326259",
+   "game": "hsr",
+   "title": "星神前瞻 | 星神★阿哈",
+   "summary": "开拓者好呀~今天为大家带来星神「星神★阿哈（欢愉•量子）」与光锥「当第一声『阿哈』响起（欢愉）」的前瞻！",
+   "url": "https://www.miyoushe.com/hsr/article/79326259",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/03/288909600/bb05d2d6d86ace6e154cc421f8b83414_6069428107341340465.png",
+   "published_at": "2026-11-04T03:00:12+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
+   "id": "genshin-79318827",
+   "game": "genshin",
+   "title": "抽4张小月卡（折现）",
+   "summary": "在该帖下评论视为参与，重复评论无效，不用关注我，但是至少把私信打开，中奖后会发帖@以及私信通知，折现方式可v或Q或支，其他方式也可以再商量。 评论后我会按顺序发号码，后续采用随机摇号抽奖（因为创作者还",
+   "url": "https://www.miyoushe.com/ys/article/79318827",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2026/11/03/393002801/4ed3fd2699c3dfb80e9535f2e5816e63_87913743298809384.jpg",
+   "published_at": "2026-11-03T15:40:10+00:00",
+   "source": "米游社",
+   "category": "社区",
+   "official": false
+  },
+  {
+   "id": "hsr-79308007",
+   "game": "hsr",
+   "title": "走近星穹：「星神★阿哈：为了拖稿竟说自己是星神？」",
+   "summary": "《苍天航路绒绒号•第一部》宣告完结后，我们特别寻访了一些社会知名人士，听听他们对此事的看法。 「首席催稿官」真小珠：「提问：何时连载第二部？我在二相乐园城郊买了一块田地，种了很多豆橛子，连载重启之日，",
+   "url": "https://www.miyoushe.com/hsr/article/79308007",
+   "cover": "",
+   "published_at": "2026-11-03T04:00:15+00:00",
+   "source": "米游社",
+   "category": "官方",
+   "official": true
+  },
+  {
    "id": "zzz-79287542",
    "game": "zzz",
    "title": "生日快乐柚叶丨接连金",
@@ -1468,18 +1840,6 @@
    "source": "米游社",
    "category": "官方",
    "official": true
-  },
-  {
-   "id": "genshin-79244858",
-   "game": "genshin",
-   "title": "给你们看看什么是真正的xp党",
-   "summary": "一张图吓哭你们 二编：统一回复一下，其实我是来展示奇偶的 xp的话主要是木偶 薇斯纳 千织（你们敢选千织吗）",
-   "url": "https://www.miyoushe.com/ys/article/79244858",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/10/31/462034563/6b697e38ec62899c049e75274f4a1a14_6210895877374041875.jpg",
-   "published_at": "2026-10-31T14:09:10+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
   },
   {
    "id": "tot-79176019",
@@ -1566,16 +1926,148 @@
    "official": true
   },
   {
-   "id": "hi3-78224823",
-   "game": "hi3",
-   "title": "【同人】崩坏前文明，但光之纽带（14）",
-   "summary": "昔望大步冲向黑潮，这片奔涌在大地上的黑液仍在肆意扩张，仿佛要将整个长空市吞噬殆尽。它像一张从地底缓缓张开的巨口，正在把地上的一切拖入深渊。那些遗留在地表的建筑残骸颤抖着缓缓下沉，如同被卷入流沙之中。",
-   "url": "https://www.miyoushe.com/bh3/article/78224823",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2026/09/17/304572816/6d96a651701b6eaae06683109ce152ea_418940622600776681.png",
-   "published_at": "2026-09-17T06:35:39+00:00",
-   "source": "米游社",
-   "category": "社区",
-   "official": false
+   "id": "wuwa-5655",
+   "game": "wuwa",
+   "title": "《鸣潮》共鸣者「锁暝」PV | 契阔",
+   "summary": "<div dat",
+   "url": "https://mc.kurogames.com/main/news/detail/5655",
+   "cover": "",
+   "published_at": "2026-10-20T02:12:11+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
+   "official": true
+  },
+  {
+   "id": "wuwa-5650",
+   "game": "wuwa",
+   "title": "《鸣潮》共鸣者战斗演示 | 锁暝",
+   "summary": "<div data-zone-id=\"0",
+   "url": "https://mc.kurogames.com/main/news/detail/5650",
+   "cover": "",
+   "published_at": "2026-10-18T02:38:19+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
+   "official": true
+  },
+  {
+   "id": "wuwa-5594",
+   "game": "wuwa",
+   "title": "《鸣潮》3.7版本「镜锁妄世，心照红尘」全平台活动开启！",
+   "summary": "参与活",
+   "url": "https://mc.kurogames.com/main/news/detail/5594",
+   "cover": "",
+   "published_at": "2026-09-30T09:08:24+00:00",
+   "source": "鸣潮官网",
+   "category": "活动",
+   "official": true
+  },
+  {
+   "id": "wuwa-5569",
+   "game": "wuwa",
+   "title": "「镜锁妄世，心照红尘」3.7版本内容说明",
+   "summary": "<img style=\"dis",
+   "url": "https://mc.kurogames.com/main/news/detail/5569",
+   "cover": "",
+   "published_at": "2026-09-29T10:07:50+00:00",
+   "source": "鸣潮官网",
+   "category": "公告",
+   "official": true
+  },
+  {
+   "id": "wuwa-5563",
+   "game": "wuwa",
+   "title": "《鸣潮》鸿蒙版正式上线说明",
+   "summary": "<div data-page-id=\"K",
+   "url": "https://mc.kurogames.com/main/news/detail/5563",
+   "cover": "",
+   "published_at": "2026-09-29T08:44:46+00:00",
+   "source": "鸣潮官网",
+   "category": "公告",
+   "official": true
+  },
+  {
+   "id": "wuwa-5531",
+   "game": "wuwa",
+   "title": "《鸣潮》版本资讯 | 3.7版本「镜锁妄世，心照红尘」9月30日即将更新",
+   "summary": "<div sty",
+   "url": "https://mc.kurogames.com/main/news/detail/5531",
+   "cover": "",
+   "published_at": "2026-09-28T07:19:41+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
+   "official": true
+  },
+  {
+   "id": "wuwa-5522",
+   "game": "wuwa",
+   "title": "《鸣潮》共鸣者「心」PV | 梦阑珊",
+   "summary": "<div class=\"vi",
+   "url": "https://mc.kurogames.com/main/news/detail/5522",
+   "cover": "",
+   "published_at": "2026-09-28T02:39:02+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
+   "official": true
+  },
+  {
+   "id": "wuwa-5517",
+   "game": "wuwa",
+   "title": "《鸣潮》共鸣者战斗演示 | 心",
+   "summary": "<div class=\"vi",
+   "url": "https://mc.kurogames.com/main/news/detail/5517",
+   "cover": "",
+   "published_at": "2026-09-24T12:48:35+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
+   "official": true
+  },
+  {
+   "id": "wuwa-5478",
+   "game": "wuwa",
+   "title": "关于客户端资源分级功能的相关说明",
+   "summary": "<div data-page-id=\"H",
+   "url": "https://mc.kurogames.com/main/news/detail/5478",
+   "cover": "",
+   "published_at": "2026-09-23T12:12:45+00:00",
+   "source": "鸣潮官网",
+   "category": "公告",
+   "official": true
+  },
+  {
+   "id": "wuwa-5477",
+   "game": "wuwa",
+   "title": "《鸣潮》3.7版本更新维护预告",
+   "summary": "<table style=\"",
+   "url": "https://mc.kurogames.com/main/news/detail/5477",
+   "cover": "",
+   "published_at": "2026-09-23T02:01:36+00:00",
+   "source": "鸣潮官网",
+   "category": "公告",
+   "official": true
+  },
+  {
+   "id": "wuwa-5457",
+   "game": "wuwa",
+   "title": "《鸣潮》3.7版本PV | 镜锁妄世，心照红尘",
+   "summary": "<div data-zone-id=\"0",
+   "url": "https://mc.kurogames.com/main/news/detail/5457",
+   "cover": "",
+   "published_at": "2026-09-19T08:49:58+00:00",
+   "source": "鸣潮官网",
+   "category": "新闻",
+   "official": true
+  },
+  {
+   "id": "wuwa-4954",
+   "game": "wuwa",
+   "title": "角色唤取活动（各版本通用）概率公示",
+   "summary": "温馨�",
+   "url": "https://mc.kurogames.com/main/news/detail/4954",
+   "cover": "",
+   "published_at": "2026-07-01T04:25:19+00:00",
+   "source": "鸣潮官网",
+   "category": "公告",
+   "official": true
   },
   {
    "id": "tot-74985000",
@@ -1590,38 +2082,38 @@
    "official": false
   },
   {
-   "id": "bh2-64333714",
-   "game": "bh2",
-   "title": "记录下自己满破的装备和抽卡记录",
-   "summary": "",
-   "url": "https://www.miyoushe.com/bh2/article/64333714",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2025/05/11/662681/3e74c8321b42697d25f40ff0753e7299_7091698708632895291.jpg",
-   "published_at": "2025-05-11T07:47:46+00:00",
+   "id": "hi3-64529279",
+   "game": "hi3",
+   "title": "崩坏三后崩二缇米朵",
+   "summary": "今天心血来潮突然又打开了后崩二，才发现一个被遗忘的角色缇米朵，话说有生之年还能看到她实装嘛",
+   "url": "https://www.miyoushe.com/bh3/article/64529279",
+   "cover": "https://upload-bbs.miyoushe.com/upload/2025/05/19/156372677/e22acbf7454ff760398d762f8a5d2410_1833438614848733792.jpg",
+   "published_at": "2025-05-19T03:25:17+00:00",
    "source": "米游社",
    "category": "社区",
    "official": false
   },
   {
-   "id": "hi3-46190823",
-   "game": "hi3",
-   "title": "怀念吗各位大佬",
-   "summary": "",
-   "url": "https://www.miyoushe.com/bh3/article/46190823",
-   "cover": "https://upload-bbs.miyoushe.com/upload/2023/12/04/229254775/3b9ba6e2190b0c6b1588f5ff159eb536_3403008530574948566.jpg",
-   "published_at": "2023-12-04T05:52:18+00:00",
+   "id": "bh2-74819",
+   "game": "bh2",
+   "title": "【集中水楼】小伙伴们，让水淹没这个帖子吧",
+   "summary": "为了防止大量水帖淹没学园，同时也希望提供给大家一个畅所欲言的地方，有什么想水的尽管冲着这个帖来！ 各位可以在这里，随便唠嗑，水水经验，但是也要合理发言哦， 感",
+   "url": "https://www.miyoushe.com/bh2/article/74819",
+   "cover": "",
+   "published_at": "2019-06-19T12:30:36+00:00",
    "source": "米游社",
-   "category": "社区",
-   "official": false
+   "category": "官方",
+   "official": true
   }
  ],
  "sources": {
   "hsr": {
    "name": "米游社",
-   "error": "获取失败: timed out"
+   "error": null
   },
   "wuwa": {
    "name": "鸣潮官网",
-   "error": "获取失败: 库洛官网资讯接口不可达: timed out"
+   "error": null
   },
   "zzz": {
    "name": "米游社",
